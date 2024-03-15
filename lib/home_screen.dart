@@ -1,10 +1,15 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:frontend/feedback/feedback_screen.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool light = false;
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +104,65 @@ class HomePage extends StatelessWidget {
                             color: const Color(0xFF374AA3).withOpacity(0.5),
                             blurRadius: 4,
                             offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 15.0,
+                              horizontal: 23.0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween, // 양쪽으로 정렬
+                              children: [
+                                const Column(
+                                  crossAxisAlignment: CrossAxisAlignment
+                                      .start, // 보유 가게와 부제목을 맞게 정렬
+                                  children: [
+                                    Text(
+                                      '보유 가게',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 12),
+                                    Text(
+                                      '보유하신 가게 전체 확인 가능합니다',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Color(0xFFC6C2C2),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Transform.scale(
+                                  scale: 1.2,
+                                  child: Switch(
+                                    value: light,
+                                    activeColor: const Color(0xFFD6D6F8),
+                                    onChanged: (bool value) {
+                                      setState(() {
+                                        light = value;
+                                      });
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {},
+                            child: const Text(
+                              '가게별 시간 설정',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
                         ],
                       ),
