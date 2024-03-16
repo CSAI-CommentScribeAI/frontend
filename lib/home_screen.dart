@@ -9,7 +9,180 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<Map<String, dynamic>> storeList = [
+    {
+      "title": "BBQ 코엑스점",
+      "style": const TextStyle(
+        color: Colors.black,
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+      "showCircle": false,
+    },
+    {
+      "title": "이남장 서초점",
+      "style": const TextStyle(
+        color: Colors.black,
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+      "showCircle": false,
+    },
+  ];
   bool light = false;
+
+  Widget circle() {
+    return Padding(
+      padding: const EdgeInsets.only(right: 21.0),
+      child: Container(
+        width: 12,
+        height: 12,
+        decoration: BoxDecoration(
+          color: const Color(0xFF7B88C2),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+    );
+  }
+
+  void chooseStore(BuildContext context) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
+      builder: (BuildContext context) {
+        // showModalBottomSheet 위젯에서 setState 처리할 때 사용
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter bottomState) {
+            // StateSetter bottomState 이름은 바꾸셔서 사용하실 수 있습니다.
+            // 예를 들어, myState, subState 같이요!
+
+            // 모달 내부 영역
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * 0.4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(31.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          '보유가게',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // 보유 가게 리스트
+                  // Column 위젯의 높이가 자식 위젯들의 높이보다 작아서 발생을 막기 위해 사용(Expanded)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                      // Listview를 쓸 때 자주 발생하는 오류를 막기 위해 singlechildscrollview 함수 사용
+                      // Column 자체를 스크롤하게끔 하는 코드 (SingleChildScrollView)
+                      child: SingleChildScrollView(
+                        physics: const ScrollPhysics(),
+                        child: Column(
+                          children: [
+                            ListView.separated(
+                              shrinkWrap: true, // child 크기만큼만 높이를 정해줌
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: storeList.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final store = storeList[index];
+                                return ListTile(
+                                  onTap: () {
+                                    // bottomState만 적용하면 bottomSheet 값은 즉시 반영되지만 parent 값은 변경되지 않음
+                                    // 그래서 꼭 setState()를 같이 추가해주어야 함
+                                    bottomState(() {
+                                      setState(() {
+                                        // 선택한 가게의 인덱스를 받아 index(선택 가게 인덱스)와 i값이 일치하면 true
+                                        // 나머지 가게는 false
+                                        for (int i = 0;
+                                            i < storeList.length;
+                                            i++) {
+                                          if (i == index) {
+                                            storeList[i]["showCircle"] = true;
+                                          } else {
+                                            storeList[i]["showCircle"] = false;
+                                          }
+                                        }
+                                      });
+                                    });
+                                  },
+                                  title: Text(
+                                    store["title"],
+                                    style: store["style"],
+                                  ),
+                                  trailing:
+                                      store["showCircle"] ? circle() : null,
+                                );
+                              },
+                              separatorBuilder:
+                                  (BuildContext context, int index) {
+                                return const Divider();
+                              },
+                            ),
+                            Transform.translate(
+                              offset: const Offset(0, -20.0),
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: ElevatedButton.icon(
+                                  onPressed: () {},
+                                  icon: const Icon(Icons.add),
+                                  label: const Text(
+                                    '가게 등록',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF7B88C2),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    shadowColor: Colors.white.withOpacity(0.25),
+                                    elevation: 10.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // 가게 등록 버튼
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+    setState(() {
+      light = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +236,7 @@ class _HomePageState extends State<HomePage> {
                   color: Color(0xFF374AA3),
                 ),
               ),
+              // 알림창
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 19.0),
                 child: Container(
@@ -72,13 +246,12 @@ class _HomePageState extends State<HomePage> {
                   child: Row(
                     children: [
                       Expanded(
-                        // Text의 폭을 무시한 채 화면의 가로폭에 맞추기 위해 사용
                         child: Container(
                           height: 40,
                           alignment: Alignment.center,
                           child: const Text(
                             '알림 뜰 때만 보이게',
-                            textAlign: TextAlign.center, // 텍스트 중앙으로
+                            textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 18),
                           ),
                         ),
@@ -87,13 +260,12 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
+              // 보유 가게 박스
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 19.0),
-
-                // Align 위젯으로 중앙 배치
                 child: Align(
                   child: Transform.translate(
-                    offset: const Offset(0.0, 63.0), // X, Y 축으로 이동할 양을 지정
+                    offset: const Offset(0.0, 63.0),
                     child: Container(
                       height: 144,
                       decoration: BoxDecoration(
@@ -115,12 +287,10 @@ class _HomePageState extends State<HomePage> {
                               horizontal: 23.0,
                             ),
                             child: Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween, // 양쪽으로 정렬
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Column(
-                                  crossAxisAlignment: CrossAxisAlignment
-                                      .start, // 보유 가게와 부제목을 맞게 정렬
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       '보유 가게',
@@ -147,6 +317,9 @@ class _HomePageState extends State<HomePage> {
                                     onChanged: (bool value) {
                                       setState(() {
                                         light = value;
+                                        if (light) {
+                                          chooseStore(context);
+                                        }
                                       });
                                     },
                                   ),
