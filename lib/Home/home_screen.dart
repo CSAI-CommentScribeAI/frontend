@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/Home/menuItem.dart';
 import 'package:frontend/feedback/feedback_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -141,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                               },
                             ),
                             Transform.translate(
-                              offset: const Offset(0, -20.0),
+                              offset: const Offset(0, -10.0),
                               child: Container(
                                 alignment: Alignment.center,
                                 child: ElevatedButton.icon(
@@ -190,6 +191,8 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color(0xFFF3F3FF),
       appBar: AppBar(
         backgroundColor: const Color(0xFF374AA3),
+
+        // 배달앱 이름
         title: const Padding(
           padding: EdgeInsets.only(left: 10.0),
           child: Text(
@@ -201,6 +204,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         centerTitle: false,
+
+        // 피드백 아이콘
         actions: [
           GestureDetector(
             onTap: () {
@@ -240,23 +245,15 @@ class _HomePageState extends State<HomePage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 19.0),
                 child: Container(
+                  width: double.infinity,
+                  height: 40,
+                  alignment: Alignment.center,
                   decoration: const BoxDecoration(
                     color: Color(0xFFD9D9D9),
                   ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 40,
-                          alignment: Alignment.center,
-                          child: const Text(
-                            '알림 뜰 때만 보이게',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: const Text(
+                    '알림 뜰 때만 보이게',
+                    style: TextStyle(fontSize: 18),
                   ),
                 ),
               ),
@@ -345,6 +342,71 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
+          const SizedBox(height: 82),
+
+          // 전체 메뉴
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 19.0),
+            child: Container(
+              padding: const EdgeInsets.all(22.0),
+              width: double.infinity,
+              height: 215,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF374AA3).withOpacity(0.5),
+                    blurRadius: 4,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '전체 메뉴',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 21),
+
+                  // overflow 방비
+                  Flexible(
+                    // 전체 메뉴 리스트(Gridview)
+                    child: GridView.count(
+                      crossAxisCount: 4, // 1개의 행에 보여줄 item의 개수
+                      crossAxisSpacing: 20.0, // 같은 행의 iteme들 사이의 간격
+                      children: [
+                        menuItem(
+                            imgPath: 'assets/images/status.png', title: '전체현황'),
+                        menuItem(
+                            imgPath: 'assets/images/store.png', title: '가게관리'),
+                        menuItem(
+                            imgPath: 'assets/images/menu.png', title: '메뉴관리'),
+                        menuItem(
+                            imgPath: 'assets/images/receipt.png',
+                            title: '접수관리'),
+                        menuItem(
+                            imgPath: 'assets/images/review.png', title: '리뷰관리'),
+                        menuItem(
+                            imgPath: 'assets/images/connexion.png',
+                            title: '단골고객'),
+                        menuItem(
+                            imgPath: 'assets/images/feedback2.png',
+                            title: '피드백'),
+                        menuItem(
+                            imgPath: 'assets/images/black.png', title: '블랙리스트'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
         ],
       ),
     );
