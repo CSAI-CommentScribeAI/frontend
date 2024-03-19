@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/Home/menuItem.dart';
+import 'package:frontend/widgets/menuItem_widget.dart';
 import 'package:frontend/feedback/feedback_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -10,6 +10,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool light = false;
+  bool isExpanded = false;
+
   List<Map<String, dynamic>> storeList = [
     {
       "title": "BBQ 코엑스점",
@@ -30,7 +33,6 @@ class _HomePageState extends State<HomePage> {
       "showCircle": false,
     },
   ];
-  bool light = false;
 
   Widget circle() {
     return Padding(
@@ -286,18 +288,28 @@ class _HomePageState extends State<HomePage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Column(
+                                Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      '보유 가게',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    Row(
+                                      children: [
+                                        const Text(
+                                          '보유 가게',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            chooseStore(context);
+                                          },
+                                          child: const Icon(Icons.expand_less),
+                                        ),
+                                      ],
                                     ),
-                                    SizedBox(height: 12),
-                                    Text(
+                                    const SizedBox(height: 12),
+                                    const Text(
                                       '보유하신 가게 전체 확인 가능합니다',
                                       style: TextStyle(
                                         fontSize: 13,
