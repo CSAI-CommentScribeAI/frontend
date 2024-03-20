@@ -10,8 +10,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool light = false;
-  bool isExpanded = false;
+  bool light = true;
+  bool isExpanded = false; // 확장 유무(Expaned_less,more)
+  String selectedStore = ''; // 선택한 가게의 이름을 저장할 변수
 
   List<Map<String, dynamic>> storeList = [
     {
@@ -87,6 +88,10 @@ class _HomePageState extends State<HomePage> {
                         IconButton(
                           onPressed: () {
                             Navigator.pop(context);
+                            setState(() {
+                              isExpanded =
+                                  true; // 닫기 버튼 눌렀을 때 isExpanded를 true로 변경
+                            });
                           },
                           icon: const Icon(Icons.close),
                         ),
@@ -122,7 +127,16 @@ class _HomePageState extends State<HomePage> {
                                             i < storeList.length;
                                             i++) {
                                           if (i == index) {
-                                            storeList[i]["showCircle"] = true;
+                                            // 선택한 가게의 showCircle을 현재 상태의 반대로 설정
+                                            storeList[i]["showCircle"] =
+                                                !storeList[i]["showCircle"];
+                                            // 만약 선택한 가게의 showCircle이 true라면 선택한 가게의 이름을 저장
+                                            if (storeList[i]["showCircle"]) {
+                                              selectedStore = store["title"];
+                                            } else {
+                                              selectedStore =
+                                                  ''; // showCircle이 false이면 선택한 가게가 없으므로 ''로 초기화
+                                            }
                                           } else {
                                             storeList[i]["showCircle"] = false;
                                           }
@@ -183,7 +197,9 @@ class _HomePageState extends State<HomePage> {
       },
     );
     setState(() {
-      light = false;
+      // 보유 가게 목록이 확장되었는지를 나타내는 상태를 저장
+      // 작성해야만 expand_less,more 변경
+      isExpanded = !isExpanded;
     });
   }
 
@@ -293,18 +309,34 @@ class _HomePageState extends State<HomePage> {
                                   children: [
                                     Row(
                                       children: [
-                                        const Text(
-                                          '보유 가게',
-                                          style: TextStyle(
+                                        // 선택한 가게의 이름을 보여줌
+                                        Text(
+                                          selectedStore.isNotEmpty
+                                              ? selectedStore
+                                              : '보유 가게',
+                                          style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
+                                        const SizedBox(width: 20),
+                                        // expand_less,more
                                         GestureDetector(
                                           onTap: () {
-                                            chooseStore(context);
+                                            setState(() {
+                                              isExpanded =
+                                                  !isExpanded; // 확장되어 있을 때는 축소하고, 축소되어 있을 때는 확장
+
+                                              // true일 경우에만 하단 모달시트 보여짐
+                                              if (isExpanded == true) {
+                                                chooseStore(context);
+                                              }
+                                            });
                                           },
-                                          child: const Icon(Icons.expand_less),
+                                          // 확장 유무에 따라 아이콘 변경
+                                          child: isExpanded
+                                              ? const Icon(Icons.expand_less)
+                                              : const Icon(Icons.expand_more),
                                         ),
                                       ],
                                     ),
@@ -326,9 +358,6 @@ class _HomePageState extends State<HomePage> {
                                     onChanged: (bool value) {
                                       setState(() {
                                         light = value;
-                                        if (light) {
-                                          chooseStore(context);
-                                        }
                                       });
                                     },
                                   ),
