@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/charts/feedback_chart.dart';
 import 'package:frontend/widgets/circle_widget.dart';
 import 'package:frontend/widgets/current_widget.dart';
 import 'package:frontend/widgets/menuItem_widget.dart';
@@ -16,6 +17,8 @@ class _HomePageState extends State<HomePage> {
   bool isExpanded = false; // 확장 유무(Expaned_less,more)
   String selectedStore = ''; // 선택한 가게의 이름을 저장할 변수
   bool titleOpacity = false; // 가게명 투명도
+  bool thisColor = true; // 선택되었을 때 원 색깔
+  bool lastColor = false;
 
   List<Map<String, dynamic>> storeList = [
     {
@@ -484,6 +487,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       const SizedBox(height: 16),
+
                       // 접수 현황표
                       const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -497,6 +501,7 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       const SizedBox(height: 16),
+
                       // 현황 표 타이틀
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -548,6 +553,124 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 22),
+
+            // 주간 피드백
+            Padding(
+              padding:
+                  const EdgeInsets.only(left: 19.0, right: 19.0, bottom: 30.0),
+              child: Container(
+                width: double.infinity,
+                height: 420,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF374AA3).withOpacity(0.5),
+                      blurRadius: 4,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(22.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            '주간피드백',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Row(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Circle(
+                                          thisColor
+                                              ? const Color(0xFF7B88C2)
+                                              : const Color(0xFFC7C7C7),
+                                          0),
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            // 이번주 버튼을 눌렀을 때 저번주 버튼이 비활성화
+                                            thisColor = true;
+                                            lastColor = false;
+                                          });
+                                        },
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.zero,
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                        ),
+                                        child: Text(
+                                          '이번주',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: thisColor
+                                                ? const Color(0xFF7B88C2)
+                                                : const Color(0xFFC7C7C7),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Circle(
+                                      lastColor
+                                          ? const Color(0xFF7B88C2)
+                                          : const Color(0xFFC7C7C7),
+                                      0),
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        lastColor = true;
+                                        thisColor = false;
+                                      });
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    child: Text(
+                                      '저번주',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: lastColor
+                                            ? const Color(0xFF7B88C2)
+                                            : const Color(0xFFC7C7C7),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+
+                      // thisColor가 true일 경우 isWeekData에 true를 저장
+                      // 반대로 false일 경우 isWeekData에 false를 저장
+                      FeedbackChart(isWeekData: thisColor),
                     ],
                   ),
                 ),

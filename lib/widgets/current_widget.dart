@@ -4,6 +4,7 @@ class CurrentCircle extends StatelessWidget {
   final Color borderColor, centerColor;
   final String value;
 
+  // 현황 표시
   const CurrentCircle(this.borderColor, this.centerColor, this.value,
       {super.key});
 
