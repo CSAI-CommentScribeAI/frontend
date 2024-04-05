@@ -150,29 +150,27 @@ class _HomePageState extends State<HomePage> {
                                 return const Divider();
                               },
                             ),
-                            Transform.translate(
-                              offset: const Offset(0, -10.0),
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: ElevatedButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.add),
-                                  label: const Text(
-                                    '가게 등록',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                            const SizedBox(height: 15),
+                            Container(
+                              alignment: Alignment.center,
+                              child: ElevatedButton.icon(
+                                onPressed: () {},
+                                icon: const Icon(Icons.add),
+                                label: const Text(
+                                  '가게 등록',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF7B88C2),
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    shadowColor: Colors.white.withOpacity(0.25),
-                                    elevation: 10.0,
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF7B88C2),
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
                                   ),
+                                  shadowColor: Colors.white.withOpacity(0.25),
+                                  elevation: 10.0,
                                 ),
                               ),
                             ),
@@ -394,7 +392,7 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 padding: const EdgeInsets.all(22.0),
                 width: double.infinity,
-                height: 215,
+                height: 225,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(15.0),
@@ -422,8 +420,10 @@ class _HomePageState extends State<HomePage> {
                     Flexible(
                       // 전체 메뉴 리스트(Gridview)
                       child: GridView.count(
+                        physics:
+                            const NeverScrollableScrollPhysics(), // Gridview의 스크롤 방지
                         crossAxisCount: 4, // 1개의 행에 보여줄 item의 개수
-                        crossAxisSpacing: 20.0, // 같은 행의 iteme들 사이의 간격
+                        crossAxisSpacing: 10.0, // 같은 행의 iteme들 사이의 간격
                         children: [
                           menuItem(
                               imgPath: 'assets/images/status.png',
