@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/charts/feedback_chart.dart';
+import 'package:frontend/screens/store_screen.dart';
 import 'package:frontend/widgets/circle_widget.dart';
 import 'package:frontend/widgets/current_widget.dart';
 import 'package:frontend/widgets/menuItem_widget.dart';
@@ -439,9 +440,23 @@ class _HomePageState extends State<HomePage> {
                             menuItem(
                                 imgPath: 'assets/images/status.png',
                                 title: '전체현황'),
-                            menuItem(
-                                imgPath: 'assets/images/store.png',
-                                title: '가게관리'),
+                            GestureDetector(
+                              onTap: () {
+                                // 가게 선택하지 않을 경우 못 들어가게 설정
+                                selectedStore.isNotEmpty
+                                    ? Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
+                                                StorePage(selectedStore)),
+                                      )
+                                    : '';
+                              },
+                              child: menuItem(
+                                  imgPath: 'assets/images/store.png',
+                                  title: '가게관리'),
+                            ),
                             menuItem(
                                 imgPath: 'assets/images/menu.png',
                                 title: '메뉴관리'),
