@@ -3,7 +3,7 @@ import 'package:frontend/charts/feedback_chart.dart';
 import 'package:frontend/widgets/circle_widget.dart';
 import 'package:frontend/widgets/current_widget.dart';
 import 'package:frontend/widgets/menuItem_widget.dart';
-import 'package:frontend/feedback/feedback_screen.dart';
+import 'package:frontend/screens/feedback_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
