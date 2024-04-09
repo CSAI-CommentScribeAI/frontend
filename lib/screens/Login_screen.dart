@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:frontend/screens/Choose_screen.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -194,9 +195,11 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: const EdgeInsets.only(top: 17),
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ChoosePage()));
+                  },
                   child: const Text(
-                    '사장님 앱이 처음이신가요?',
+                    '처음이신가요?',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
