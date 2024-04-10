@@ -447,9 +447,10 @@ class _HomePageState extends State<HomePage> {
                                     ? Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
-                                                StorePage(selectedStore)),
+                                          builder: (context) =>
+                                              // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
+                                              StorePage(selectedStore),
+                                        ),
                                       )
                                     : '';
                               },
