@@ -25,6 +25,8 @@ class _StorePageState extends State<StorePage> {
   String category = '';
   String explanation = '';
 
+  bool saveColor = false;
+
   void printFormValues() {
     print('사업자 등록 번호: $register');
     print('음식점 이름: $name');
@@ -77,244 +79,290 @@ class _StorePageState extends State<StorePage> {
         body: SingleChildScrollView(
           child: Form(
             key: formKey,
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 30, horizontal: 75.5),
-              child: Column(
-                children: [
-                  storeTextFormField(
-                    value: register,
-                    label: '사업자 등록 번호',
-                    onSaved: (val) {
-                      // 입력한 값을 지정한 변수에 저장
+            child: Column(children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0, left: 350.0),
+                child: SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: ElevatedButton(
+                    onPressed: () {
                       setState(() {
-                        register = val;
+                        saveColor = !saveColor;
                       });
                     },
-                    // 값 입력하지 않으면 에러 발생
-                    validator: (val) {
-                      if (val.isEmpty) {
-                        return '등록 번호를 입력하세요';
-                      }
-                      return null;
-                    },
-                  ),
-                  storeTextFormField(
-                    value: name,
-                    label: '음식점 이름',
-                    onSaved: (val) {
-                      setState(() {
-                        name = val;
-                      });
-                    },
-                    validator: (val) {
-                      if (val.isEmpty) {
-                        return '이름을 입력하세요';
-                      }
-                      return null;
-                    },
-                  ),
-                  storeTextFormField(
-                    value: phoneNumber,
-                    label: '음식점 전화번호',
-                    onSaved: (val) {
-                      setState(() {
-                        phoneNumber = val;
-                      });
-                    },
-                    validator: (val) {
-                      if (val.isEmpty) {
-                        return '전화번호를 입력하세요';
-                      }
-                      return null;
-                    },
-                  ),
-                  storeTextFormField(
-                    value: address,
-                    label: '음식점 주소',
-                    onSaved: (val) {
-                      setState(() {
-                        address = val;
-                      });
-                    },
-                    validator: (val) {
-                      if (val.isEmpty) {
-                        return '주소를 입력하세요';
-                      }
-                      return null;
-                    },
-                  ),
-                  storeTextFormField(
-                    value: category,
-                    label: '음식점 카테고리',
-                    onSaved: (val) {
-                      setState(() {
-                        category = val;
-                      });
-                    },
-                    validator: (val) {
-                      if (val.isEmpty) {
-                        return '카테고리를 입력하세요';
-                      }
-                      return null;
-                    },
-                  ),
-                  storeTextFormField(
-                    value: explanation,
-                    label: '가게 설명',
-                    onSaved: (val) {
-                      setState(() {
-                        explanation = val;
-                      });
-                    },
-                    validator: (val) {
-                      if (val.isEmpty) {
-                        return '가게 설명 입력하세요';
-                      }
-                      return null;
-                    },
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // 오픈 시간
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '오픈 시간',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF7E7EB2),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              // 시간 설정 화면 표시
-                              final TimeOfDay? timeOfDay = await showTimePicker(
-                                context: context,
-                                initialTime: openInitialTime,
-                              );
-                              // 시간 설정 시 초기 시간에 설정한 시간 저장 후 boolean 값 변경
-                              if (timeOfDay != null) {
-                                setState(() {
-                                  openInitialTime = timeOfDay;
-                                  openTimeBoolean = !openTimeBoolean;
-                                });
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              minimumSize: const Size(120, 50),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              elevation: 0,
-                            ),
-                            child: Text(
-                              // timeOfDay != null로 해서 삼항연산자를 할려고 했으나 정의되지 않는 변수이고 boolean일 때만 사용하라고 해서
-                              // timeBoolean이라는 불리안 변수를 만들어 설정을 안할 시 false를, 시간을 설정할 때는 true로 지정해
-                              // true일 때는 설정한 시간을, false일 때는 "오픈 마감 시간"을 보이게 구현
-                              openTimeBoolean
-                                  ? '${openInitialTime.hour}:${openInitialTime.minute}'
-                                  : '00:00',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF7E7EB2),
-                              ),
-                            ),
-                          ),
-                        ],
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      backgroundColor: saveColor
+                          ? const Color(0xFF374AA3).withOpacity(0.66)
+                          : const Color(0xFFB3A9A9),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
                       ),
-
-                      // 마감 시간
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '마감 시간',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF7E7EB2),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              final TimeOfDay? timeOfDay = await showTimePicker(
-                                context: context,
-                                initialTime: closeInitialTime,
-                              );
-                              if (timeOfDay != null) {
-                                setState(() {
-                                  closeInitialTime = timeOfDay;
-                                  closeTimeBoolean = !closeTimeBoolean;
-                                });
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              minimumSize: const Size(120, 50),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              elevation: 0,
-                            ),
-                            child: Text(
-                              closeTimeBoolean
-                                  ? '${closeInitialTime.hour}:${closeInitialTime.minute}'
-                                  : '00:00',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF7E7EB2),
-                              ),
-                            ),
-                          ),
-                        ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                        // 아이콘 크기 조절
                       ),
-                    ],
+                    ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ),
-        bottomNavigationBar: ElevatedButton(
-          onPressed: () async {
-            // 설정한 유효성에 맞으면 true를 리턴
-            if (formKey.currentState!.validate()) {
-              // validation 이 성공하면 폼 저장
-              formKey.currentState!.save();
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 75.5),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    storeTextFormField(
+                      value: register,
+                      label: '사업자 등록 번호',
+                      editable: saveColor ? false : true,
+                      onSaved: (val) {
+                        // 입력한 값을 지정한 변수에 저장
+                        setState(() {
+                          register = val;
+                        });
+                      },
+                      // 값 입력하지 않으면 에러 발생
+                      validator: (val) {
+                        if (val.isEmpty) {
+                          return '등록 번호를 입력하세요';
+                        }
+                        return null;
+                      },
+                    ),
+                    storeTextFormField(
+                      value: name,
+                      label: '음식점 이름',
+                      editable: saveColor ? false : true,
+                      onSaved: (val) {
+                        setState(() {
+                          name = val;
+                        });
+                      },
+                      validator: (val) {
+                        if (val.isEmpty) {
+                          return '이름을 입력하세요';
+                        }
+                        return null;
+                      },
+                    ),
+                    storeTextFormField(
+                      value: phoneNumber,
+                      label: '음식점 전화번호',
+                      editable: saveColor ? false : true,
+                      onSaved: (val) {
+                        setState(() {
+                          phoneNumber = val;
+                        });
+                      },
+                      validator: (val) {
+                        if (val.isEmpty) {
+                          return '전화번호를 입력하세요';
+                        }
+                        return null;
+                      },
+                    ),
+                    storeTextFormField(
+                      value: address,
+                      label: '음식점 주소',
+                      editable: saveColor ? false : true,
+                      onSaved: (val) {
+                        setState(() {
+                          address = val;
+                        });
+                      },
+                      validator: (val) {
+                        if (val.isEmpty) {
+                          return '주소를 입력하세요';
+                        }
+                        return null;
+                      },
+                    ),
+                    storeTextFormField(
+                      value: category,
+                      label: '음식점 카테고리',
+                      editable: saveColor
+                          ? false
+                          : true, // 편집 버튼 눌렀으면(saveColor=true) 쓰기 모드로 전환
+                      onSaved: (val) {
+                        setState(() {
+                          category = val;
+                        });
+                      },
+                      validator: (val) {
+                        if (val.isEmpty) {
+                          return '카테고리를 입력하세요';
+                        }
+                        return null;
+                      },
+                    ),
+                    storeTextFormField(
+                      value: explanation,
+                      label: '가게 설명',
+                      editable: saveColor ? false : true,
+                      onSaved: (val) {
+                        setState(() {
+                          explanation = val;
+                        });
+                      },
+                      validator: (val) {
+                        if (val.isEmpty) {
+                          return '가게 설명 입력하세요';
+                        }
+                        return null;
+                      },
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // 오픈 시간
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '오픈 시간',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF7E7EB2),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                // 시간 설정 화면 표시
+                                final TimeOfDay? timeOfDay =
+                                    await showTimePicker(
+                                  context: context,
+                                  initialTime: openInitialTime,
+                                );
+                                // 시간 설정 시 초기 시간에 설정한 시간 저장 후 boolean 값 변경
+                                if (timeOfDay != null) {
+                                  setState(() {
+                                    openInitialTime = timeOfDay;
+                                    openTimeBoolean = !openTimeBoolean;
+                                  });
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                minimumSize: const Size(120, 50),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Text(
+                                // timeOfDay != null로 해서 삼항연산자를 할려고 했으나 정의되지 않는 변수이고 boolean일 때만 사용하라고 해서
+                                // timeBoolean이라는 불리안 변수를 만들어 설정을 안할 시 false를, 시간을 설정할 때는 true로 지정해
+                                // true일 때는 설정한 시간을, false일 때는 "오픈 마감 시간"을 보이게 구현
+                                openTimeBoolean
+                                    ? '${openInitialTime.hour}:${openInitialTime.minute}'
+                                    : '00:00',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF7E7EB2),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
 
-              // 스낵바를 보여줌
-              Get.snackbar(
-                "저장완료",
-                '폼 저장이 완료되었습니다!',
-                backgroundColor: Colors.white,
-              );
-            }
-            // 저장이 되는지 안되는지 확인하기 위해 호출
-            printFormValues();
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF274AA3),
-            minimumSize: const Size(double.infinity, 80),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(0),
-            ),
-          ),
-          child: const Text(
-            '저장하기',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+                        // 마감 시간
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '마감 시간',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF7E7EB2),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                final TimeOfDay? timeOfDay =
+                                    await showTimePicker(
+                                  context: context,
+                                  initialTime: closeInitialTime,
+                                );
+                                if (timeOfDay != null) {
+                                  setState(() {
+                                    closeInitialTime = timeOfDay;
+                                    closeTimeBoolean = !closeTimeBoolean;
+                                  });
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                minimumSize: const Size(120, 50),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Text(
+                                closeTimeBoolean
+                                    ? '${closeInitialTime.hour}:${closeInitialTime.minute}'
+                                    : '00:00',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF7E7EB2),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ]),
           ),
         ),
+        bottomNavigationBar: saveColor
+            ? ElevatedButton(
+                onPressed: () async {
+                  // 설정한 유효성에 맞으면 true를 리턴
+                  if (formKey.currentState!.validate()) {
+                    // validation 이 성공하면 폼 저장
+                    formKey.currentState!.save();
+
+                    // 스낵바를 보여줌
+                    Get.snackbar(
+                      "저장완료",
+                      '폼 저장이 완료되었습니다!',
+                      backgroundColor: Colors.white,
+                    );
+                  }
+                  // 저장이 되는지 안되는지 확인하기 위해 호출
+                  printFormValues();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF274AA3),
+                  minimumSize: const Size(double.infinity, 80),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(0),
+                  ),
+                ),
+                child: const Text(
+                  '저장하기',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              )
+            : Container(
+                height: 0,
+              ),
       ),
     );
   }
@@ -326,6 +374,7 @@ storeTextFormField({
   required String label,
   required FormFieldSetter onSaved,
   required FormFieldValidator validator,
+  required bool editable,
 }) {
   return Column(
     children: [
@@ -345,6 +394,7 @@ storeTextFormField({
         initialValue: value,
         onSaved: onSaved, // 폼 필드가 저장될 때 호출
         validator: validator, // 입력된 값의 유효성을 검사
+        readOnly: editable, // 읽기/쓰기 권한
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,
