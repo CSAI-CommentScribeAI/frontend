@@ -38,6 +38,8 @@ dependencies:
   flutter_pw_validator: ^1.6.0
   syncfusion_flutter_charts: ^25.1.38
   get: ^4.6.6
+  toggle_switch: ^2.3.0
+
 
 dev_dependencies:
   flutter_test:
