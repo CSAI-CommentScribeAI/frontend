@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:frontend/screens/Signup_screen.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class ChoosePage extends StatefulWidget {
@@ -78,6 +79,7 @@ class _ChoosePageState extends State<ChoosePage> {
                 padding: const EdgeInsets.only(top: 100, left: 300),
                 child: TextButton(
                   onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const SignupPage()));
                   },
                   style: TextButton.styleFrom(
                   ),
