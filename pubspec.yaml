@@ -39,6 +39,7 @@ dependencies:
   syncfusion_flutter_charts: ^25.1.38
   get: ^4.6.6
   toggle_switch: ^2.3.0
+  flutter_rating_bar: ^4.0.1
 
 
 dev_dependencies:
