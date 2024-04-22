@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/widgets/chooseWrite_widget.dart';
+import 'package:frontend/screens/reply_screen.dart';
 import 'package:frontend/widgets/circle_widget.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:frontend/widgets/userReview_widget.dart';
 
 class ReviewPage extends StatefulWidget {
   final String selectedStore;
@@ -82,6 +83,7 @@ class _ReviewPageState extends State<ReviewPage> {
       "reply": "다음에도 더 맛있는 자메이카 통다리 만들어보겠습니다!!!"
     },
   ];
+
   // 날짜 선택하는 바텀시트 호출 함수
   void chooseDate(BuildContext context) async {
     await showModalBottomSheet(
@@ -240,7 +242,7 @@ class _ReviewPageState extends State<ReviewPage> {
                     ),
                   ),
 
-                  // 날짜 선택 리스트
+                  // 작성법 선택 리스트
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(18.0),
@@ -249,7 +251,7 @@ class _ReviewPageState extends State<ReviewPage> {
                         child: ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: dateList.length,
+                          itemCount: writeList.length,
                           separatorBuilder: (BuildContext context, int index) {
                             return const Divider();
                           },
@@ -257,6 +259,18 @@ class _ReviewPageState extends State<ReviewPage> {
                             final write = writeList[index];
                             return ListTile(
                               onTap: () {
+                                // Navigator.pop을 호출하여 바텀시트를 닫은 후
+                                Navigator.pop(context);
+                                // 그 후에 Navigator.push를 호출하여 새 페이지로 이동
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ReplyPage(
+                                      // index로 객체 review 접근
+                                      review: reviewList[index],
+                                    ),
+                                  ),
+                                );
                                 bottomState(() {
                                   setState(() {});
                                 });
@@ -448,102 +462,9 @@ class _ReviewPageState extends State<ReviewPage> {
                                 padding: const EdgeInsets.only(top: 25),
                                 child: Column(
                                   children: [
-                                    ListTile(
-                                      // 프로필(ClipRect 함수를 사용해 둥근 정사각형으로 구현)
-                                      leading: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                        child: Image.asset(
-                                          review["profileImgPath"],
-                                        ),
-                                      ),
-
-                                      // 이름
-                                      title: Text(
-                                        review["name"],
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                        ),
-                                      ),
-
-                                      // 리뷰 등록일과 별점
-                                      subtitle: Row(
-                                        children: [
-                                          Text(review["open_date"]),
-                                          const SizedBox(width: 8.0),
-                                          RatingBarIndicator(
-                                            rating: review["rate"],
-                                            itemSize: 20.0,
-                                            itemBuilder: (context, index) {
-                                              return const Icon(
-                                                Icons.star,
-                                                color: Colors.amber,
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-
-                                      // 더보기란(위치를 title과 같은 행으로 배치하기 위해 isThreeLine을 true로 설정)
-                                      trailing: const Icon(Icons.more_vert),
-                                      isThreeLine: true,
-                                    ),
-                                    const SizedBox(height: 5),
-
-                                    // 리뷰 글
-                                    ListTile(
-                                      // 주문 메뉴 이름
-                                      title: Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 5.0),
-                                        child: Text(
-                                          review["menu"],
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: const Color(0xFF000000)
-                                                .withOpacity(0.6),
-                                          ),
-                                        ),
-                                      ),
-
-                                      // 리뷰 댓글
-                                      subtitle: Text(
-                                        review["review"],
-                                        style: TextStyle(
-                                          color: const Color(0xFF000000)
-                                              .withOpacity(0.6),
-                                        ),
-                                      ),
-
-                                      // 주문 메뉴 사진
-                                      trailing: Container(
-                                        width: 64,
-                                        height: 70,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black
-                                                  .withOpacity(0.25),
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 4),
-                                            ),
-                                          ],
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
-                                          child: Image.asset(
-                                            review["menuImgPath"],
-                                            width: 64,
-                                            height: 70,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    // 고객 리뷰
+                                    // reviewList[index](객체 review)를 전달
+                                    UserReview(review: review),
                                     const SizedBox(height: 20),
 
                                     // 답글 달기 버튼
