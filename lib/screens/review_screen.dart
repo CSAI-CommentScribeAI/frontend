@@ -16,6 +16,7 @@ class _ReviewPageState extends State<ReviewPage> {
   String selectedDate = ''; // 선택된 날짜
   double rate = 0.0; // 선택된 날짜에 해당하는 리뷰들의 평균 별점
   bool isExpanded = false;
+  late int reviewNum;
   bool isReplied = true; // 답글 유무
 
   List<Map<String, dynamic>> dateList = [
@@ -266,8 +267,10 @@ class _ReviewPageState extends State<ReviewPage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ReplyPage(
-                                      // index로 객체 review 접근
-                                      review: reviewList[index],
+                                      // reviewNum로 객체 review 접근
+                                      // index가 n인 reviewNum을 여기로 가져오면 n번째 reviewList 정보를 가지고 있는 고객 리뷰로 연결
+                                      // 예시 : 1번째 답글 버튼을 가져와서 reviewNum가 1이기 때문에 reviewList[1]인 객체 정보를 가져옴
+                                      review: reviewList[reviewNum],
                                     ),
                                   ),
                                 );
@@ -544,6 +547,9 @@ class _ReviewPageState extends State<ReviewPage> {
                                               chooseWrite(context);
                                             }
                                           });
+
+                                          // 답글 달기 버튼을 눌렀을 때 몇번째 답글 버튼인지를 결정하는 index를 가져와서 reviewNum에 저장
+                                          reviewNum = index;
                                         },
                                         style: ElevatedButton.styleFrom(
                                             foregroundColor: Colors.white,
