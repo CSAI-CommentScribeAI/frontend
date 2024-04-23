@@ -17,7 +17,7 @@ class _ReviewPageState extends State<ReviewPage> {
   double rate = 0.0; // 선택된 날짜에 해당하는 리뷰들의 평균 별점
   bool isExpanded = false;
   late int reviewNum;
-  bool isReplied = true; // 답글 유무
+  bool isReplied = false; // 답글 유무
 
   List<Map<String, dynamic>> dateList = [
     {
@@ -149,6 +149,7 @@ class _ReviewPageState extends State<ReviewPage> {
                             final date = dateList[index]; // date는 객체가 됨
                             return ListTile(
                               onTap: () {
+                                Navigator.pop(context);
                                 bottomState(() {
                                   setState(() {
                                     for (int i = 0; i < dateList.length; i++) {
@@ -473,7 +474,6 @@ class _ReviewPageState extends State<ReviewPage> {
                                     // 답글 달기 버튼
                                     // 아마도 작성 유형이나 답글 등록 버튼 누를 때 isReplied 값 상태 변경할 예정
                                     if (isReplied)
-
                                       // 답글이 생성되었을 때
                                       Container(
                                         width: double.infinity,
@@ -532,7 +532,7 @@ class _ReviewPageState extends State<ReviewPage> {
                                                       const Color(0xFFFF0000),
                                                 ),
                                               ],
-                                            )
+                                            ),
                                           ],
                                         ),
                                       )
