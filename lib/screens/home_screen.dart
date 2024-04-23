@@ -111,6 +111,8 @@ class _HomePageState extends State<HomePage> {
                                 final store = storeList[index];
                                 return ListTile(
                                   onTap: () {
+                                    // 가게 선택 후 바텀시트 닫기
+                                    Navigator.pop(context);
                                     // bottomState만 적용하면 bottomSheet 값은 즉시 반영되지만 parent 값은 변경되지 않음
                                     // 그래서 꼭 setState()를 같이 추가해주어야 함
                                     bottomState(() {
