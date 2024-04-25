@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
@@ -15,6 +17,127 @@ class UserReview extends StatefulWidget {
 enum MenuItem { menuItem1, menuItem2, menuItem3 }
 
 class _UserReviewState extends State<UserReview> {
+  bool selected = false; // 신고 선택 여부(신고하기 버튼에 사용)
+
+  List texts = [
+    {
+      "value": false,
+      "title": "욕설/생명경시/혐오/차별적 표헌",
+    },
+    {
+      "value": false,
+      "title": "불쾌한 표현",
+    },
+    {
+      "value": false,
+      "title": "개인정보 노출 리뷰",
+    },
+    {"value": false, "title": "도배성 댓글"},
+    {
+      "value": false,
+      "title": "매장과 관련 없는 댓글",
+    },
+  ];
+
+  // 팝업메뉴 아이템 눌렀을 때 각각 수행하는 함수
+  void handleMenuItem(BuildContext context, MenuItem item) {
+    // 신고 팝업창
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          actions: [
+            Column(
+              children: [
+                StatefulBuilder(
+                  builder: (context, setState) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 30.0,
+                        horizontal: 8.0,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          // 종료 버튼
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Icon(Icons.close),
+                          ),
+
+                          // 체크박스 신고 리스트
+                          Column(
+                            children: List.generate(
+                              texts.length,
+                              (index) => CheckboxListTile(
+                                value: texts[index]["value"],
+                                onChanged: (value) {
+                                  setState(() {
+                                    // 다른 체크박스를 선택할 때 먼저 모든 value 키 값에 false를 설정한 후
+                                    // 그 다음에 선택된 체크박스 value 키 값을 선택한 값을 업데이트해 true로 설정
+                                    for (var elements in texts) {
+                                      // 모든 value값에 false로 설정
+                                      elements["value"] = false;
+                                    }
+                                    // 선택된 체크박스의 value 값을 선택한 값(value)으로 업데이트
+                                    texts[index]["value"] = value;
+                                  });
+                                },
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                                contentPadding: EdgeInsets.zero, // 체크박스 주위의 여백
+                                title: Text(texts[index]["title"]),
+                                activeColor: const Color(0xFF374AA3),
+                                checkColor: Colors.white,
+                                checkboxShape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10.0)),
+                                ),
+                              ),
+                              // Column 위젯은 Widget의 리스트를 요구
+                              // 따라서 toList() 메서드를 사용하여 List<CheckboxListTile>을 Widget의 리스트로 변환
+                            ).toList(),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+
+                // 신고하기 버튼
+                SizedBox(
+                  width: 200,
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF374AA3),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    child: const Text(
+                      '신고하기',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -59,14 +182,17 @@ class _UserReviewState extends State<UserReview> {
             color: const Color(0xFF7783C2),
             itemBuilder: (BuildContext context) {
               return [
-                menuItem('신고'),
+                menuItem('신고', MenuItem.menuItem1),
                 const PopupMenuDivider(),
-                menuItem('차단'),
+                menuItem('차단', MenuItem.menuItem2),
                 const PopupMenuDivider(),
-                menuItem('숨김'),
+                menuItem('숨김', MenuItem.menuItem3),
               ];
             },
             child: const Icon(Icons.more_vert_rounded),
+            onSelected: (value) {
+              handleMenuItem(context, value);
+            },
           ),
 
           isThreeLine: true,
@@ -127,11 +253,10 @@ class _UserReviewState extends State<UserReview> {
 }
 
 // 팝업메뉴
-PopupMenuItem<MenuItem> menuItem(String text) {
+PopupMenuItem<MenuItem> menuItem(String text, MenuItem item) {
   return PopupMenuItem<MenuItem>(
     enabled: true, // 팝업메뉴 호출(ex: onTap()) 가능
-    onTap: () {},
-    value: MenuItem.menuItem1,
+    value: item,
     height: 30,
     child: Center(
       child: Text(
