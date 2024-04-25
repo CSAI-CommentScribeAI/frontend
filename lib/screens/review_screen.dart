@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/filtering_screen.dart';
 import 'package:frontend/screens/reply_screen.dart';
 import 'package:frontend/widgets/circle_widget.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -72,6 +73,8 @@ class _ReviewPageState extends State<ReviewPage> {
           "추운날 늦은밤까지 맛있게 요리해 주셔서 감사합니다 너무 맛있어요. 기름기 없이 촉촉하게여 먹기에 좋았어요. 감사해요.",
       "menuImgPath": 'assets/images/chicken.png',
       "reply": "리뷰를 남겨주셔서 감사합니다. 또 이용해주세요^^",
+      "block": false, // 차단 활성화 값 변경 위해 추가
+      "hide": false // 숨김 활성화 값 변경 위해 추가
     },
     {
       "profileImgPath": 'assets/images/profile2.png',
@@ -81,7 +84,9 @@ class _ReviewPageState extends State<ReviewPage> {
       "menu": "자메이카 통다리 치킨",
       "review": "너무 맛있어요. 기름기 없이 촉촉하게여 먹기에 좋았어요. 살도 진짜 부드러워요. 감사합니다.",
       "menuImgPath": 'assets/images/jamaica.png',
-      "reply": "다음에도 더 맛있는 자메이카 통다리 만들어보겠습니다!!!"
+      "reply": "다음에도 더 맛있는 자메이카 통다리 만들어보겠습니다!!!",
+      "block": false,
+      "hide": false
     },
   ];
 
@@ -272,6 +277,7 @@ class _ReviewPageState extends State<ReviewPage> {
                                       // index가 n인 reviewNum을 여기로 가져오면 n번째 reviewList 정보를 가지고 있는 고객 리뷰로 연결
                                       // 예시 : 1번째 답글 버튼을 가져와서 reviewNum가 1이기 때문에 reviewList[1]인 객체 정보를 가져옴
                                       review: reviewList[reviewNum],
+                                      reviewList: reviewList,
                                     ),
                                   ),
                                 );
@@ -323,13 +329,27 @@ class _ReviewPageState extends State<ReviewPage> {
           ),
         ),
         centerTitle: true,
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 23.0),
-            child: Icon(
-              Icons.tune,
-              size: 30,
-              color: Colors.white,
+            padding: const EdgeInsets.only(right: 23.0),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    // Homepage에서 가져온 selectedStord를 Filteringpage에서도 사용
+                    builder: (context) => FilteringPage(
+                      selectedStore: widget.selectedStore,
+                      reviewList: reviewList,
+                    ),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.tune,
+                size: 30,
+                color: Colors.white,
+              ),
             ),
           ),
         ],
@@ -468,7 +488,10 @@ class _ReviewPageState extends State<ReviewPage> {
                                   children: [
                                     // 고객 리뷰
                                     // reviewList[index](객체 review)를 전달
-                                    UserReview(review: review),
+                                    UserReview(
+                                      review: review,
+                                      visibleTrail: true,
+                                    ),
                                     const SizedBox(height: 20),
 
                                     // 답글 달기 버튼

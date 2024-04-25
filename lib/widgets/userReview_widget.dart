@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
@@ -8,7 +6,9 @@ class UserReview extends StatefulWidget {
   // Listview.builder에서 사용해야하기 때문에 객체 review를 받아야 함
   // 리스트 받으면 아래의 코드에서 리스트안의 객체를 받아야하는 코드를 구현해야 함
   final Map<String, dynamic> review;
-  const UserReview({required this.review, super.key});
+  final bool visibleTrail;
+  const UserReview(
+      {required this.review, required this.visibleTrail, super.key});
 
   @override
   State<UserReview> createState() => _UserReviewState();
@@ -18,6 +18,7 @@ enum MenuItem { menuItem1, menuItem2, menuItem3 }
 
 class _UserReviewState extends State<UserReview> {
   bool selected = false; // 신고 선택 여부(신고하기 버튼에 사용)
+  // bool isHidden = false; // 숨김 여부
 
   List texts = [
     {
@@ -178,22 +179,44 @@ class _UserReviewState extends State<UserReview> {
           ),
 
           // 더보기란(위치를 title과 같은 행으로 배치하기 위해 isThreeLine을 true로 설정)
-          trailing: PopupMenuButton<MenuItem>(
-            color: const Color(0xFF7783C2),
-            itemBuilder: (BuildContext context) {
-              return [
-                menuItem('신고', MenuItem.menuItem1),
-                const PopupMenuDivider(),
-                menuItem('차단', MenuItem.menuItem2),
-                const PopupMenuDivider(),
-                menuItem('숨김', MenuItem.menuItem3),
-              ];
-            },
-            child: const Icon(Icons.more_vert_rounded),
-            onSelected: (value) {
-              handleMenuItem(context, value);
-            },
-          ),
+          // UserReview를 사용하는 파일에서 visibleTrail 값을 가져와 수행
+          trailing: widget.visibleTrail
+              ? PopupMenuButton<MenuItem>(
+                  color: const Color(0xFF7783C2),
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      menuItem('신고', MenuItem.menuItem1),
+                      const PopupMenuDivider(),
+                      menuItem('차단', MenuItem.menuItem2),
+                      const PopupMenuDivider(),
+                      menuItem('숨김', MenuItem.menuItem3),
+                    ];
+                  },
+                  child: const Icon(Icons.more_vert_rounded),
+                  onSelected: (MenuItem item) {
+                    // 신고 눌렀을 때 신고 리스트 모달창 띄움
+                    if (item == MenuItem.menuItem1) {
+                      handleMenuItem(context, MenuItem.menuItem1);
+                    }
+                    // 차단 눌렀을 때 차단 여부 true로 설정
+                    if (item == MenuItem.menuItem2) {
+                      setState(() {
+                        widget.review["block"] = !widget
+                            .review["block"]; // 객체 review의 block 값 변경(true)
+                        widget.review["hide"] = false; // 동시 선택 방지하기 위해 숨김 비활성화
+                      });
+                    }
+                    if (item == MenuItem.menuItem3) {
+                      setState(() {
+                        // 숨김 활성화 시 차단 비활성화
+                        widget.review["hide"] = !widget.review["hide"];
+                        widget.review["block"] = false;
+                      });
+                    }
+                  },
+                )
+              // Container() 위젯을 사용하면 container에 내장된 기본 사이즈때매 타일이 넘칠 위험이 있음
+              : null,
 
           isThreeLine: true,
         ),
@@ -215,11 +238,31 @@ class _UserReviewState extends State<UserReview> {
           ),
 
           // 리뷰 댓글
-          subtitle: Text(
-            widget.review["review"],
-            style: TextStyle(
-              color: const Color(0xFF000000).withOpacity(0.6),
-            ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 차단 리뷰 표시
+              Row(
+                children: [
+                  // isBlocked, isHidden을 사용하면 이 클래스에서 값이 바뀌기 때문에 FilteringPage에 적용 안됨
+                  // review 키 값을 사용해 FilteriingPage에서도 값을 가져갈 수 있음 -> 차단 or 숨김 리뷰 구현 가능
+                  // 여기서 review는 block이나 hide가 true인 것만 뽑아낸 객체
+                  if (widget.review["block"]) reviewStatus(Icons.lock, '차단 리뷰'),
+                  if (widget.review["hide"])
+                    reviewStatus(Icons.visibility_off, '사장님에게만 보이는 리뷰'),
+                  const SizedBox(width: 3),
+                ],
+              ),
+              const SizedBox(height: 5),
+
+              // 고객 리뷰
+              Text(
+                widget.review["review"],
+                style: TextStyle(
+                  color: const Color(0xFF000000).withOpacity(0.6),
+                ),
+              ),
+            ],
           ),
 
           // 주문 메뉴 사진
@@ -267,5 +310,26 @@ PopupMenuItem<MenuItem> menuItem(String text, MenuItem item) {
         ),
       ),
     ),
+  );
+}
+
+// 차단 또는 숨김 리뷰 텍스트, 아이콘 위젯을 생성하는 함수
+Widget reviewStatus(IconData icon, String text) {
+  return Row(
+    children: [
+      Icon(
+        icon,
+        color: const Color(0xFF374AA3).withOpacity(0.66),
+      ),
+      const SizedBox(width: 3),
+      Text(
+        text,
+        style: TextStyle(
+          color: const Color(0xFF374AA3).withOpacity(0.66),
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ],
   );
 }
