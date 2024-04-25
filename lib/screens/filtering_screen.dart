@@ -37,14 +37,17 @@ class FilteringPage extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        itemCount: filteredReviews.length,
-        itemBuilder: (BuildContext context, int index) {
-          return UserReview(
-            review: filteredReviews[index],
-            visibleTrail: false,
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
+        child: ListView.builder(
+          itemCount: filteredReviews.length,
+          itemBuilder: (BuildContext context, int index) {
+            return UserReview(
+              review: filteredReviews[index],
+              visibleTrail: false,
+            );
+          },
+        ),
       ),
     );
   }
