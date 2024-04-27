@@ -40,6 +40,8 @@ dependencies:
   get: ^4.6.6
   toggle_switch: ^2.3.0
   flutter_rating_bar: ^4.0.1
+  scrollable_positioned_list: ^0.3.8
+  carousel_slider: ^4.2.1
 
 dev_dependencies:
   flutter_test:
@@ -80,6 +82,10 @@ flutter:
     - assets/images/sajang.png
     - assets/images/AIWriting.png
     - assets/images/handWriting.png
+    - assets/templates/christmas.png
+    - assets/templates/leaf.png
+    - assets/templates/autumn.png
+    - assets/templates/frog.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
