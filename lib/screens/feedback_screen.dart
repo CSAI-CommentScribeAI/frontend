@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class FeedbackPage extends StatefulWidget {
   const FeedbackPage(selectedStore, {super.key});
@@ -12,6 +11,23 @@ class FeedbackPage extends StatefulWidget {
 class _FeedbackeState extends State<FeedbackPage> {
   String selectedDate = ''; // 선택된 날짜
   double rate = 0.0; // 선택된 날짜에 해당하는 리뷰들의 평균 별점
+  int currentWeek = 1; // 현재 주차
+
+  void goToPreviousWeek() {
+    setState(() {
+      if (currentWeek > 1) {
+        currentWeek--;
+      }
+    });
+  }
+
+  void goToNextWeek() {
+    setState(() {
+      if (currentWeek < 4) {
+        currentWeek++;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,13 +80,13 @@ class _FeedbackeState extends State<FeedbackPage> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.chevron_left),
-                        onPressed: () {},
+                        onPressed: goToPreviousWeek,
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(12.0),
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
                         child: Text(
-                          '12월 1주차',
-                          style: TextStyle(
+                          '12월 $currentWeek주차',
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -78,11 +94,12 @@ class _FeedbackeState extends State<FeedbackPage> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.chevron_right),
-                        onPressed: () {},
+                        onPressed: goToNextWeek,
                       ),
                     ],
                   ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -91,7 +108,7 @@ class _FeedbackeState extends State<FeedbackPage> {
                             animation: true, // 애니메이션 활성화
                             animationDuration: 1200, // 애니메이션 지속 시간 설정
                             lineWidth: 12.0, // 두께
-                            percent: 1, // 퍼센트 %
+                            percent: 0.9, // 퍼센트 %
                             center: const Text(
                               "4.5",
                               style: TextStyle(
@@ -102,27 +119,107 @@ class _FeedbackeState extends State<FeedbackPage> {
                             circularStrokeCap:
                                 CircularStrokeCap.butt, // 원의 모양 설정
                             progressColor: const Color(0xFF7E7EB2)),
-                        // 진행 바 색상
+                        // 진행 바
                       ),
+                      const SizedBox(width: 15),
                       Column(
                         children: [
-                          Text(
-                            rate.toString(),
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            children: [
+                              const Text(
+                                '5점',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              // 날짜에 해당하는 평점 rate를 가져와 rating에 집어넣어 색상 양 설정
+                              LinearPercentIndicator(
+                                width: 150.0, // 바 길이
+                                lineHeight: 8.0, // 바 넓이
+                                percent: 1, // 퍼센트
+                                progressColor: const Color(0xffF9BC28),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Text(
+                                '4점',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              // 날짜에 해당하는 평점 rate를 가져와 rating에 집어넣어 색상 양 설정
+                              LinearPercentIndicator(
+                                width: 150.0, // 바 길이
+                                lineHeight: 8.0, // 바 넓이
+                                percent: 0.8, // 퍼센트
+                                progressColor: const Color(0xffF9BC28),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Text(
+                                '3점',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              // 날짜에 해당하는 평점 rate를 가져와 rating에 집어넣어 색상 양 설정
+                              LinearPercentIndicator(
+                                width: 150.0, // 바 길이
+                                lineHeight: 8.0, // 바 넓이
+                                percent: 0.6, // 퍼센트
+                                progressColor: const Color(0xffF9BC28),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Text(
+                                '2점',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              // 날짜에 해당하는 평점 rate를 가져와 rating에 집어넣어 색상 양 설정
+                              LinearPercentIndicator(
+                                width: 150.0, // 바 길이
+                                lineHeight: 8.0, // 바 넓이
+                                percent: 0.4, // 퍼센트
+                                progressColor: const Color(0xffF9BC28),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Text(
+                                '1점',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              // 날짜에 해당하는 평점 rate를 가져와 rating에 집어넣어 색상 양 설정
+                              LinearPercentIndicator(
+                                width: 150.0, // 바 길이
+                                lineHeight: 8.0, // 바 넓이
+                                percent: 0.2, // 퍼센트
+                                progressColor: const Color(0xffF9BC28),
+                              ),
+                            ],
                           ),
                         ],
-                      ),
-                      const SizedBox(width: 10),
-                      // 날짜에 해당하는 평점 rate를 가져와 rating에 집어넣어 색상 양 설정
-                      RatingBarIndicator(
-                        rating: rate,
-                        itemBuilder: (context, index) => const Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                        ),
                       ),
                     ],
                   )
