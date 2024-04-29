@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/charts/feedback_chart.dart';
 import 'package:frontend/screens/Menu_screen.dart';
+import 'package:frontend/screens/review_screen.dart';
 import 'package:frontend/screens/store_screen.dart';
 import 'package:frontend/widgets/circle_widget.dart';
 import 'package:frontend/widgets/current_widget.dart';
@@ -111,6 +112,8 @@ class _HomePageState extends State<HomePage> {
                                 final store = storeList[index];
                                 return ListTile(
                                   onTap: () {
+                                    // 가게 선택 후 바텀시트 닫기
+                                    Navigator.pop(context);
                                     // bottomState만 적용하면 bottomSheet 값은 즉시 반영되지만 parent 값은 변경되지 않음
                                     // 그래서 꼭 setState()를 같이 추가해주어야 함
                                     bottomState(() {
@@ -125,7 +128,8 @@ class _HomePageState extends State<HomePage> {
                                             storeList[i]["showCircle"] =
                                                 !storeList[i]["showCircle"];
                                             // 만약 선택한 가게의 showCircle이 true라면 선택한 가게의 이름을 저장
-                                            if (storeList[i]["showCircle"]) {
+                                            if (storeList[i]["showCircle"] ==
+                                                true) {
                                               selectedStore = store["title"];
                                             } else {
                                               selectedStore =
@@ -480,9 +484,24 @@ class _HomePageState extends State<HomePage> {
                             menuItem(
                                 imgPath: 'assets/images/receipt.png',
                                 title: '접수관리'),
-                            menuItem(
-                                imgPath: 'assets/images/review.png',
-                                title: '리뷰관리'),
+                            GestureDetector(
+                              onTap: () {
+                                // 가게 선택하지 않을 경우 못 들어가게 설정
+                                selectedStore.isNotEmpty
+                                    ? Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
+                                              ReviewPage(selectedStore),
+                                        ),
+                                      )
+                                    : '';
+                              },
+                              child: menuItem(
+                                  imgPath: 'assets/images/review.png',
+                                  title: '리뷰관리'),
+                            ),
                             menuItem(
                                 imgPath: 'assets/images/connexion.png',
                                 title: '단골고객'),
