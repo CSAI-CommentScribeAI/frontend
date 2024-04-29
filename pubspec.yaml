@@ -39,7 +39,7 @@ dependencies:
   syncfusion_flutter_charts: ^25.1.38
   get: ^4.6.6
   toggle_switch: ^2.3.0
-  image_picker: ^1.1.0
+  image_picker: ^1.0.8
   flutter_rating_bar: ^4.0.1
 
 dev_dependencies:
@@ -89,6 +89,7 @@ flutter:
     - assets/images/sajang.png
     - assets/images/AIWriting.png
     - assets/images/handWriting.png
+    - assets/images/bottom_menu.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
