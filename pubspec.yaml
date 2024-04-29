@@ -40,7 +40,6 @@ dependencies:
   get: ^4.6.6
   toggle_switch: ^2.3.0
   flutter_rating_bar: ^4.0.1
-  scrollable_positioned_list: ^0.3.8
   carousel_slider: ^4.2.1
 
 dev_dependencies:
@@ -86,6 +85,17 @@ flutter:
     - assets/templates/leaf.png
     - assets/templates/autumn.png
     - assets/templates/frog.png
+    - assets/characters/christmasBall.png
+    - assets/characters/christmasGift.png
+    - assets/characters/christmasPenguin.png
+    - assets/characters/christmasPlants.png
+    - assets/characters/christmasStocking.png
+    - assets/characters/christmasTree.png
+    - assets/characters/gingerbreadMan.png
+    - assets/characters/rainbow.png
+    - assets/characters/santaClausBag.png
+    - assets/characters/snowflake.png
+    - assets/characters/sun.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
