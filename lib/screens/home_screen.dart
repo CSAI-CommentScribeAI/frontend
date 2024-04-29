@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/charts/feedback_chart.dart';
 import 'package:frontend/screens/Menu_screen.dart';
+import 'package:frontend/screens/receipt_screen.dart';
 import 'package:frontend/screens/review_screen.dart';
 import 'package:frontend/screens/store_screen.dart';
 import 'package:frontend/widgets/circle_widget.dart';
 import 'package:frontend/widgets/current_widget.dart';
 import 'package:frontend/widgets/menuItem_widget.dart';
-import 'package:frontend/screens/feedback_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -225,9 +225,7 @@ class _HomePageState extends State<HomePage> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const FeedbackPage(),
-                ),
+                MaterialPageRoute(builder: (context) => const ReceiptPage()),
               );
             },
             child: Padding(
