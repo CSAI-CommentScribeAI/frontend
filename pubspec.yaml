@@ -41,6 +41,7 @@ dependencies:
   toggle_switch: ^2.3.0
   flutter_rating_bar: ^4.0.1
   carousel_slider: ^4.2.1
+  flutter_font_picker: ^1.4.0
 
 dev_dependencies:
   flutter_test:
@@ -96,6 +97,9 @@ flutter:
     - assets/characters/santaClausBag.png
     - assets/characters/snowflake.png
     - assets/characters/sun.png
+    - assets/characters/chick.png
+    - assets/characters/flower.png
+    - assets/characters/smile.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
