@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter_font_picker/flutter_font_picker.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 
 class LetterPage extends StatefulWidget {
   const LetterPage({super.key});
@@ -10,13 +11,16 @@ class LetterPage extends StatefulWidget {
 }
 
 class _LetterPageState extends State<LetterPage> {
-  late ScrollController scrollController;
-  bool charactersOpened = false;
+  bool characterOpened = false;
+  bool fontOpened = false;
   bool isCompleted = true; // 수정 완료 활성화 여부
   CarouselController controller = CarouselController();
   int currentPageIndex = 0;
-  List<Widget> overlayWidgets = [];
 
+  String selectedFont = 'Roboto';
+  TextEditingController letterController = TextEditingController();
+
+  List<Widget> overlayWidgets = [];
   int startIndex = 0;
   int endIndex = 7;
 
@@ -44,7 +48,16 @@ class _LetterPageState extends State<LetterPage> {
     {'url': 'assets/characters/smile.png'},
   ];
 
-  List<Map<String, dynamic>> nextIconList = [];
+  List<String> fontList = [
+    'PyeongChangPeace',
+    'KyoboHandwriting2023wsa',
+    'EF_jejudoldam',
+    'YClover',
+    'DungGeunMo',
+    'Adultkid',
+  ];
+
+  String letterContent = '';
 
   void loadNextIcons() {
     setState(() {
@@ -73,16 +86,180 @@ class _LetterPageState extends State<LetterPage> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    scrollController = ScrollController();
+  // 캐릭터 선택 박스 콜백 함수
+  BottomAppBar openCharacter() {
+    return BottomAppBar(
+      color: const Color(0xFFE8E8FF),
+      height: 130,
+      child: Builder(
+        builder: (context) {
+          return Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // 캐릭터 추가 버튼
+                  Row(
+                    children: [
+                      const Text(
+                        '캐릭터 추가',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.add_circle),
+                      ),
+                    ],
+                  ),
+
+                  // 캐릭터 이동 버튼
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          loadPreviousIcons();
+                        },
+                        icon: const Icon(Icons.arrow_back_ios),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          loadNextIcons();
+                        },
+                        icon: const Icon(Icons.arrow_forward_ios),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Stack(
+                children: [
+                  SizedBox(
+                    height: 55,
+                    child: Row(
+                      children: iconList
+                          // iconList의 startIndex부터 endIndex까지의 아이콘 이미지를 가져옴
+                          .sublist(startIndex, endIndex)
+                          .map(
+                            (icon) => Draggable<Map<String, dynamic>>(
+                              // Draggable 위젯에서 가져올 아이콘 지정
+                              data: icon,
+
+                              // 드래그 동안 화면에 나타날 아이콘 지정
+                              feedback: Image.asset(
+                                icon['url'],
+                                height: 53,
+                                width: 53,
+                              ),
+
+                              // 캐릭터 박스에 있는 아이콘 지정
+                              child: Image.asset(
+                                icon['url'],
+                                height: 53,
+                                width: 53,
+                              ),
+
+                              // 드래그가 완료될 때의 콜백 함수
+                              // 오버레이 위젯에 추가될 위치를 계산하고, 그 위치에 이미지 위젯을 추가
+                              onDragEnd: (details) {
+                                setState(() {
+                                  RenderBox overlay = Overlay.of(
+                                    context,
+                                  ).context.findRenderObject() as RenderBox;
+                                  final relative =
+                                      overlay.globalToLocal(details.offset);
+                                  overlayWidgets.add(
+                                    Positioned(
+                                      left: relative.dx - 55,
+                                      top: relative.dy - 230,
+                                      child: Image.asset(
+                                        icon['url'],
+                                        height: 53,
+                                        width: 53,
+                                      ),
+                                    ),
+                                  );
+                                });
+                              },
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                  ...overlayWidgets,
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 
-  @override
-  void dispose() {
-    scrollController.dispose();
-    super.dispose();
+  // 폰트 선택 박스 콜백 함수
+  BottomAppBar openFont() {
+    return BottomAppBar(
+      color: const Color(0xFFE8E8FF),
+      height: 130,
+      child: Builder(
+        builder: (context) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 5.0, left: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '글씨체',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          fontOpened = false; // 하단바 나가기
+                        });
+                      },
+                      child: const Text(
+                        '완료',
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Flexible(
+                child: CupertinoPicker(
+                  itemExtent: 50.0, // 각 아이템의 높이 설정
+                  onSelectedItemChanged: (index) {
+                    setState(() {
+                      selectedFont = fontList[index];
+                    });
+                  },
+                  children: fontList.map((String font) {
+                    return Center(
+                      child: Text(
+                        font,
+                        style: TextStyle(fontFamily: font),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -178,11 +355,12 @@ class _LetterPageState extends State<LetterPage> {
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            charactersOpened = !charactersOpened;
+                            characterOpened = !characterOpened;
+                            fontOpened = false; // 캐릭터 버튼 눌렀을 때 글씨체 선택 창 닫기
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: charactersOpened
+                          backgroundColor: characterOpened
                               ? const Color(0xFF7B88C2)
                               : const Color(0xFFD9D9D9),
                           elevation: 3.0,
@@ -203,11 +381,14 @@ class _LetterPageState extends State<LetterPage> {
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            charactersOpened = !charactersOpened;
+                            fontOpened = !fontOpened;
+                            characterOpened = false; // 글씨체 버튼 눌렀을 때 캐릭터 창 닫기
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFD9D9D9),
+                          backgroundColor: fontOpened
+                              ? const Color(0xFF7B88C2)
+                              : const Color(0xFFD9D9D9),
                           elevation: 3.0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
@@ -253,116 +434,11 @@ class _LetterPageState extends State<LetterPage> {
                 ),
               ),
             )
-          : charactersOpened
-              ? BottomAppBar(
-                  color: const Color(0xFFE8E8FF),
-                  height: 130,
-                  child: Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // 캐릭터 추가 버튼
-                          Row(
-                            children: [
-                              const Text(
-                                '캐릭터 추가',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.add_circle),
-                              ),
-                            ],
-                          ),
-
-                          // 캐릭터 이동 버튼
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  loadPreviousIcons();
-                                },
-                                icon: const Icon(Icons.arrow_back_ios),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  loadNextIcons();
-                                },
-                                icon: const Icon(Icons.arrow_forward_ios),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Stack(
-                        children: [
-                          SizedBox(
-                            height: 55,
-                            child: Row(
-                              children: iconList
-                                  // iconList의 startIndex부터 endIndex까지의 아이콘 이미지를 가져옴
-                                  .sublist(startIndex, endIndex)
-                                  .map(
-                                    (icon) => Draggable<Map<String, dynamic>>(
-                                      // Draggable 위젯에서 가져올 아이콘 지정
-                                      data: icon,
-
-                                      // 드래그 동안 화면에 나타날 아이콘 지정
-                                      feedback: Image.asset(
-                                        icon['url'],
-                                        height: 53,
-                                        width: 53,
-                                      ),
-
-                                      // 캐릭터 박스에 있는 아이콘 지정
-                                      child: Image.asset(
-                                        icon['url'],
-                                        height: 53,
-                                        width: 53,
-                                      ),
-
-                                      // 드래그가 완료될 때의 콜백 함수
-                                      // 오버레이 위젯에 추가될 위치를 계산하고, 그 위치에 이미지 위젯을 추가
-                                      onDragEnd: (details) {
-                                        setState(() {
-                                          RenderBox overlay = Overlay.of(
-                                                  context) // 다른 위젯 위에 겹쳐질 위젯 구현
-                                              .context
-                                              .findRenderObject() as RenderBox;
-                                          final relative =
-                                              overlay.globalToLocal(details
-                                                  .offset); // 드래그한 위치를 상대적인 좌표로 변환
-                                          overlayWidgets.add(
-                                            Positioned(
-                                              // 드롭할 위치 지정
-                                              left: relative.dx - 55,
-                                              top: relative.dy - 230,
-                                              child: Image.asset(
-                                                icon['url'],
-                                                height: 53,
-                                                width: 53,
-                                              ),
-                                            ),
-                                          );
-                                        });
-                                      },
-                                    ),
-                                  )
-                                  .toList(),
-                            ),
-                          ),
-                          ...overlayWidgets,
-                        ],
-                      ),
-                    ],
-                  ),
-                )
-              : null,
+          : characterOpened
+              ? openCharacter()
+              : fontOpened
+                  ? openFont()
+                  : null,
     );
   }
 
@@ -372,8 +448,8 @@ class _LetterPageState extends State<LetterPage> {
       itemCount: templateList.length,
       itemBuilder: (context, index, pageViewIndex) {
         return DragTarget<String>(
-          onWillAccept: (data) => true,
-          onAccept: (data) {},
+          onWillAcceptWithDetails: (data) => true,
+          onAcceptWithDetails: (data) {},
           builder: (context, candidateData, rejectedData) {
             return Column(
               children: [
@@ -391,6 +467,7 @@ class _LetterPageState extends State<LetterPage> {
                       height: 450,
                       width: 320,
                       decoration: BoxDecoration(
+                        color: Colors.brown,
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.25),
@@ -401,6 +478,29 @@ class _LetterPageState extends State<LetterPage> {
                         image: DecorationImage(
                           image: AssetImage(templateList[index]['url']!),
                           fit: BoxFit.fill,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 30.0, horizontal: 40.0),
+                        child: TextFormField(
+                          controller: letterController,
+                          readOnly: isCompleted ? true : false,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.done,
+                          onSaved: (value) {
+                            setState(() {
+                              letterContent = value.toString();
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            border: InputBorder.none, // underline 제거
+                          ),
+                          style: TextStyle(
+                            fontFamily: selectedFont,
+                          ),
+                          maxLines: null, // 다중 라인을 지원하기 위해 null로 설정
+                          expands: true, // Container의 크기에 따라 확장
                         ),
                       ),
                     ),

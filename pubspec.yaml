@@ -42,6 +42,7 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   carousel_slider: ^4.2.1
   flutter_font_picker: ^1.4.0
+  google_fonts: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -112,17 +113,30 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  fonts:
+    - family: PyeongChangPeace
+      fonts:
+        - asset: assets/fonts/PyeongChangPeace-Bold.otf
+    - family: KyoboHandwriting2023wsa
+      fonts:
+        - asset: assets/fonts/KyoboHandwriting2023wsa.otf
+    - family: EF_jejudoldam
+      fonts:
+        - asset: assets/fonts/EF_jejudoldam.otf
+    - family: YClover
+      fonts:
+        - asset: assets/fonts/YClover-Bold.otf
+    - family: DungGeunMo
+      fonts:
+        - asset: assets/fonts/DungGeunMo.otf
+    - family: Adultkid
+      fonts:
+        - asset: assets/fonts/Adultkid.otf
+
+  #  - family: Jersey25Charted
+  #    fonts:
+  #      - asset: assets/google_fonts/Jersey25Charted-Regular.ttf
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
