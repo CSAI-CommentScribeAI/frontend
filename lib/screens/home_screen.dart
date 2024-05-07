@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/charts/feedback_chart.dart';
+import 'package:frontend/screens/Menu_screen.dart';
+import 'package:frontend/screens/receipt_screen.dart';
 import 'package:frontend/screens/review_screen.dart';
 import 'package:frontend/screens/store_screen.dart';
 import 'package:frontend/widgets/circle_widget.dart';
 import 'package:frontend/widgets/current_widget.dart';
 import 'package:frontend/widgets/menuItem_widget.dart';
-import 'package:frontend/screens/feedback_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -224,9 +225,7 @@ class _HomePageState extends State<HomePage> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const FeedbackPage(),
-                ),
+                MaterialPageRoute(builder: (context) => const ReceiptPage()),
               );
             },
             child: Padding(
@@ -462,9 +461,24 @@ class _HomePageState extends State<HomePage> {
                                   imgPath: 'assets/images/store.png',
                                   title: '가게관리'),
                             ),
-                            menuItem(
-                                imgPath: 'assets/images/menu.png',
-                                title: '메뉴관리'),
+                            GestureDetector(
+                              onTap: () {
+                                // 가게 선택하지 않을 경우 못 들어가게 설정
+                                selectedStore.isNotEmpty
+                                    ? Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
+                                              MenuPage(selectedStore),
+                                        ),
+                                      )
+                                    : '';
+                              },
+                              child: menuItem(
+                                  imgPath: 'assets/images/menu.png',
+                                  title: '메뉴관리'),
+                            ),
                             menuItem(
                                 imgPath: 'assets/images/receipt.png',
                                 title: '접수관리'),

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/widgets/userReview_widget.dart';
 
 class ReplyPage extends StatefulWidget {
+  final List<Map<String, dynamic>> reviewList;
   final Map<String, dynamic> review;
-  const ReplyPage({required this.review, super.key});
+  const ReplyPage({required this.reviewList, required this.review, super.key});
 
   @override
   State<ReplyPage> createState() => _ReplyPageState();
@@ -52,7 +53,10 @@ class _ReplyPageState extends State<ReplyPage> {
         padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 30.0),
         child: Column(
           children: [
-            UserReview(review: widget.review),
+            UserReview(
+              review: widget.review,
+              visibleTrail: false,
+            ),
             const SizedBox(height: 30),
 
             // 답글 텍스트필드
