@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/charts/feedback_chart.dart';
 import 'package:frontend/screens/Menu_screen.dart';
+import 'package:frontend/screens/feedback_screen.dart';
 import 'package:frontend/screens/receipt_screen.dart';
 import 'package:frontend/screens/review_screen.dart';
 import 'package:frontend/screens/store_screen.dart';
@@ -223,7 +224,6 @@ class _HomePageState extends State<HomePage> {
         actions: [
           GestureDetector(
             onTap: () {
-
               // 가게 선택하지 않을 경우 못 들어가게 설정
               selectedStore.isNotEmpty
                   ? Navigator.push(
