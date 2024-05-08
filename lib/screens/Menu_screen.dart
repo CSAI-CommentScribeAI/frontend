@@ -375,16 +375,12 @@ class _MenuPageState extends State<MenuPage> {
           color: const Color(0xFF374AA3),
           child: GridView.count(
             physics: const NeverScrollableScrollPhysics(), // Gridview의 스크롤 방지
-            crossAxisCount: 5, // 1개의 행에 보여줄 item의 개수
+            crossAxisCount: 3, // 1개의 행에 보여줄 item의 개수
             crossAxisSpacing: 10.0, // 같은 행의 iteme들 사이의 간격
             children: [
               storeItem(imgPath: 'assets/images/bottom_home.png', title: '홈'),
               storeItem(
                   imgPath: 'assets/images/bottom_store.png', title: '가게 관리'),
-              storeItem(
-                  imgPath: 'assets/images/bottom_record.png', title: '접수 관리'),
-              storeItem(
-                  imgPath: 'assets/images/bottom_review.png', title: '리뷰 관리'),
               storeItem(imgPath: 'assets/images/bottom_my.png', title: 'MY'),
             ],
           ),

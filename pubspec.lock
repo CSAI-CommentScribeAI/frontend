@@ -367,6 +367,15 @@ packages:
       sha256: "5a7999be66e000916500be4f15a3633ebceb8302719b47b9cc49ce924125350f"
       url: "https://pub.dev"
     source: hosted
+    version: "1.9.0"
+  percent_indicator:
+    dependency: "direct main"
+    description:
+      name: percent_indicator
+      sha256: c37099ad833a883c9d71782321cb65c3a848c21b6939b6185f0ff6640d05814c
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.3"
     version: "2.3.2"
   path_provider_linux:
     dependency: transitive

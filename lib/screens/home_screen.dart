@@ -223,10 +223,18 @@ class _HomePageState extends State<HomePage> {
         actions: [
           GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ReceiptPage()),
-              );
+
+              // 가게 선택하지 않을 경우 못 들어가게 설정
+              selectedStore.isNotEmpty
+                  ? Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
+                            FeedbackPage(selectedStore),
+                      ),
+                    )
+                  : '';
             },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -503,9 +511,24 @@ class _HomePageState extends State<HomePage> {
                             menuItem(
                                 imgPath: 'assets/images/connexion.png',
                                 title: '단골고객'),
-                            menuItem(
-                                imgPath: 'assets/images/feedback2.png',
-                                title: '피드백'),
+                            GestureDetector(
+                              onTap: () {
+                                // 가게 선택하지 않을 경우 못 들어가게 설정
+                                selectedStore.isNotEmpty
+                                    ? Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
+                                              FeedbackPage(selectedStore),
+                                        ),
+                                      )
+                                    : '';
+                              },
+                              child: menuItem(
+                                  imgPath: 'assets/images/feedback2.png',
+                                  title: '피드백'),
+                            ),
                             menuItem(
                                 imgPath: 'assets/images/black.png',
                                 title: '블랙리스트'),

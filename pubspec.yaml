@@ -41,9 +41,11 @@ dependencies:
   toggle_switch: ^2.3.0
   image_picker: ^1.0.8
   flutter_rating_bar: ^4.0.1
+  percent_indicator: 4.2.3
   carousel_slider: ^4.2.1
   flutter_font_picker: ^1.4.0
   google_fonts: ^5.1.0
+
 
 dev_dependencies:
   flutter_test:
@@ -93,6 +95,8 @@ flutter:
     - assets/images/sajang.png
     - assets/images/AIWriting.png
     - assets/images/handWriting.png
+    - assets/images/good.png
+    - assets/images/bad.png
     - assets/templates/christmas.png
     - assets/templates/leaf.png
     - assets/templates/autumn.png
