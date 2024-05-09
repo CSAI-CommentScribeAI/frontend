@@ -35,17 +35,35 @@ class _ReceiptPageState extends State<ReceiptPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF3F3FF),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF374AA3),
-        toolbarHeight: 70,
+        actions: const [
+          // 오른쪽 상단에 프로필 아이콘을 나타내는 아이콘 추가
+          Padding(
+            padding: EdgeInsets.only(right: 23.0),
+            child: Icon(
+              Icons.menu,
+              size: 30,
+              color: Colors.white,
+            ),
+          ),
+        ],
+        // 가게 이름을 표시하는 타이틀 설정
+        title: const Text(
+          '접수 관리',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        centerTitle: true, // 타이틀을 가운데 정렬
+        backgroundColor: const Color(0xFF374AA3), // 앱 바 배경색 설정
+        toolbarHeight: 70, // 앱 바의 높이 설정
         leading: const Padding(
+          // 왼쪽 상단에 뒤로가기 아이콘을 나타내는 아이콘 추가
           padding: EdgeInsets.only(left: 15.0),
           child: BackButton(
             color: Colors.white,
           ),
-        ),
-        title: const Text(
-          '주문 접수',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -59,13 +77,6 @@ class _ReceiptPageState extends State<ReceiptPage> {
             // 완료된 주문 정보 갯수
             Row(
               children: [
-                Text(
-                  '완료(${orderList.length})',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 const SizedBox(width: 20),
                 ElevatedButton(
                   onPressed: () {

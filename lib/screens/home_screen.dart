@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/charts/feedback_chart.dart';
 import 'package:frontend/screens/Menu_screen.dart';
 import 'package:frontend/screens/feedback_screen.dart';
@@ -487,9 +488,19 @@ class _HomePageState extends State<HomePage> {
                                   imgPath: 'assets/images/menu.png',
                                   title: '메뉴관리'),
                             ),
-                            menuItem(
-                                imgPath: 'assets/images/receipt.png',
-                                title: '접수관리'),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ReceiptPage(),
+                                  ),
+                                );
+                              },
+                              child: menuItem(
+                                  imgPath: 'assets/images/receipt.png',
+                                  title: '접수관리'),
+                            ),
                             GestureDetector(
                               onTap: () {
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
