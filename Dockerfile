@@ -15,7 +15,7 @@ RUN git clone https://github.com/flutter/flutter.git /opt/flutter && \
 ENV PATH="/opt/flutter/bin:$PATH"
 
 # Flutter 프로젝트 디렉토리로 이동
-WORKDIR /app/flutter_project
+WORKDIR /app/frontend
 
 # Flutter 프로젝트를 포함한 디렉토리를 복사
 COPY . .
@@ -25,7 +25,7 @@ RUN /opt/flutter/bin/flutter build web
 
 # 웹 서버 설정
 RUN apt-get update && apt-get install -y nginx
-RUN cp -r /app/flutter_project/build/web/* /var/www/html/
+RUN cp -r /app/frontend/build/web/* /var/www/html/
 
 # Nginx 설정 변경
 # 설정 파일을 생성하고 Dockerfile에 적용합니다.
@@ -33,5 +33,5 @@ RUN echo "server { listen 80; root /var/www/html; index index.html; location / {
 RUN rm -f /etc/nginx/sites-enabled/default && ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
 # 포트 노출 및 웹 서버 실행
-EXPOSE 80
+EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
