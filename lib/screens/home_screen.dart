@@ -46,8 +46,8 @@ class _HomePageState extends State<HomePage> {
     },
   ];
 
-  void chooseStore(BuildContext context) async {
-    await showModalBottomSheet(
+  void chooseStore(BuildContext context) {
+    showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
