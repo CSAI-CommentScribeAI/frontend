@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/charts/feedback_chart.dart';
-import 'package:frontend/screens/Menu_screen.dart';
+import 'package:frontend/screens/menu_screen.dart';
 import 'package:frontend/screens/feedback_screen.dart';
 import 'package:frontend/screens/receipt_screen.dart';
 import 'package:frontend/screens/review_screen.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:frontend/screens/Choose_screen.dart';
+import 'package:frontend/screens/choose_screen.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -48,8 +48,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     labelText: _isEmailValid ? '이메일' : '',
                     labelStyle: const TextStyle(fontSize: 13),
-                    errorText:
-                        _isEmailValid ? null : '올바른 이메일 형식이 아닙니다.',
+                    errorText: _isEmailValid ? null : '올바른 이메일 형식이 아닙니다.',
                   ),
                   onChanged: (value) {
                     setState(() {
@@ -70,8 +69,7 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     if (value.isEmpty ||
                         value.length < 10 ||
-                        !RegExp(
-                                r'(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+])(?=.*[0-9]).{10,}')
+                        !RegExp(r'(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+])(?=.*[0-9]).{10,}')
                             .hasMatch(value)) {
                       _isPasswordValid = false;
                     } else {
@@ -93,8 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     children: [
                       Checkbox(
-                        materialTapTargetSize:
-                            MaterialTapTargetSize.shrinkWrap,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         visualDensity: const VisualDensity(
                           horizontal: VisualDensity.minimumDensity,
                           vertical: VisualDensity.minimumDensity,
@@ -173,8 +170,8 @@ class _LoginPageState extends State<LoginPage> {
                   child: TextButton(
                     onPressed: () {},
                     style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(const Color(0xff374AA3)),
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          const Color(0xff374AA3)),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
@@ -196,7 +193,10 @@ class _LoginPageState extends State<LoginPage> {
                 padding: const EdgeInsets.only(top: 17),
                 child: TextButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ChoosePage()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ChoosePage()));
                   },
                   child: const Text(
                     '처음이신가요?',
@@ -253,7 +253,6 @@ class PasswordTextField extends StatelessWidget {
                   : '비밀번호는 적어도 하나의 영문자, 특수문자 포함 10자 이상이어야 합니다.',
             ),
           ),
-          
           Positioned(
             right: 0,
             top: isPasswordValid ? 6 : -10,
