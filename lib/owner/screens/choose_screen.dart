@@ -18,6 +18,14 @@ class _ChoosePageState extends State<ChoosePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 15.0),
+          child: BackButton(
+            color: Colors.black,
+          ),
+        ),
+      ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
         child: Center(
@@ -89,9 +97,17 @@ class _ChoosePageState extends State<ChoosePage> {
                 child: TextButton(
                     onPressed: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SignupPage()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SignupPage(
+                            // 0이면 사장님(ROLE_OWNER), 1이면 고객(ROLE_USER) 반환
+                            userRole: _selectedIndex == 0
+                                ? 'ROLE_OWNER'
+                                : 'ROLE_USER',
+                          ),
+                        ),
+                      );
+                      print(_selectedIndex);
                     },
                     style: TextButton.styleFrom(),
                     child: const Text('다음으로 >',
