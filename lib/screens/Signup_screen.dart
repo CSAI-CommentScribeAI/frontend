@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:frontend/screens/Login_screen.dart';
 import 'package:http/http.dart' as http;
 
 class SignupPage extends StatefulWidget {
@@ -43,6 +44,71 @@ class _SignupPageState extends State<SignupPage> {
     addrController = TextEditingController();
   }
 
+  void completedSignup() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          icon: const Icon(
+            Icons.check_circle,
+            size: 40,
+            color: Color(0xFF7B88C2),
+          ),
+          // 메인 타이틀
+          title: const Column(
+            children: [
+              Text("회원가입 완료"),
+            ],
+          ),
+          //
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "지금 바로 이용해보세요!!",
+              ),
+            ],
+          ),
+          actions: [
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginPage(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF374AA3),
+                  minimumSize: const Size(200, 40),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                child: const Text(
+                  '확인',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future handleSignUp(String nickname, String email, String userId,
       String password, String userRole) async {
     try {
@@ -53,6 +119,7 @@ class _SignupPageState extends State<SignupPage> {
         serverAddress = 'http://127.0.0.1:9000/api/v1/auth/signup';
       }
 
+      // 엔드포인트 가져
       final url = Uri.parse(serverAddress);
       final response = await http.post(
         url,
@@ -68,6 +135,7 @@ class _SignupPageState extends State<SignupPage> {
         }),
       );
       if (response.statusCode == 200) {
+        completedSignup();
         print('회원가입 성공!!');
       } else {
         print('회원가입 실패! ${response.body}');
@@ -80,182 +148,191 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-      padding: const EdgeInsets.all(20.0),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              '배달반도',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 36,
-              ),
-            ),
-            const SizedBox(height: 20.0),
-
-            // 이름 입력 필드
-            SizedBox(
-              height: 55,
-              child: TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  labelText: '이름',
-                  labelStyle: const TextStyle(fontSize: 13),
+      appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 15.0),
+          child: BackButton(
+            color: Colors.black,
+          ),
+        ),
+      ),
+      body: Container(
+        padding: const EdgeInsets.all(20.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                '배달반도',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 36,
                 ),
               ),
-            ),
-            const SizedBox(height: 10.0),
+              const SizedBox(height: 20.0),
 
-            // 이메일 입력 필드
-            SizedBox(
-              height: 55,
-              child: TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  labelText: _isEmailValid ? '이메일 주소' : '',
-                  labelStyle: const TextStyle(fontSize: 13),
-                  errorText: _isEmailValid
-                      ? null
-                      : '올바른 이메일 형식이 아닙니다.', // _isEmailValid가 false이면 '올바른 이메일 형식이 아닙니다.'가 표시
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    // 사용자가 입력한 텍스트(value)가 비어있는지 확인
-                    if (value.isEmpty) {
-                      // 만약 비어있다면, 유효한 이메일이 아니라고 판단
-                      _isEmailValid = true;
-                    } else {
-                      // 값이 비어있지 않다면, EmailValidator.validate 함수를 사용하여 이메일 유효성을 검사
-                      _isEmailValid = EmailValidator.validate(value);
-                    }
-                  });
-                },
-              ),
-            ),
-            const SizedBox(height: 10.0),
-
-            // 아이디 입력 필드
-            SizedBox(
-              height: 55,
-              child: TextField(
-                controller: idController,
-                maxLength: 10, // 아이디의 최대 길이를 10으로 제한
-                decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  labelText: _isIDValid ? '아이디' : '',
-                  labelStyle: const TextStyle(fontSize: 13),
-                  counterText: '',
-                  errorText: _isIDValid
-                      ? null
-                      : idController.text.length < 4 &&
-                              idController.text.length > 10
-                          ? '4자 이상 10자 이하로 작성해주세요.'
-                          : '',
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _isIDValid = !_isIDValid;
-                  });
-                },
-              ),
-            ),
-            const SizedBox(height: 10.0),
-
-            PasswordTextField(
-              // 비밀번호 입력 필드
-              isPasswordValid: _isPasswordValid,
-              isPasswordVisible: _isPasswordVisible,
-              isPasswordConfirmed: _isPasswordConfirmed,
-              onChanged: (value) {
-                setState(() {
-                  if (value.isEmpty ||
-                      value.length < 10 ||
-                      !RegExp(r'(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+])(?=.*[0-9]).{10,}')
-                          .hasMatch(value)) {
-                    _isPasswordValid = false;
-                  } else {
-                    _isPasswordValid = true;
-                  }
-                });
-              },
-              onVisibilityToggle: () {
-                setState(() {
-                  _isPasswordVisible = !_isPasswordVisible;
-                });
-              },
-              controller: _passwordController,
-            ),
-            const SizedBox(height: 10.0),
-            SizedBox(
-              height: 55,
-              child: TextField(
-                obscureText: true,
-                controller: _confirmPasswordController,
-                onChanged: (value) {
-                  setState(() {
-                    _isPasswordConfirmed = _passwordController.text == value;
-                  });
-                },
-                decoration: InputDecoration(
+              // 이름 입력 필드
+              SizedBox(
+                height: 55,
+                child: TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    labelText: _isPasswordConfirmed ? '비밀번호 확인' : '',
+                    labelText: '이름',
                     labelStyle: const TextStyle(fontSize: 13),
-                    errorText:
-                        _isPasswordConfirmed ? null : '비밀번호가 일치하지 않습니다.'),
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 10.0),
-            Padding(
-              padding: const EdgeInsets.only(top: 17),
-              child: SizedBox(
-                height: 45,
-                width: 400,
-                child: TextButton(
-                  onPressed: () {
-                    handleSignUp(
-                      nameController.text,
-                      emailController.text,
-                      idController.text,
-                      _passwordController.text,
-                      widget.userRole,
-                    );
+              const SizedBox(height: 10.0),
+
+              // 이메일 입력 필드
+              SizedBox(
+                height: 55,
+                child: TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    labelText: _isEmailValid ? '이메일 주소' : '',
+                    labelStyle: const TextStyle(fontSize: 13),
+                    errorText: _isEmailValid
+                        ? null
+                        : '올바른 이메일 형식이 아닙니다.', // _isEmailValid가 false이면 '올바른 이메일 형식이 아닙니다.'가 표시
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      // 사용자가 입력한 텍스트(value)가 비어있는지 확인
+                      if (value.isEmpty) {
+                        // 만약 비어있다면, 유효한 이메일이 아니라고 판단
+                        _isEmailValid = true;
+                      } else {
+                        // 값이 비어있지 않다면, EmailValidator.validate 함수를 사용하여 이메일 유효성을 검사
+                        _isEmailValid = EmailValidator.validate(value);
+                      }
+                    });
                   },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color(0xff374AA3)),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
+                ),
+              ),
+              const SizedBox(height: 10.0),
+
+              // 아이디 입력 필드
+              SizedBox(
+                height: 55,
+                child: TextField(
+                  controller: idController,
+                  maxLength: 10, // 아이디의 최대 길이를 10으로 제한
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    labelText: _isIDValid ? '아이디' : '',
+                    labelStyle: const TextStyle(fontSize: 13),
+                    counterText: '',
+                    errorText: _isIDValid
+                        ? null
+                        : idController.text.length < 4 &&
+                                idController.text.length > 10
+                            ? '4자 이상 10자 이하로 작성해주세요.'
+                            : '',
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _isIDValid = !_isIDValid;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 10.0),
+
+              PasswordTextField(
+                // 비밀번호 입력 필드
+                isPasswordValid: _isPasswordValid,
+                isPasswordVisible: _isPasswordVisible,
+                isPasswordConfirmed: _isPasswordConfirmed,
+                onChanged: (value) {
+                  setState(() {
+                    if (value.isEmpty ||
+                        value.length < 10 ||
+                        !RegExp(r'(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+])(?=.*[0-9]).{10,}')
+                            .hasMatch(value)) {
+                      _isPasswordValid = false;
+                    } else {
+                      _isPasswordValid = true;
+                    }
+                  });
+                },
+                onVisibilityToggle: () {
+                  setState(() {
+                    _isPasswordVisible = !_isPasswordVisible;
+                  });
+                },
+                controller: _passwordController,
+              ),
+              const SizedBox(height: 10.0),
+              SizedBox(
+                height: 55,
+                child: TextField(
+                  obscureText: true,
+                  controller: _confirmPasswordController,
+                  onChanged: (value) {
+                    setState(() {
+                      _isPasswordConfirmed = _passwordController.text == value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5),
                       ),
+                      labelText: _isPasswordConfirmed ? '비밀번호 확인' : '',
+                      labelStyle: const TextStyle(fontSize: 13),
+                      errorText:
+                          _isPasswordConfirmed ? null : '비밀번호가 일치하지 않습니다.'),
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              Padding(
+                padding: const EdgeInsets.only(top: 17),
+                child: SizedBox(
+                  height: 45,
+                  width: 400,
+                  child: TextButton(
+                    onPressed: () {
+                      handleSignUp(
+                        nameController.text,
+                        emailController.text,
+                        idController.text,
+                        _passwordController.text,
+                        widget.userRole,
+                      );
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          const Color(0xff374AA3)),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'Sign up',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                    child: const Text(
+                      'Sign up',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }
 

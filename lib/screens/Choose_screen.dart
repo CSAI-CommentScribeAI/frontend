@@ -18,6 +18,14 @@ class _ChoosePageState extends State<ChoosePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 15.0),
+          child: BackButton(
+            color: Colors.black,
+          ),
+        ),
+      ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
         child: Center(
