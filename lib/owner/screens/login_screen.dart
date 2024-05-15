@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:frontend/screens/choose_screen.dart';
+import 'package:frontend/owner/screens/choose_screen.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

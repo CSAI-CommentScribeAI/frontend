@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/charts/feedback_chart.dart';
-import 'package:frontend/screens/menu_screen.dart';
-import 'package:frontend/screens/feedback_screen.dart';
-import 'package:frontend/screens/receipt_screen.dart';
-import 'package:frontend/screens/review_screen.dart';
-import 'package:frontend/screens/store_screen.dart';
-import 'package:frontend/widgets/circle_widget.dart';
-import 'package:frontend/widgets/current_widget.dart';
-import 'package:frontend/widgets/menuItem_widget.dart';
+import 'package:frontend/owner/charts/feedback_chart.dart';
+import 'package:frontend/owner/screens/feedback_screen.dart';
+import 'package:frontend/owner/screens/menu_screen.dart';
+import 'package:frontend/owner/screens/review_screen.dart';
+import 'package:frontend/owner/screens/store_screen.dart';
+import 'package:frontend/owner/widgets/circle_widget.dart';
+import 'package:frontend/owner/widgets/current_widget.dart';
+import 'package:frontend/owner/widgets/menuItem_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
