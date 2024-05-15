@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:frontend/screens/Signup_screen.dart';
+import 'package:frontend/owner/screens/signup_screen.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class ChoosePage extends StatefulWidget {
@@ -11,7 +11,8 @@ class ChoosePage extends StatefulWidget {
 }
 
 class _ChoosePageState extends State<ChoosePage> {
-  int _selectedIndex = -1; // -1을 초기 값으로 사용하는 것은 초기화되지 않은 상태를 나타내거나 아직 유효한 선택이 없음을 나타냄
+  int _selectedIndex =
+      -1; // -1을 초기 값으로 사용하는 것은 초기화되지 않은 상태를 나타내거나 아직 유효한 선택이 없음을 나타냄
   int _previousIndex = -1;
 
   @override
@@ -26,7 +27,7 @@ class _ChoosePageState extends State<ChoosePage> {
               const Text(
                 '배달반도',
                 style: TextStyle(
-                  fontSize: 36, 
+                  fontSize: 36,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -47,22 +48,29 @@ class _ChoosePageState extends State<ChoosePage> {
                   minWidth: 200.0,
                   minHeight: 60.0,
                   cornerRadius: 10.0,
-                  activeBgColors: const [[Colors.white], [Colors.white]], // 토글 선택 시 선택된 토글 해당 색상으로 변경
+                  activeBgColors: const [
+                    [Colors.white],
+                    [Colors.white]
+                  ], // 토글 선택 시 선택된 토글 해당 색상으로 변경
                   activeFgColor: Colors.black,
                   inactiveBgColor: const Color(0xFFD6D6F8), // 토글 전체 색상 변경
-                  activeBorders: [Border.all(width: 5, color: const Color(0xFFD6D6F8))], // 전체 토글과 선택된 토글 사이의 간격 해당 색상으로 변경
+                  activeBorders: [
+                    Border.all(width: 5, color: const Color(0xFFD6D6F8))
+                  ], // 전체 토글과 선택된 토글 사이의 간격 해당 색상으로 변경
                   inactiveFgColor: Colors.black,
                   initialLabelIndex: _selectedIndex,
                   totalSwitches: 2,
                   labels: const ['사장님', '고객'],
                   radiusStyle: true,
                   onToggle: (index) {
-                    if(index == _previousIndex) { // 사용자가 이전에 선택한 인덱스와 현재 선택한 인덱스가 같을 경우 함수를 종료
+                    if (index == _previousIndex) {
+                      // 사용자가 이전에 선택한 인덱스와 현재 선택한 인덱스가 같을 경우 함수를 종료
                       return;
                     }
                     setState(() {
                       _selectedIndex = index!;
-                      _previousIndex = index;  // 선택된 인덱스를 _selectedIndex 변수에 저장하고, 이전 선택된 인덱스를 _previousIndex 변수에 저장
+                      _previousIndex =
+                          index; // 선택된 인덱스를 _selectedIndex 변수에 저장하고, 이전 선택된 인덱스를 _previousIndex 변수에 저장
                     });
                   },
                   customTextStyles: [
@@ -70,7 +78,8 @@ class _ChoosePageState extends State<ChoosePage> {
                       TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: _selectedIndex == i ? Colors.black : Colors.black54,
+                        color:
+                            _selectedIndex == i ? Colors.black : Colors.black54,
                       ),
                   ],
                 ),
@@ -78,20 +87,21 @@ class _ChoosePageState extends State<ChoosePage> {
               Padding(
                 padding: const EdgeInsets.only(top: 100, left: 300),
                 child: TextButton(
-                  onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const SignupPage()));
-                  },
-                  style: TextButton.styleFrom(
-                  ),
-                  child: const Text(
-                            '다음으로 >',
-                            style: TextStyle(
-                              color: Color(0xFF7E7EB2),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                  )
-                          )),
-              )],
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SignupPage()));
+                    },
+                    style: TextButton.styleFrom(),
+                    child: const Text('다음으로 >',
+                        style: TextStyle(
+                          color: Color(0xFF7E7EB2),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ))),
+              )
+            ],
           ),
         ),
       ),
