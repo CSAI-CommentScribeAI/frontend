@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/widgets/userReview_widget.dart';
+import 'package:frontend/owner/widgets/userReview_widget.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 class FeedbackPage extends StatefulWidget {

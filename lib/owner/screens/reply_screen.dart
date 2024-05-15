@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/widgets/userReview_widget.dart';
+import 'package:frontend/owner/widgets/userReview_widget.dart';
 
 class ReplyPage extends StatefulWidget {
   final List<Map<String, dynamic>> reviewList;

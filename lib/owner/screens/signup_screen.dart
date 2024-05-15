@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:frontend/screens/Login_screen.dart';
+import 'package:frontend/owner/screens/login_screen.dart';
 import 'package:http/http.dart' as http;
 
 class SignupPage extends StatefulWidget {
