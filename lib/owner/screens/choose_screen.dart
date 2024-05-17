@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:frontend/screens/Signup_screen.dart';
+import 'package:frontend/owner/screens/signup_screen.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class ChoosePage extends StatefulWidget {
@@ -18,6 +18,14 @@ class _ChoosePageState extends State<ChoosePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 15.0),
+          child: BackButton(
+            color: Colors.black,
+          ),
+        ),
+      ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
         child: Center(
@@ -99,6 +107,10 @@ class _ChoosePageState extends State<ChoosePage> {
                           ),
                         ),
                       );
+<<<<<<< HEAD:lib/screens/Choose_screen.dart
+=======
+                      print(_selectedIndex);
+>>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/choose_screen.dart
                     },
                     style: TextButton.styleFrom(),
                     child: const Text('다음으로 >',

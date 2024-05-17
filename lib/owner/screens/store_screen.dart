@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/widgets/storeForm_widget.dart';
+import 'package:frontend/owner/widgets/storeForm_widget.dart';
 import 'package:get/get.dart';
 
 class StorePage extends StatefulWidget {

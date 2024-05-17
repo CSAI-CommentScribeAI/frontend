@@ -49,6 +49,7 @@ dependencies:
   shared_preferences: ^2.2.3
 
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -117,7 +118,6 @@ flutter:
     - assets/characters/chick.png
     - assets/characters/flower.png
     - assets/characters/smile.png
-   
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
