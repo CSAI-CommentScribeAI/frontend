@@ -1,16 +1,11 @@
+import 'package:frontend/owner/screens/choose_screen.dart';
+import 'package:frontend/owner/screens/home_screen.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
-<<<<<<< HEAD:lib/screens/Login_screen.dart
-import 'package:frontend/screens/Choose_screen.dart';
-import 'package:frontend/screens/home_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-=======
-import 'package:email_validator/email_validator.dart';
-import 'package:frontend/owner/screens/choose_screen.dart';
->>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/login_screen.dart
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -156,7 +151,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     labelText: _isIDValid ? '아이디' : '',
                     labelStyle: const TextStyle(fontSize: 13),
-<<<<<<< HEAD:lib/screens/Login_screen.dart
                     counterText: '',
                     errorText: _isIDValid
                         ? null
@@ -164,9 +158,6 @@ class _LoginPageState extends State<LoginPage> {
                                 idController.text.length > 10
                             ? '4자 이상 10자 이하로 작성해주세요.'
                             : '',
-=======
-                    errorText: _isEmailValid ? null : '올바른 이메일 형식이 아닙니다.',
->>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/login_screen.dart
                   ),
                   onChanged: (value) {
                     setState(() {

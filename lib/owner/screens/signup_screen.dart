@@ -4,11 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
-<<<<<<< HEAD:lib/screens/Signup_screen.dart
-import 'package:frontend/screens/Login_screen.dart';
-=======
 import 'package:frontend/owner/screens/login_screen.dart';
->>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/signup_screen.dart
 import 'package:http/http.dart' as http;
 
 class SignupPage extends StatefulWidget {
@@ -48,18 +44,6 @@ class _SignupPageState extends State<SignupPage> {
     addrController = TextEditingController();
   }
 
-<<<<<<< HEAD:lib/screens/Signup_screen.dart
-  Future handleSignUp(String nickname, String email, String userId,
-      String password, String userRole) async {
-    try {
-      // 현재 플랫폼에 따라서 그에 맞는 주소를 설정
-      if (Platform.isAndroid) {
-        serverAddress = 'http://10.0.2.2:9000/api/v1/auth/signup';
-      } else if (Platform.isIOS) {
-        serverAddress = 'http://127.0.0.1:9000/api/v1/auth/signup';
-      }
-
-=======
   void completedSignup() {
     showDialog(
       context: context,
@@ -135,7 +119,6 @@ class _SignupPageState extends State<SignupPage> {
         serverAddress = 'http://127.0.0.1:9000/api/v1/auth/signup';
       }
 
->>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/signup_screen.dart
       // 엔드포인트 가져
       final url = Uri.parse(serverAddress);
       final response = await http.post(
@@ -152,10 +135,7 @@ class _SignupPageState extends State<SignupPage> {
         }),
       );
       if (response.statusCode == 200) {
-<<<<<<< HEAD:lib/screens/Signup_screen.dart
-=======
         completedSignup();
->>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/signup_screen.dart
         print('회원가입 성공!!');
       } else {
         print('회원가입 실패! ${response.body}');
@@ -168,31 +148,6 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-<<<<<<< HEAD:lib/screens/Signup_screen.dart
-        body: Container(
-      padding: const EdgeInsets.all(20.0),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              '배달반도',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 36,
-              ),
-            ),
-            const SizedBox(height: 20.0),
-
-            // 이름 입력 필드
-            SizedBox(
-              height: 55,
-              child: TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-=======
       appBar: AppBar(
         leading: const Padding(
           padding: EdgeInsets.only(left: 15.0),
@@ -227,38 +182,9 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     labelText: '이름',
                     labelStyle: const TextStyle(fontSize: 13),
->>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/signup_screen.dart
                   ),
-                  labelText: '이름',
-                  labelStyle: const TextStyle(fontSize: 13),
                 ),
               ),
-<<<<<<< HEAD:lib/screens/Signup_screen.dart
-            ),
-            const SizedBox(height: 10.0),
-
-            // 이메일 입력 필드
-            SizedBox(
-              height: 55,
-              child: TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  labelText: _isEmailValid ? '이메일 주소' : '',
-                  labelStyle: const TextStyle(fontSize: 13),
-                  errorText: _isEmailValid
-                      ? null
-                      : '올바른 이메일 형식이 아닙니다.', // _isEmailValid가 false이면 '올바른 이메일 형식이 아닙니다.'가 표시
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    // 사용자가 입력한 텍스트(value)가 비어있는지 확인
-                    if (value.isEmpty) {
-                      // 만약 비어있다면, 유효한 이메일이 아니라고 판단
-                      _isEmailValid = true;
-=======
               const SizedBox(height: 10.0),
 
               // 이메일 입력 필드
@@ -333,115 +259,18 @@ class _SignupPageState extends State<SignupPage> {
                         !RegExp(r'(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+])(?=.*[0-9]).{10,}')
                             .hasMatch(value)) {
                       _isPasswordValid = false;
->>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/signup_screen.dart
                     } else {
-                      // 값이 비어있지 않다면, EmailValidator.validate 함수를 사용하여 이메일 유효성을 검사
-                      _isEmailValid = EmailValidator.validate(value);
+                      _isPasswordValid = true;
                     }
                   });
                 },
-              ),
-            ),
-            const SizedBox(height: 10.0),
-
-            // 아이디 입력 필드
-            SizedBox(
-              height: 55,
-              child: TextField(
-                controller: idController,
-                maxLength: 10, // 아이디의 최대 길이를 10으로 제한
-                decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  labelText: _isIDValid ? '아이디' : '',
-                  labelStyle: const TextStyle(fontSize: 13),
-                  counterText: '',
-                  errorText: _isIDValid
-                      ? null
-                      : idController.text.length < 4 &&
-                              idController.text.length > 10
-                          ? '4자 이상 10자 이하로 작성해주세요.'
-                          : '',
-                ),
-                onChanged: (value) {
+                onVisibilityToggle: () {
                   setState(() {
-                    _isIDValid = !_isIDValid;
+                    _isPasswordVisible = !_isPasswordVisible;
                   });
                 },
+                controller: _passwordController,
               ),
-<<<<<<< HEAD:lib/screens/Signup_screen.dart
-            ),
-            const SizedBox(height: 10.0),
-
-            PasswordTextField(
-              // 비밀번호 입력 필드
-              isPasswordValid: _isPasswordValid,
-              isPasswordVisible: _isPasswordVisible,
-              isPasswordConfirmed: _isPasswordConfirmed,
-              onChanged: (value) {
-                setState(() {
-                  if (value.isEmpty ||
-                      value.length < 10 ||
-                      !RegExp(r'(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+])(?=.*[0-9]).{10,}')
-                          .hasMatch(value)) {
-                    _isPasswordValid = false;
-                  } else {
-                    _isPasswordValid = true;
-                  }
-                });
-              },
-              onVisibilityToggle: () {
-                setState(() {
-                  _isPasswordVisible = !_isPasswordVisible;
-                });
-              },
-              controller: _passwordController,
-            ),
-            const SizedBox(height: 10.0),
-            SizedBox(
-              height: 55,
-              child: TextField(
-                obscureText: true,
-                controller: _confirmPasswordController,
-                onChanged: (value) {
-                  setState(() {
-                    _isPasswordConfirmed = _passwordController.text == value;
-                  });
-                },
-                decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    labelText: _isPasswordConfirmed ? '비밀번호 확인' : '',
-                    labelStyle: const TextStyle(fontSize: 13),
-                    errorText:
-                        _isPasswordConfirmed ? null : '비밀번호가 일치하지 않습니다.'),
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            Padding(
-              padding: const EdgeInsets.only(top: 17),
-              child: SizedBox(
-                height: 45,
-                width: 400,
-                child: TextButton(
-                  onPressed: () {
-                    handleSignUp(
-                      nameController.text,
-                      emailController.text,
-                      idController.text,
-                      _passwordController.text,
-                      widget.userRole,
-                    );
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color(0xff374AA3)),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-=======
               const SizedBox(height: 10.0),
               SizedBox(
                 height: 55,
@@ -494,29 +323,16 @@ class _SignupPageState extends State<SignupPage> {
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
->>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/signup_screen.dart
                       ),
-                    ),
-                  ),
-                  child: const Text(
-                    'Sign up',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-<<<<<<< HEAD:lib/screens/Signup_screen.dart
-    ));
-=======
     );
->>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/signup_screen.dart
   }
 }
 
