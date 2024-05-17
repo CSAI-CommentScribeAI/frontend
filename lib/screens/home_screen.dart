@@ -205,6 +205,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF3F3FF),
       appBar: AppBar(
+        automaticallyImplyLeading: false, // 페이지 이동 시 자동으로 생긴 뒤로가기 버튼 숨김
         backgroundColor: const Color(0xFF374AA3),
 
         // 배달앱 이름

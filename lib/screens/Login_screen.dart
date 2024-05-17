@@ -1,8 +1,9 @@
+import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:frontend/screens/Choose_screen.dart';
+import 'package:frontend/screens/home_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -101,9 +102,20 @@ class _LoginPageState extends State<LoginPage> {
 
         print('로그인 성공');
         sendDataToServer();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
       } else {
         // 로그인 실패 시
-        print('로그인 실패 ${response.body}');
+        print('로그인 실패');
+        // 로그인 실패 시 스낵바 띄우기
+        Get.snackbar(
+          "로그인 실패",
+          "아이디 또는 비밀번호가 올바르지 않습니다.",
+          backgroundColor: const Color(0xFFEFEDED).withOpacity(0.5),
+          colorText: Colors.black,
+        );
       }
     } catch (e) {
       // 예외 발생 시
