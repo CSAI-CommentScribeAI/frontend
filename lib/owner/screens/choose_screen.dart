@@ -107,7 +107,10 @@ class _ChoosePageState extends State<ChoosePage> {
                           ),
                         ),
                       );
+<<<<<<< HEAD:lib/screens/Choose_screen.dart
+=======
                       print(_selectedIndex);
+>>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/choose_screen.dart
                     },
                     style: TextButton.styleFrom(),
                     child: const Text('다음으로 >',

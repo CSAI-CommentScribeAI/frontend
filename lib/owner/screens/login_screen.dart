@@ -1,6 +1,16 @@
+import 'package:get/get.dart';
+import 'dart:convert';
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+<<<<<<< HEAD:lib/screens/Login_screen.dart
+import 'package:frontend/screens/Choose_screen.dart';
+import 'package:frontend/screens/home_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+=======
 import 'package:email_validator/email_validator.dart';
 import 'package:frontend/owner/screens/choose_screen.dart';
+>>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/login_screen.dart
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,16 +20,112 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool _isIDValid = true; // 아이디 유효성
+  late String serverAddress;
+  late String tokenAddress;
   bool isChecked = false;
-  bool _isEmailValid = true;
   bool _isPasswordValid = true;
   bool _isPasswordVisible = false;
-  late TextEditingController _passwordController;
+  TextEditingController idController = TextEditingController();
+  final TextEditingController _passwordController =
+      TextEditingController(); // 비밀번호 입력을 위한 Controller 추가
 
   @override
   void initState() {
     super.initState();
-    _passwordController = TextEditingController();
+  }
+
+  // 토큰 API
+  Future<void> sendDataToServer() async {
+    // 1. SharedPreferences에서 엑세스 토큰과 리프레시 토큰을 가져옵니다.
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
+    final refreshToken = prefs.getString('refreshToken') ?? '';
+
+    // 2. 현재 플랫폼에 따라 토큰 갱신을 위한 주소를 설정합니다.
+    if (Platform.isAndroid) {
+      tokenAddress = 'http://10.0.2.2:9000/api/v1/auth/refresh';
+    } else if (Platform.isIOS) {
+      tokenAddress = 'http://127.0.0.1:9000/api/v1/auth/refresh';
+    }
+
+    // 3. 토큰을 포함하여 서버에 POST 요청을 보냅니다.
+    final url = Uri.parse(tokenAddress);
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken', // 엑세스 토큰을 헤더에 포함
+      },
+      body: jsonEncode(<String, String>{
+        'refreshToken': refreshToken, // 리프레시 토큰을 요청 본문에 포함
+      }),
+    );
+
+    // 4. 서버 응답을 처리합니다.
+    if (response.statusCode == 200) {
+      // 성공적으로 데이터를 보낸 경우
+      print('데이터 전송 성공!');
+    } else {
+      // 데이터 전송 실패 시
+      print('데이터 전송 실패! ${response.body}');
+    }
+  }
+
+// 로그인 API 처리 함수
+  Future<void> handleLogin(String userId, String password) async {
+    try {
+      // 1. 현재 플랫폼에 따라 로그인을 위한 주소를 설정합니다.
+      if (Platform.isAndroid) {
+        serverAddress = 'http://10.0.2.2:9000/api/v1/auth/login';
+      } else if (Platform.isIOS) {
+        serverAddress = 'http://127.0.0.1:9000/api/v1/auth/login';
+      }
+
+      // 2. 서버에 로그인 요청을 보냅니다.
+      final url = Uri.parse(serverAddress);
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(<String, String>{
+          'userId': userId, // 사용자 아이디
+          'password': password, // 사용자 비밀번호
+        }),
+      );
+
+      // 3. 서버 응답을 처리합니다.
+      if (response.statusCode == 200) {
+        // 로그인 성공 시
+        final responseData = jsonDecode(response.body);
+        final accessToken = responseData['accessToken']; // 엑세스 토큰
+        final refreshToken = responseData['refreshToken']; // 리프레시 토큰
+
+        // 4. 토큰을 SharedPreferences에 저장합니다.
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', accessToken);
+        await prefs.setString('refreshToken', refreshToken);
+
+        print('로그인 성공');
+        sendDataToServer();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } else {
+        // 로그인 실패 시
+        print('로그인 실패');
+        // 로그인 실패 시 스낵바 띄우기
+        Get.snackbar(
+          "로그인 실패",
+          "아이디 또는 비밀번호가 올바르지 않습니다.",
+          backgroundColor: const Color(0xFFEFEDED).withOpacity(0.5),
+          colorText: Colors.black,
+        );
+      }
+    } catch (e) {
+      // 예외 발생 시
+      print(e.toString());
+    }
   }
 
   @override
@@ -42,21 +148,29 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 55,
                 child: TextField(
+                  controller: idController,
+                  maxLength: 10, // 아이디의 최대 길이를 10으로 제한
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    labelText: _isEmailValid ? '이메일' : '',
+                    labelText: _isIDValid ? '아이디' : '',
                     labelStyle: const TextStyle(fontSize: 13),
+<<<<<<< HEAD:lib/screens/Login_screen.dart
+                    counterText: '',
+                    errorText: _isIDValid
+                        ? null
+                        : idController.text.length < 4 &&
+                                idController.text.length > 10
+                            ? '4자 이상 10자 이하로 작성해주세요.'
+                            : '',
+=======
                     errorText: _isEmailValid ? null : '올바른 이메일 형식이 아닙니다.',
+>>>>>>> b878d2b1f02f25bf523aff85ab56a03124a15e5c:lib/owner/screens/login_screen.dart
                   ),
                   onChanged: (value) {
                     setState(() {
-                      if (value.isEmpty) {
-                        _isEmailValid = true;
-                      } else {
-                        _isEmailValid = EmailValidator.validate(value);
-                      }
+                      _isIDValid = !_isIDValid;
                     });
                   },
                 ),
@@ -168,7 +282,11 @@ class _LoginPageState extends State<LoginPage> {
                   height: 45,
                   width: 400,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      String userId = idController.text;
+                      String password = _passwordController.text;
+                      handleLogin(userId, password);
+                    },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
                           const Color(0xff374AA3)),
