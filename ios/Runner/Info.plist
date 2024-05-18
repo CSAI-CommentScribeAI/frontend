@@ -2,6 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- NSAppTransportSecurity 권한 및 io.flutter.embedded_views_preview 설정 -->
+	<key>NSAppTransportSecurity</key>
+      <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+        <key>NSAllowsArbitraryLoadsInWebContent</key>
+        <true/>
+      </dict>
+    <key>io.flutter.embedded_views_preview</key>
+    <true/>
 <key>NSCameraUsageDescription</key>
 <string>카메라에 접근하여 사진을 촬영하고 업로드합니다.</string>
 <key>NSPhotoLibraryUsageDescription</key>

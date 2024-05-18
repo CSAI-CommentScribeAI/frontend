@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:frontend/owner/screens/choose_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,16 +14,88 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool _isIDValid = true; // 아이디 유효성
+  late String serverAddress;
+  late String tokenAddress;
   bool isChecked = false;
-  bool _isEmailValid = true;
   bool _isPasswordValid = true;
   bool _isPasswordVisible = false;
-  late TextEditingController _passwordController;
+  TextEditingController idController = TextEditingController();
+  final TextEditingController _passwordController =
+      TextEditingController(); // 비밀번호 입력을 위한 Controller 추가
 
   @override
   void initState() {
     super.initState();
-    _passwordController = TextEditingController();
+  }
+
+  Future<void> sendDataToServer() async {
+    final prefs = await SharedPreferences.getInstance(); // 앱 내부에 저장된 토큰 값을 가져옴
+    final accessToken = prefs.getString('accessToken') ?? '';
+    final refreshToken = prefs.getString('refreshToken') ?? '';
+
+    if (Platform.isAndroid) {
+      tokenAddress = 'http://10.0.2.2:9000/api/v1/auth/refresh';
+    } else if (Platform.isIOS) {
+      tokenAddress = 'http://127.0.0.1:9000/api/v1/auth/refresh';
+    }
+
+    final url = Uri.parse(tokenAddress);
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken', // access token을 헤더에 포함
+      },
+      body: jsonEncode(<String, String>{
+        'refreshToken': refreshToken, // 필요에 따라 refresh token을 포함
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('데이터 전송 성공!');
+      print(accessToken);
+      print(refreshToken);
+    } else {
+      print('데이터 전송 실패! ${response.body}');
+    }
+  }
+
+  // 로그인 API
+  Future<void> handleLogin(String userId, String password) async {
+    try {
+      if (Platform.isAndroid) {
+        serverAddress = 'http://10.0.2.2:9000/api/v1/auth/login';
+      } else if (Platform.isIOS) {
+        serverAddress = 'http://127.0.0.1:9000/api/v1/auth/login';
+      }
+
+      final url = Uri.parse(serverAddress);
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(<String, String>{
+          'userId': userId,
+          'password': password,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final accessToken = responseData['accessToken'];
+        final refreshToken = responseData['refreshToken'];
+
+        // 토큰 저장
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', accessToken);
+        await prefs.setString('refreshToken', refreshToken);
+
+        print('로그인 성공');
+      } else {
+        print('로그인 실패 ${response.body}');
+      }
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
@@ -42,21 +118,25 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 55,
                 child: TextField(
+                  controller: idController,
+                  maxLength: 10, // 아이디의 최대 길이를 10으로 제한
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    labelText: _isEmailValid ? '이메일' : '',
+                    labelText: _isIDValid ? '아이디' : '',
                     labelStyle: const TextStyle(fontSize: 13),
-                    errorText: _isEmailValid ? null : '올바른 이메일 형식이 아닙니다.',
+                    counterText: '',
+                    errorText: _isIDValid
+                        ? null
+                        : idController.text.length < 4 &&
+                                idController.text.length > 10
+                            ? '4자 이상 10자 이하로 작성해주세요.'
+                            : '',
                   ),
                   onChanged: (value) {
                     setState(() {
-                      if (value.isEmpty) {
-                        _isEmailValid = true;
-                      } else {
-                        _isEmailValid = EmailValidator.validate(value);
-                      }
+                      _isIDValid = !_isIDValid;
                     });
                   },
                 ),
@@ -168,7 +248,13 @@ class _LoginPageState extends State<LoginPage> {
                   height: 45,
                   width: 400,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // sendDataToServer();
+
+                      String userId = idController.text;
+                      String password = _passwordController.text;
+                      handleLogin(userId, password);
+                    },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
                           const Color(0xff374AA3)),
