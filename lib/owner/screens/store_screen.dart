@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/widgets/storeForm_widget.dart';
 import 'package:get/get.dart';
+import 'dart:io' show Platform;
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StorePage extends StatefulWidget {
   // home_screen.dart에서 selectedStore 값을 가져옴
@@ -75,6 +78,47 @@ class _StorePageState extends State<StorePage> {
 
   String selectedAreaCode = '02'; // 초기값 설정
 
+  late String serverAddress;
+  Future<void> deletedStore() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
+
+    try {
+      if (Platform.isAndroid) {
+        serverAddress = 'http://10.0.2.2:9000/api/v1/store';
+      } else if (Platform.isIOS) {
+        serverAddress = 'http://127.0.0.1:9000/api/v1/store';
+      }
+
+      final url = Uri.parse(serverAddress);
+      final response = await http.delete(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-type': 'multipart/form-data',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Get.snackbar(
+          "삭제완료",
+          '가게 삭제가 완료되었습니다!',
+          backgroundColor: Colors.white,
+        );
+      } else {
+        Get.snackbar(
+          "삭제실패",
+          '가게 삭제에 실패했습니다. 다시 시도해주세요.',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        print(response.body);
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -100,14 +144,12 @@ class _StorePageState extends State<StorePage> {
             ),
           ),
           centerTitle: true,
-          actions: const [
+          actions: [
             Padding(
-              padding: EdgeInsets.only(right: 23.0),
-              child: Icon(
-                Icons.account_circle,
-                size: 30,
-                color: Colors.white,
-              ),
+              padding: const EdgeInsets.only(right: 23.0),
+              child: saveColor
+                  ? actionIcon(icon: Icons.delete)
+                  : actionIcon(icon: Icons.account_circle),
             ),
           ],
           backgroundColor: const Color(0xFF374AA3),
@@ -494,6 +536,18 @@ class _StorePageState extends State<StorePage> {
             : Container(
                 height: 0,
               ),
+      ),
+    );
+  }
+
+  // 상단바 action 아이콘 위젯
+  IconButton actionIcon({required IconData icon}) {
+    return IconButton(
+      onPressed: deletedStore,
+      icon: Icon(
+        icon,
+        size: 30,
+        color: Colors.white,
       ),
     );
   }
