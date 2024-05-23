@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/screens/address_screen.dart';
 import 'package:frontend/owner/widgets/storeForm_widget.dart';
 import 'package:get/get.dart';
+import 'package:kpostal/kpostal.dart';
 
 class StorePage extends StatefulWidget {
   // home_screen.dart에서 selectedStore 값을 가져옴
@@ -74,6 +76,13 @@ class _StorePageState extends State<StorePage> {
   }
 
   String selectedAreaCode = '02'; // 초기값 설정
+
+  String postCode = '-';
+  String addressName = '-';
+  String latitude = '-';
+  String longitude = '-';
+  String kakaoLatitude = '-';
+  String kakaoLongitude = '-';
 
   @override
   Widget build(BuildContext context) {
@@ -228,23 +237,42 @@ class _StorePageState extends State<StorePage> {
                         suffixText: '',
                       ),
 
-                      storeTextFormField(
-                        value: address,
-                        label: '음식점 주소',
-                        editable: saveColor ? false : true,
-                        onSaved: (val) {
-                          setState(() {
-                            address = val;
-                          });
-                        },
-                        validator: (val) {
-                          if (val.isEmpty) {
-                            return '주소를 입력하세요';
-                          }
-                          return null;
-                        },
-                        suffixText: '',
-                        showAreaCodeDropdown: false, // 지역번호 선택 드롭다운 표시 여부
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width *
+                                0.7, // 예시로 너비 지정
+                            child: storeTextFormField(
+                              value: address,
+                              label: '음식점 주소',
+                              editable: saveColor ? false : true,
+                              onSaved: (val) {
+                                setState(() {
+                                  address = val;
+                                });
+                              },
+                              validator: (val) {
+                                if (val.isEmpty) {
+                                  return '주소를 입력하세요';
+                                }
+                                return null;
+                              },
+                              suffixText: '',
+                              showAreaCodeDropdown: false, // 지역번호 선택 드롭다운 표시 여부
+                            ),
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AddressPage(),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.map_outlined)),
+                        ],
                       ),
 
                       storeTextFormField(

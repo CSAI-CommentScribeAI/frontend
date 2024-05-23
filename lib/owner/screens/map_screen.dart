@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:kakao_map_plugin/kakao_map_plugin.dart';
 import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
 import 'dart:convert';
 
 class MapPage extends StatefulWidget {
-  const MapPage({super.key});
+  final String address;
+  const MapPage({required this.address, super.key});
 
   @override
   State<MapPage> createState() => _MapPageState();
 }
 
 class _MapPageState extends State<MapPage> {
-  final TextEditingController searchController =
-      TextEditingController(); // 검색어를 입력받기 위한 텍스트 컨트롤러
   KakaoMapController? mapController;
-
   static const String kakaoApiKey =
       'dc5f4dca4d1bc2e566f3be9bd3df53c0'; // 카카오 developer API Key
 
   // 지도 생성 시 호출 함수
   void onMapCreated(KakaoMapController controller) {
     mapController = controller;
-  }
-
-  void hintText(String message) {
-    Text(message);
+    // 지도 생성 직후 검색 수행
+    searchLocation();
   }
 
   // 사용자가 입력한 검색어대로 카카오 장소 검색 API 호출
   Future<void> searchLocation() async {
-    final query = searchController.text; // 검색한 값을 query에 저장
+    final query = widget.address; // 검색한 값을 query에 저장
+    print('Searching for: $query'); // 디버깅 로그 추가
 
     // 검색어가 비어있으면 아무것도 실행 안됨
     if (query.isEmpty) {
@@ -37,7 +35,7 @@ class _MapPageState extends State<MapPage> {
     }
 
     final url = Uri.parse(
-      'https://dapi.kakao.com/v2/local/search/keyword.json?query=$query',
+      'https://dapi.kakao.com/v2/local/search/address.json?query=$query',
     );
 
     try {
@@ -68,20 +66,54 @@ class _MapPageState extends State<MapPage> {
               Marker(markerId: 'search marker', latLng: latLng),
             ],
           );
+
+          final address = firstResult['address'] ?? {}; // address의 value 값 생성
+          final roadAddress =
+              firstResult['road_address'] ?? {}; // road_address의 value 값 생성
+
+          // 결과를 사용자에게 보여주는 다이얼로그를 안전하게 호출
+          if (mounted) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('검색 결과'),
+                  content: SingleChildScrollView(
+                    child: ListBody(
+                      children: <Widget>[
+                        Text('전체 주소: ${firstResult['address_name']}'),
+                        Text('도로명 주소: ${roadAddress['road_name'] ?? '없음'}'),
+                        Text('지번 주소: ${address['address_name'] ?? '없음'}'),
+                        Text('우편번호: ${roadAddress['zone_no'] ?? '없음'}'),
+                        Text('위도: ${firstResult['y']}'),
+                        Text('경도: ${firstResult['x']}'),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('확인'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('검색 결과가 없습니다.')),
-          );
+          Get.snackbar('검색 결과가 없습니다.', '다시 검색해보세요');
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('검색 중 오류가 발생했습니다: ${response.statusCode}')),
-        );
+        Get.snackbar('검색 중 오류가 발생했습니다', '${response.statusCode}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('검색 중 오류가 발생했습니다: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('검색 중 오류가 발생했습니다: $e')),
+        );
+      }
     }
   }
 
@@ -89,58 +121,16 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kakao Map Search'),
+        title: const Text('지도에서 위치 확인'),
       ),
       body: Stack(
         children: [
           KakaoMap(
             onMapCreated: onMapCreated,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Card(
-                    elevation: 2.0,
-                    child: TextField(
-                      controller: searchController,
-                      decoration: const InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: '검색어를 입력하세요',
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10.0, vertical: 5.0),
-                      ),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  style: IconButton.styleFrom(
-                    backgroundColor: const Color(0xFFF3F3FF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                    elevation: 2.0,
-                    shadowColor: Colors.black,
-                  ),
-                  onPressed: searchLocation,
-                ),
-              ],
-            ),
+            zoomControlPosition: ControlPosition.bottomRight,
           ),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    searchController.dispose();
-    super.dispose();
   }
 }
