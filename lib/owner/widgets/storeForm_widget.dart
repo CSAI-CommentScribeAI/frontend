@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 // 가게 정보 텍스트필드 위젯
 Widget storeTextFormField({
-  required dynamic value,
+  required TextEditingController controller,
   required String label,
   required FormFieldSetter onSaved,
   required FormFieldValidator validator,
@@ -46,7 +46,7 @@ Widget storeTextFormField({
           const SizedBox(width: 8), // 조금의 간격을 추가하여 텍스트 필드와 분리
           Expanded(
             child: TextFormField(
-              initialValue: value.toString(),
+              controller: controller,
               onSaved: onSaved, // 폼 필드가 저장될 때 호출
               validator: validator, // 입력된 값의 유효성을 검사
               readOnly: editable, // 읽기/쓰기 권한
