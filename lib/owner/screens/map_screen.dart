@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/screens/store_screen.dart';
 import 'package:kakao_map_plugin/kakao_map_plugin.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'dart:convert';
 
 class MapPage extends StatefulWidget {
-  final String address;
-  const MapPage({required this.address, super.key});
+  String address;
+  String detailAddress;
+  MapPage({required this.address, required this.detailAddress, super.key});
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -84,6 +86,7 @@ class _MapPageState extends State<MapPage> {
                         Text('전체 주소: ${firstResult['address_name']}'),
                         Text('도로명 주소: ${roadAddress['road_name'] ?? '없음'}'),
                         Text('지번 주소: ${address['address_name'] ?? '없음'}'),
+                        Text('상세주소: ${widget.detailAddress}'),
                         Text('우편번호: ${roadAddress['zone_no'] ?? '없음'}'),
                         Text('위도: ${firstResult['y']}'),
                         Text('경도: ${firstResult['x']}'),
@@ -94,7 +97,7 @@ class _MapPageState extends State<MapPage> {
                     TextButton(
                       child: const Text('확인'),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.pop(context);
                       },
                     ),
                   ],
@@ -123,13 +126,8 @@ class _MapPageState extends State<MapPage> {
       appBar: AppBar(
         title: const Text('지도에서 위치 확인'),
       ),
-      body: Stack(
-        children: [
-          KakaoMap(
-            onMapCreated: onMapCreated,
-            zoomControlPosition: ControlPosition.bottomRight,
-          ),
-        ],
+      body: KakaoMap(
+        onMapCreated: onMapCreated,
       ),
     );
   }

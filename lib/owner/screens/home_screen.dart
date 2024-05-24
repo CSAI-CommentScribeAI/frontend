@@ -530,7 +530,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             menuItem(
                                 imgPath: 'assets/images/black.png',
-                                title: '블랙리스트'),
+                                title: '블랙'),
                           ],
                         ),
                       ),

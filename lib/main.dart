@@ -1,10 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:frontend/owner/screens/choose_screen.dart';
 import 'package:frontend/owner/screens/login_screen.dart';
-import 'package:frontend/owner/screens/map_screen.dart';
 import 'package:get/get.dart';
 import 'package:kakao_map_plugin/kakao_map_plugin.dart';
 
@@ -17,7 +13,12 @@ void main() async {
   await dotenv.load(fileName: 'assets/env/.env');
 
   // 라이브러리 메모리에 appKey 등록
-  AuthRepository.initialize(appKey: dotenv.env['APP_KEY'] ?? '');
+  String appKey = dotenv.env['APP_KEY'] ?? '';
+  if (appKey.isEmpty) {
+    throw Exception('APP_KEY is missing in .env file');
+  }
+
+  AuthRepository.initialize(appKey: appKey);
   runApp(const MyApp());
 }
 
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // snackbar를 사용하기 위해 GetX 컨텍스트 초기화를 위해 작성
     return const GetMaterialApp(
-      home: MapPage(),
+      home: LoginPage(),
     );
   }
 }

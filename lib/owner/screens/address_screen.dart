@@ -3,7 +3,9 @@ import 'package:frontend/owner/screens/map_screen.dart';
 import 'package:kpostal/kpostal.dart';
 
 class AddressPage extends StatefulWidget {
-  const AddressPage({super.key});
+  final Function(String) onAddressSelected;
+
+  const AddressPage({super.key, required this.onAddressSelected});
 
   @override
   State<AddressPage> createState() => _AddressPageState();
@@ -17,8 +19,7 @@ class _AddressPageState extends State<AddressPage> {
   String longitude = '';
   String kakaoLatitude = '';
   String kakaoLongitude = '';
-
-  bool setAddress = false;
+  TextEditingController detailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +75,11 @@ class _AddressPageState extends State<AddressPage> {
                     context,
                     MaterialPageRoute(
                       builder: (_) => KpostalView(
-                        useLocalServer: false,
-                        kakaoKey: '6b495c589c2dc2d9d5bb5c10b293c129',
+                        useLocalServer: false, // 카카오 서버를 사용하기 때문에 false로 설정
+                        kakaoKey:
+                            '6b495c589c2dc2d9d5bb5c10b293c129', // 카카오 플랫폼의 API를 사용하기 위해 애플리케이션 인증
                         callback: (Kpostal result) {
+                          // Kpostal 패키지에서 갖고있는 검색 결과 처리
                           setState(() {
                             postCode = result.postCode;
                             address = result.address;
@@ -136,7 +139,10 @@ class _AddressPageState extends State<AddressPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MapPage(address: address),
+                    builder: (context) => MapPage(
+                      address: address,
+                      detailAddress: detailController.text,
+                    ),
                   ),
                 );
               },
@@ -160,22 +166,56 @@ class _AddressPageState extends State<AddressPage> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const Text(
-                        'LatLng',
+                        '위도',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text('latitude: $latitude, longitude: $longitude'),
+
+                      // 상세 주소 입력 필드
                       const Text(
-                        'through KAKAO Geocoder',
+                        '상세 주소',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Text('latitude: $kakaoLatitude'),
-                      Text('longitude: $kakaoLongitude'),
+                      TextFormField(
+                        style: const TextStyle(fontSize: 10.0),
+                        controller: detailController,
+                        textAlign: TextAlign.center,
+                        decoration: const InputDecoration(
+                          enabledBorder:
+                              OutlineInputBorder(borderSide: BorderSide.none),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
-            )
+            ),
           ],
+        ),
+      ),
+      bottomNavigationBar: ElevatedButton(
+        onPressed: () {
+          String detailAddress = detailController.text;
+          String fullAddress = '$address $detailAddress'; // 상세 주소 생성
+
+          widget.onAddressSelected(
+              fullAddress); // StorePage에서 임무 받은 fullAddress 값을 전달
+          Navigator.pop(context);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF374AA3),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5.0),
+          ),
+          minimumSize: const Size(double.infinity, 80),
+        ),
+        child: const Text(
+          '등록하기',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 25,
+          ),
         ),
       ),
     );
