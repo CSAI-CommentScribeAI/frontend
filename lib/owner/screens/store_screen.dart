@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/screens/address_screen.dart';
 import 'package:frontend/owner/widgets/storeForm_widget.dart';
 import 'package:get/get.dart';
 
@@ -19,61 +20,83 @@ class _StorePageState extends State<StorePage> {
 
   final formKey = GlobalKey<FormState>();
 
-  String register = '110-89-341392';
-  String name = 'BBQ 코엑스점';
-  String phoneNumber = '343-1230';
-  String address = '서울특별시 강남구 영동대로 513';
-  String explanation = '가게 설명글';
-  int minOrderPrice = 18000;
+  String register = '';
+  String name = '';
+  String phoneNumber = '';
+  String fullAddress = '';
+  String explanation = '';
+  int minOrderPrice = 1800;
 
   bool saveColor = false;
 
   // TextFormField의 입력을 제어
-  final TextEditingController _textEditingController = TextEditingController();
-  final List<String> _tags = []; // 태그가 들어갈 빈 리스트
+  // final TextEditingController _textEditingController = TextEditingController();
+  // final List<String> _tags = []; // 태그가 들어갈 빈 리스트
 
-  List<Widget> _buildTags() {
-    return _tags.map((tag) => _buildTagItem(tag)).toList();
-  }
+  // List<Widget> _buildTags() {
+  //   return _tags.map((tag) => _buildTagItem(tag)).toList();
+  // }
 
   // 태그 위젯
-  Widget _buildTagItem(String tag) {
-    return Chip(
-      label: Text(tag),
-      labelStyle: const TextStyle(
-        color: Colors.white,
-        fontSize: 16,
-      ),
-      deleteIcon: const Icon(
-        Icons.clear,
-        size: 20,
-        color: Colors.white,
-      ),
-      backgroundColor: const Color(0xFFD7D7FE),
-      side: BorderSide.none,
+  // Widget _buildTagItem(String tag) {
+  //   return Chip(
+  //     label: Text(tag),
+  //     labelStyle: const TextStyle(
+  //       color: Colors.white,
+  //       fontSize: 16,
+  //     ),
+  //     deleteIcon: const Icon(
+  //       Icons.clear,
+  //       size: 20,
+  //       color: Colors.white,
+  //     ),
+  //     backgroundColor: const Color(0xFFD7D7FE),
+  //     side: BorderSide.none,
 
-      // 삭제 시 _tags 리스트에 삭제
-      onDeleted: () {
-        setState(() {
-          _tags.remove(tag);
-        });
-      },
-    );
-  }
+  //     // 삭제 시 _tags 리스트에 삭제
+  //     onDeleted: () {
+  //       setState(() {
+  //         _tags.remove(tag);
+  //       });
+  //     },
+  //   );
+  // }
 
   void printFormValues() {
     print('사업자 등록 번호: $register');
     print('음식점 이름: $name');
     print('음식점 전화번호: $phoneNumber');
-    print('음식점 주소: $address');
+    print('음식점 주소: $fullAddress');
     print('가게 설명: $explanation');
     print('음식점 카테고리: $minOrderPrice');
     print('오픈 시간: $openInitialTime');
     print('마감 시간: $closeInitialTime');
-    print('배달 가능 지역 $_tags');
+    // print('배달 가능 지역 $_tags');
   }
 
   String selectedAreaCode = '02'; // 초기값 설정
+
+  String postCode = '-';
+  String addressName = '-';
+  String latitude = '-';
+  String longitude = '-';
+  String kakaoLatitude = '-';
+  String kakaoLongitude = '-';
+
+  TextEditingController resisterController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController addrController = TextEditingController();
+  TextEditingController infoController = TextEditingController();
+  TextEditingController priceController = TextEditingController();
+
+  // 가게 설정 콜백 함수
+  // 전체 주소를 받아서 주소 입력 컨트롤러에 저장
+  void _onAddressSelected(String fullAddress) {
+    setState(() {
+      addrController.text = fullAddress;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +178,7 @@ class _StorePageState extends State<StorePage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       storeTextFormField(
-                        value: register,
+                        controller: resisterController,
                         label: '사업자 등록 번호',
                         editable: saveColor ? false : true,
                         onSaved: (val) {
@@ -176,7 +199,7 @@ class _StorePageState extends State<StorePage> {
                       ),
 
                       storeTextFormField(
-                        value: name,
+                        controller: nameController,
                         label: '음식점 이름',
                         editable: saveColor ? false : true,
                         onSaved: (val) {
@@ -195,7 +218,7 @@ class _StorePageState extends State<StorePage> {
                       ),
 
                       storeTextFormField(
-                        value: phoneNumber,
+                        controller: phoneController,
                         label: '음식점 전화번호',
                         selectedAreaCode: selectedAreaCode, // 선택된 지역번호
                         onAreaCodeChanged: saveColor // 편집 버튼 누를 때만 드롭다운 버튼 활성화
@@ -228,27 +251,54 @@ class _StorePageState extends State<StorePage> {
                         suffixText: '',
                       ),
 
-                      storeTextFormField(
-                        value: address,
-                        label: '음식점 주소',
-                        editable: saveColor ? false : true,
-                        onSaved: (val) {
-                          setState(() {
-                            address = val;
-                          });
-                        },
-                        validator: (val) {
-                          if (val.isEmpty) {
-                            return '주소를 입력하세요';
-                          }
-                          return null;
-                        },
-                        suffixText: '',
-                        showAreaCodeDropdown: false, // 지역번호 선택 드롭다운 표시 여부
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width *
+                                0.7, // 예시로 너비 지정
+                            child: GestureDetector(
+                              onTap: () {
+                                saveColor
+                                    ? Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AddressPage(
+                                            // 주소 입력 페이지(AddressPage)로 함수 전달
+                                            // 주소 입력 창에 주소 좀 집어넣게 주소 값 좀 알아오라고 임무 전달
+                                            onAddressSelected:
+                                                _onAddressSelected,
+                                          ),
+                                        ),
+                                      )
+                                    : '';
+                              },
+                              child: storeTextFormField(
+                                controller: addrController,
+                                label: '음식점 주소',
+                                editable: saveColor ? false : true,
+                                onSaved: (val) {
+                                  setState(() {
+                                    fullAddress = val;
+                                  });
+                                },
+                                validator: (val) {
+                                  if (val.isEmpty) {
+                                    return '주소를 입력하세요';
+                                  }
+                                  return null;
+                                },
+                                suffixText: '',
+                                showAreaCodeDropdown:
+                                    false, // 지역번호 선택 드롭다운 표시 여부
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
 
                       storeTextFormField(
-                        value: explanation,
+                        controller: infoController,
                         label: '가게 설명',
                         editable: saveColor ? false : true,
                         onSaved: (val) {
@@ -267,7 +317,7 @@ class _StorePageState extends State<StorePage> {
                       ),
 
                       storeTextFormField(
-                        value: minOrderPrice,
+                        controller: priceController,
                         label: '최소 주문 가격',
                         editable: saveColor
                             ? false
@@ -407,49 +457,49 @@ class _StorePageState extends State<StorePage> {
                       const SizedBox(height: 30),
 
                       // 배달 가능 지역
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          TextFormField(
-                            controller: _textEditingController,
-                            readOnly: saveColor ? false : true,
-                            decoration: InputDecoration(
-                              hintText: '배달 가능 지역',
-                              hintStyle: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                              focusColor: Colors.white,
-                              prefixIcon: const Icon(Icons.search),
-                              prefixIconColor: Colors.white,
-                              filled: true,
-                              fillColor: const Color(0xFF7E7EB2),
-                              contentPadding: const EdgeInsets.all(5.0),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5.0),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            // 입력을 완료하고 엔터를 눌렀을 때 호출
-                            onFieldSubmitted: (value) {
-                              // 값을 입력했으면 _tags 리스트에 추가 및 입력 필드가 비워짐
-                              if (value.isNotEmpty) {
-                                setState(() {
-                                  _tags.add(value);
-                                  _textEditingController.clear();
-                                });
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: _buildTags(),
-                          ),
-                        ],
-                      ),
+                      // Column(
+                      //   crossAxisAlignment: CrossAxisAlignment.stretch,
+                      //   children: [
+                      //     TextFormField(
+                      //       controller: _textEditingController,
+                      //       readOnly: saveColor ? false : true,
+                      //       decoration: InputDecoration(
+                      //         hintText: '배달 가능 지역',
+                      //         hintStyle: const TextStyle(
+                      //           fontSize: 16,
+                      //           fontWeight: FontWeight.w700,
+                      //           color: Colors.white,
+                      //         ),
+                      //         focusColor: Colors.white,
+                      //         prefixIcon: const Icon(Icons.search),
+                      //         prefixIconColor: Colors.white,
+                      //         filled: true,
+                      //         fillColor: const Color(0xFF7E7EB2),
+                      //         contentPadding: const EdgeInsets.all(5.0),
+                      //         border: OutlineInputBorder(
+                      //           borderRadius: BorderRadius.circular(5.0),
+                      //           borderSide: BorderSide.none,
+                      //         ),
+                      //       ),
+                      //       // 입력을 완료하고 엔터를 눌렀을 때 호출
+                      //       onFieldSubmitted: (value) {
+                      //         // 값을 입력했으면 _tags 리스트에 추가 및 입력 필드가 비워짐
+                      //         if (value.isNotEmpty) {
+                      //           setState(() {
+                      //             _tags.add(value);
+                      //             _textEditingController.clear();
+                      //           });
+                      //         }
+                      //       },
+                      //     ),
+                      //     const SizedBox(height: 16),
+                      //     Wrap(
+                      //       spacing: 8,
+                      //       runSpacing: 8,
+                      //       children: _buildTags(),
+                      //     ),
+                      //   ],
+                      // ),
                     ],
                   ),
                 ),
