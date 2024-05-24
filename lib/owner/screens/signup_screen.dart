@@ -125,12 +125,12 @@ class _SignupPageState extends State<SignupPage> {
         url,
         headers: {'Content-Type': 'application/json'},
         // 서버로 전송할 데이터들
-        body: jsonEncode(<String, String>{
+        body: jsonEncode(<String, dynamic>{
           'userId': userId,
           'password': password,
           'email': email,
           'nickname': nickname,
-          'memo': '',
+          'address': 0,
           'userRole': userRole,
         }),
       );
