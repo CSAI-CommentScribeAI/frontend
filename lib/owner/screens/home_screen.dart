@@ -3,6 +3,7 @@ import 'package:frontend/owner/charts/feedback_chart.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/feedback_screen.dart';
 import 'package:frontend/owner/screens/menu_screen.dart';
+import 'package:frontend/owner/screens/register_store.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
 import 'package:frontend/owner/screens/store_screen.dart';
 import 'package:frontend/owner/services/store_service.dart';
@@ -11,7 +12,8 @@ import 'package:frontend/owner/widgets/current_widget.dart';
 import 'package:frontend/owner/widgets/menuItem_widget.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String accessToken;
+  const HomePage({required this.accessToken, super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -81,7 +83,7 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 18.0),
                       child: FutureBuilder<List<StoreModel>>(
                         // getStore() 메서드를 호출해서 데이터를 가져옴
-                        future: ApiService().getStore(),
+                        future: StoreService().getStore(widget.accessToken),
                         builder: (context, snapshot) {
                           // 데이터가 로드되는 동안 로딩 스피너 표시
                           if (snapshot.connectionState ==
@@ -139,7 +141,14 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.symmetric(vertical: 40.0),
                     alignment: Alignment.center,
                     child: ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ResisterStorePage(),
+                          ),
+                        );
+                      },
                       icon: const Icon(Icons.add),
                       label: const Text(
                         '가게 등록',
@@ -317,7 +326,8 @@ class _HomePageState extends State<HomePage> {
                                             // expand_less,more
                                             GestureDetector(
                                               onTap: () {
-                                                ApiService().getStore();
+                                                StoreService().getStore(
+                                                    widget.accessToken);
                                                 setState(() {
                                                   isExpanded =
                                                       !isExpanded; // 확장되어 있을 때는 축소하고, 축소되어 있을 때는 확장
@@ -506,7 +516,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             menuItem(
                                 imgPath: 'assets/images/black.png',
-                                title: '블랙리스트'),
+                                title: '블랙'),
                           ],
                         ),
                       ),

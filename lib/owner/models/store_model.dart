@@ -1,16 +1,21 @@
 // 하나의 가게 정보가 들어가있는 객체 형식의 클래스
+import 'dart:io';
+
 class StoreModel {
-  final int id;
-  final String name;
-  final String address;
+  final String businessLicense,
+      name,
+      info,
+      category,
+      minOrderPrice,
+      fullAddress;
+  final File logo;
 
-  StoreModel({required this.id, required this.name, required this.address});
-
-  factory StoreModel.fromJson(Map<String, dynamic> json) {
-    return StoreModel(
-      id: json['id'],
-      name: json['name'],
-      address: json['address'],
-    );
-  }
+  StoreModel.fromJson(Map<String, dynamic> json)
+      : businessLicense = json['businessLicense'],
+        name = json['name'],
+        info = json['info'],
+        category = json['category'],
+        minOrderPrice = json['minOrderPrice'],
+        fullAddress = json['fullAddress'],
+        logo = json['logo'];
 }
