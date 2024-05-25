@@ -3,7 +3,6 @@ import 'package:frontend/owner/charts/feedback_chart.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/feedback_screen.dart';
 import 'package:frontend/owner/screens/menu_screen.dart';
-import 'package:frontend/owner/screens/register_store.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
 import 'package:frontend/owner/screens/store_screen.dart';
 import 'package:frontend/owner/services/store_service.dart';
@@ -145,7 +144,8 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ResisterStorePage(),
+                            builder: (context) =>
+                                StorePage(selectedStore, widget.accessToken),
                           ),
                         );
                       },
@@ -445,7 +445,8 @@ class _HomePageState extends State<HomePage> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
-                                              StorePage(selectedStore),
+                                              StorePage(selectedStore,
+                                                  widget.accessToken),
                                         ),
                                       )
                                     : '';

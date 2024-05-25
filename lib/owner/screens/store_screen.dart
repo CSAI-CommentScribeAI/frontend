@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
+import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/storeForm_widget.dart';
 import 'package:get/get.dart';
-import 'dart:io' show Platform;
+import 'dart:io' show File;
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
 
 class StorePage extends StatefulWidget {
   // home_screen.dart에서 selectedStore 값을 가져옴
   final String selectedStore;
-  const StorePage(this.selectedStore, {super.key});
+  final String accessToken;
+  const StorePage(this.selectedStore, this.accessToken, {super.key});
 
   @override
   State<StorePage> createState() => _StorePageState();
@@ -20,17 +22,40 @@ class _StorePageState extends State<StorePage> {
   TimeOfDay closeInitialTime = TimeOfDay.now(); // 마감 시간
   bool openTimeBoolean = false;
   bool closeTimeBoolean = false;
+  bool isPickingImage = false;
 
   final formKey = GlobalKey<FormState>();
 
+  final List<String> categories = [
+    '햄버거',
+    '피자',
+    '커피',
+    '디저트',
+    '한식',
+    '중식',
+    '분식',
+    '일식',
+    '치킨'
+  ];
+
   String register = '';
   String name = '';
+  String? category;
   String phoneNumber = '';
   String fullAddress = '';
   String explanation = '';
-  int minOrderPrice = 1800;
+  String minOrderPrice = '';
+  String finalRoadAddress = '';
+  String finalJibunAddres = '';
+  String finalPostalCode = '';
+  String finalLatitude = '';
+  String finalLongitude = '';
 
   bool saveColor = false;
+
+  File? _menuImage; // 이미지 선택
+  XFile? _image; //이미지를 담을 변수 선언
+  final ImagePicker picker = ImagePicker();
 
   // TextFormField의 입력을 제어
   // final TextEditingController _textEditingController = TextEditingController();
@@ -68,27 +93,24 @@ class _StorePageState extends State<StorePage> {
   void printFormValues() {
     print('사업자 등록 번호: $register');
     print('음식점 이름: $name');
-    print('음식점 전화번호: $phoneNumber');
+    print('음식점 카테고리: $category');
     print('음식점 주소: $fullAddress');
     print('가게 설명: $explanation');
-    print('음식점 카테고리: $minOrderPrice');
+    print('최소 주문가격: $minOrderPrice');
     print('오픈 시간: $openInitialTime');
     print('마감 시간: $closeInitialTime');
+    print('지번 주소: $finalJibunAddres');
+    print('위도와 경도: $finalLatitude $finalLongitude');
+    print('도로명: $finalRoadAddress');
+    print('우편 번호: $finalPostalCode');
+    print('이미지: $_menuImage');
     // print('배달 가능 지역 $_tags');
   }
 
   String selectedAreaCode = '02'; // 초기값 설정
 
-  String postCode = '-';
-  String addressName = '-';
-  String latitude = '-';
-  String longitude = '-';
-  String kakaoLatitude = '-';
-  String kakaoLongitude = '-';
-
   TextEditingController resisterController = TextEditingController();
   TextEditingController nameController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
   TextEditingController addrController = TextEditingController();
   TextEditingController infoController = TextEditingController();
   TextEditingController priceController = TextEditingController();
@@ -99,6 +121,116 @@ class _StorePageState extends State<StorePage> {
     setState(() {
       addrController.text = fullAddress;
     });
+  }
+
+  // 주소 전달 함수
+  void sendAddress(String roadAddress, String jibunAddres, String postalCode,
+      String latitude, String longitude) {
+    setState(() {
+      finalRoadAddress = roadAddress;
+      finalJibunAddres = jibunAddres;
+      finalPostalCode = postalCode;
+      finalLatitude = latitude;
+      finalLongitude = longitude;
+    });
+  }
+
+  //이미지를 가져오는 함수
+  Future<void> getImage(ImageSource imageSource) async {
+    // 이미지 선택 중일 때 추가 요청 막기
+    if (isPickingImage) return;
+
+    setState(() {
+      isPickingImage = true;
+    });
+
+    try {
+      // pickedFile에 ImagePicker로 가져온 이미지가 담긴다.
+      final XFile? pickedFile = await picker.pickImage(source: imageSource);
+      if (pickedFile != null) {
+        setState(() {
+          _image = XFile(pickedFile.path); // 가져온 이미지를 _image에 저장
+        });
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isPickingImage = false;
+      });
+    }
+  }
+
+  void _showImageSelectionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  // 이미지가 선택되었을 때 이미지 표시
+                  _image != null
+                      ? SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: Image.file(File(_image!.path)),
+                        )
+                      // 이미지가 선택되지 않았을 때 기본 컨테이너 표시
+                      : Container(
+                          width: 100,
+                          height: 100,
+                          color: Colors.grey,
+                        ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      ElevatedButton(
+                        onPressed: () {
+                          getImage(ImageSource.camera).then((_) {
+                            // 이미지가 선택되면 상태를 갱신하여 다이얼로그를 다시 그립니다.
+                            setState(() {});
+                            // 이미지가 선택되면 _menuImage에도 할당합니다.
+                            if (_image != null) {
+                              _menuImage = File(_image!.path);
+                            }
+                          });
+                        },
+                        child: const Text("카메라"),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          getImage(ImageSource.gallery).then((_) {
+                            // 이미지가 선택되면 상태를 갱신하여 다이얼로그를 다시 그립니다.
+                            setState(() {});
+                            // 이미지가 선택되면 _menuImage에도 할당합니다.
+                            if (_image != null) {
+                              _menuImage = File(_image!.path);
+                            }
+                          });
+                        },
+                        child: const Text("갤러리"),
+                      ),
+                      const SizedBox(width: 10),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Close"),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -185,6 +317,7 @@ class _StorePageState extends State<StorePage> {
                         onSaved: (val) {
                           // 입력한 값을 지정한 변수에 저장
                           setState(() {
+                            val = resisterController.text;
                             register = val;
                           });
                         },
@@ -205,6 +338,7 @@ class _StorePageState extends State<StorePage> {
                         editable: saveColor ? false : true,
                         onSaved: (val) {
                           setState(() {
+                            val = nameController.text;
                             name = val;
                           });
                         },
@@ -218,39 +352,70 @@ class _StorePageState extends State<StorePage> {
                         showAreaCodeDropdown: false, // 지역번호 선택 드롭다운 표시 여부
                       ),
 
-                      storeTextFormField(
-                        controller: phoneController,
-                        label: '음식점 전화번호',
-                        selectedAreaCode: selectedAreaCode, // 선택된 지역번호
-                        onAreaCodeChanged: saveColor // 편집 버튼 누를 때만 드롭다운 버튼 활성화
-                            ? (newValue) {
-                                setState(() {
-                                  selectedAreaCode = newValue ??
-                                      selectedAreaCode; // 지역번호가 바뀌면 newValue값을 업데이트해 selectedAreaCode에 저장
-                                });
-                              }
-                            : null,
-                        showAreaCodeDropdown: true, // 지역번호 선택 드롭다운 표시 여부
-                        editable: saveColor ? false : true,
-                        onSaved: (val) {
-                          setState(() {
-                            phoneNumber = '$selectedAreaCode-$val'; // 전화번호 저장
-                          });
-                        },
-                        validator: (val) {
-                          if (val.isEmpty) {
-                            return '전화번호를 입력하세요';
-                          }
-                          // 정규표현식을 사용하여 전화번호의 형식을 검사합니다.
-                          // 하이픈(-)을 포함한 전화번호의 형식인지 확인하고, 중간 번호와 마지막 번호의 자릿수를 검사합니다.
-                          RegExp phoneRegex = RegExp(r'^\d{3,4}-\d{4}$');
-                          if (!phoneRegex.hasMatch(val)) {
-                            return '올바른 전화번호 형식이 아닙니다';
-                          }
-                          return null;
-                        },
-                        suffixText: '',
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '카테고리: $category',
+                            style: TextStyle(
+                              color: saveColor
+                                  ? Colors.black
+                                  : const Color(0xFFD9D9D9),
+                            ),
+                          ),
+                          const SizedBox(width: 30),
+                          DropdownButton<String>(
+                            hint: const Text('카테고리 선택'),
+                            value: category,
+                            items: categories.map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: saveColor
+                                ? (String? val) {
+                                    setState(() {
+                                      category = val;
+                                    });
+                                  }
+                                : null,
+                          ),
+                        ],
                       ),
+                      // storeTextFormField(
+                      //   controller: phoneController,
+                      //   label: '음식점 전화번호',
+                      //   selectedAreaCode: selectedAreaCode, // 선택된 지역번호
+                      //   onAreaCodeChanged: saveColor // 편집 버튼 누를 때만 드롭다운 버튼 활성화
+                      //       ? (newValue) {
+                      //           setState(() {
+                      //             selectedAreaCode = newValue ??
+                      //                 selectedAreaCode; // 지역번호가 바뀌면 newValue값을 업데이트해 selectedAreaCode에 저장
+                      //           });
+                      //         }
+                      //       : null,
+                      //   showAreaCodeDropdown: true, // 지역번호 선택 드롭다운 표시 여부
+                      //   editable: saveColor ? false : true,
+                      //   onSaved: (val) {
+                      //     setState(() {
+                      //       phoneNumber = '$selectedAreaCode-$val'; // 전화번호 저장
+                      //     });
+                      //   },
+                      //   validator: (val) {
+                      //     if (val.isEmpty) {
+                      //       return '전화번호를 입력하세요';
+                      //     }
+                      //     // 정규표현식을 사용하여 전화번호의 형식을 검사합니다.
+                      //     // 하이픈(-)을 포함한 전화번호의 형식인지 확인하고, 중간 번호와 마지막 번호의 자릿수를 검사합니다.
+                      //     RegExp phoneRegex = RegExp(r'^\d{3,4}-\d{4}$');
+                      //     if (!phoneRegex.hasMatch(val)) {
+                      //       return '올바른 전화번호 형식이 아닙니다';
+                      //     }
+                      //     return null;
+                      //   },
+                      //   suffixText: '',
+                      // ),
 
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -269,6 +434,7 @@ class _StorePageState extends State<StorePage> {
                                             // 주소 입력 창에 주소 좀 집어넣게 주소 값 좀 알아오라고 임무 전달
                                             onAddressSelected:
                                                 _onAddressSelected,
+                                            sendAddress: sendAddress,
                                           ),
                                         ),
                                       )
@@ -280,6 +446,7 @@ class _StorePageState extends State<StorePage> {
                                 editable: saveColor ? false : true,
                                 onSaved: (val) {
                                   setState(() {
+                                    val = addrController.text;
                                     fullAddress = val;
                                   });
                                 },
@@ -304,6 +471,7 @@ class _StorePageState extends State<StorePage> {
                         editable: saveColor ? false : true,
                         onSaved: (val) {
                           setState(() {
+                            val = infoController.text;
                             explanation = val;
                           });
                         },
@@ -325,13 +493,8 @@ class _StorePageState extends State<StorePage> {
                             : true, // 편집 버튼 눌렀으면(saveColor=true) 쓰기 모드로 전환
                         onSaved: (val) {
                           setState(() {
-                            // 문자열을 정수로 변환
-                            // 정수가 아닌 문자열로 변화 시 예외 처리 발생
-                            try {
-                              minOrderPrice = int.parse(val);
-                            } on FormatException {
-                              minOrderPrice = -1;
-                            }
+                            val = priceController;
+                            minOrderPrice = val;
                           });
                         },
                         validator: (val) {
@@ -457,6 +620,62 @@ class _StorePageState extends State<StorePage> {
                       ),
                       const SizedBox(height: 30),
 
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _image != null
+                              ? // 이미지가 선택된 경우
+                              SizedBox(
+                                  width: 100,
+                                  height: 100,
+                                  child: Image.file(_menuImage!), // 선택된 이미지 표시
+                                )
+                              : GestureDetector(
+                                  onTap: _showImageSelectionDialog,
+                                  child: Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(
+                                      Icons.add_photo_alternate,
+                                      size: 40,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                          const SizedBox(width: 25),
+                          SizedBox(
+                            width: 110,
+                            height: 34,
+                            child: TextButton(
+                              onPressed: () {},
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all<
+                                        Color>(
+                                    const Color(0xff374AA3).withOpacity(0.66)),
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                              ),
+                              child: const Text(
+                                '사진 등록',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
                       // 배달 가능 지역
                       // Column(
                       //   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -510,28 +729,36 @@ class _StorePageState extends State<StorePage> {
         ),
         bottomNavigationBar: saveColor
             ? ElevatedButton(
-                onPressed: () async {
-                  // 설정한 유효성에 맞으면 true를 리턴
-                  if (formKey.currentState!.validate()) {
-                    // validation 이 성공하면 폼 저장
-                    formKey.currentState!.save();
+                onPressed: () {
+                  // 주소 페이지로 이동하면서 도로,지번 주소와 우편번호 값들을 받아온 후
+                  // 이 페이지에 있는 도로,지번 주소와 우편번호 변수에 저장하기 위해 sendAddress를 호출해 값을 저장
+                  sendAddress(finalRoadAddress, finalJibunAddres,
+                      finalPostalCode, finalLatitude, finalLongitude);
 
-                    // 스낵바를 보여줌
-                    Get.snackbar(
-                      "저장완료",
-                      '폼 저장이 완료되었습니다!',
-                      backgroundColor: Colors.white,
-                    );
-                  }
                   // 저장이 되는지 안되는지 확인하기 위해 호출
                   printFormValues();
+                  StoreService().registerStore(
+                    register,
+                    name,
+                    category!,
+                    explanation,
+                    minOrderPrice,
+                    fullAddress,
+                    finalRoadAddress,
+                    finalJibunAddres,
+                    finalPostalCode,
+                    finalLatitude,
+                    finalLongitude,
+                    openInitialTime,
+                    closeInitialTime,
+                    _menuImage!,
+                    formKey,
+                    widget.accessToken,
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF274AA3),
                   minimumSize: const Size(double.infinity, 80),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(0),
-                  ),
                 ),
                 child: const Text(
                   '저장하기',
@@ -552,7 +779,7 @@ class _StorePageState extends State<StorePage> {
   // 상단바 action 아이콘 위젯
   IconButton actionIcon({required IconData icon}) {
     return IconButton(
-      onPressed: deletedStore,
+      onPressed: () {},
       icon: Icon(
         icon,
         size: 30,

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/store_screen.dart';
-import 'package:kakao_map_plugin/kakao_map_plugin.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'dart:convert';
+
+import 'package:kakao_map_plugin/kakao_map_plugin.dart';
 
 class MapPage extends StatefulWidget {
   String address;
