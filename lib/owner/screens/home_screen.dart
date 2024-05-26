@@ -117,10 +117,12 @@ class _HomePageState extends State<HomePage> {
                                     snapshot.data![index]; // 현재 인덱스의 가게 데이터
                                 return ListTile(
                                   onTap: () {
-                                    Navigator.pop(context);
-                                    bottomState(() {
-                                      setState(() {});
+                                    setState(() {
+                                      selectedStore =
+                                          store.name; // 선택한 가게의 이름을 저장
+                                      isExpanded = false; // 모달 닫기
                                     });
+                                    Navigator.pop(context);
                                   },
                                   title: Text(store.name),
                                 );
@@ -439,17 +441,15 @@ class _HomePageState extends State<HomePage> {
                             GestureDetector(
                               onTap: () {
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
-                                selectedStore.isNotEmpty
-                                    ? Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
-                                              StorePage(selectedStore,
-                                                  widget.accessToken),
-                                        ),
-                                      )
-                                    : '';
+                                if (selectedStore.isNotEmpty) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => StorePage(
+                                          selectedStore, widget.accessToken),
+                                    ),
+                                  );
+                                }
                               },
                               child: menuItem(
                                   imgPath: 'assets/images/store.png',
@@ -458,16 +458,15 @@ class _HomePageState extends State<HomePage> {
                             GestureDetector(
                               onTap: () {
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
-                                selectedStore.isNotEmpty
-                                    ? Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
-                                              MenuPage(selectedStore),
-                                        ),
-                                      )
-                                    : '';
+                                if (selectedStore.isNotEmpty) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          MenuPage(selectedStore),
+                                    ),
+                                  );
+                                }
                               },
                               child: menuItem(
                                   imgPath: 'assets/images/menu.png',
@@ -479,16 +478,15 @@ class _HomePageState extends State<HomePage> {
                             GestureDetector(
                               onTap: () {
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
-                                selectedStore.isNotEmpty
-                                    ? Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
-                                              ReviewPage(selectedStore),
-                                        ),
-                                      )
-                                    : '';
+                                if (selectedStore.isNotEmpty) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ReviewPage(selectedStore),
+                                    ),
+                                  );
+                                }
                               },
                               child: menuItem(
                                   imgPath: 'assets/images/review.png',
@@ -500,16 +498,15 @@ class _HomePageState extends State<HomePage> {
                             GestureDetector(
                               onTap: () {
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
-                                selectedStore.isNotEmpty
-                                    ? Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
-                                              FeedbackPage(selectedStore),
-                                        ),
-                                      )
-                                    : '';
+                                if (selectedStore.isNotEmpty) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          FeedbackPage(selectedStore),
+                                    ),
+                                  );
+                                }
                               },
                               child: menuItem(
                                   imgPath: 'assets/images/feedback2.png',
