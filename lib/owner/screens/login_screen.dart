@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -104,7 +105,9 @@ class _LoginPageState extends State<LoginPage> {
         sendDataToServer();
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(
+            builder: (context) => HomePage(accessToken: accessToken),
+          ),
         );
       } else {
         // 로그인 실패 시
