@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
 import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/storeForm_widget.dart';
@@ -272,318 +273,335 @@ class _StorePageState extends State<StorePage> {
                 Padding(
                   padding: const EdgeInsets.only(
                       left: 75.5, right: 75.5, bottom: 40.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      storeTextFormField(
-                        controller: resisterController,
-                        label: '사업자 등록 번호',
-                        editable: saveColor ? false : true,
-                        onSaved: (val) {
-                          // 입력한 값을 지정한 변수에 저장
-                          setState(() {
-                            register = val ?? '';
-                          });
-                        },
-                        // 값 입력하지 않으면 에러 발생
-                        validator: (val) {
-                          if (val.isEmpty) {
-                            return '등록 번호를 입력하세요';
-                          }
-                          return null;
-                        },
-                        suffixText: '',
-                      ),
-                      storeTextFormField(
-                        controller: nameController,
-                        label: '음식점 이름',
-                        editable: saveColor ? false : true,
-                        onSaved: (val) {
-                          setState(() {
-                            name = val ?? '';
-                          });
-                        },
-                        validator: (val) {
-                          if (val.isEmpty) {
-                            return '이름을 입력하세요';
-                          }
-                          return null;
-                        },
-                        suffixText: '',
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '카테고리: $category',
-                            style: TextStyle(
-                              color: saveColor
-                                  ? Colors.black
-                                  : const Color(0xFFD9D9D9),
+                  child: FutureBuilder<List<StoreModel>>(
+                    future: StoreService().getStore(widget.accessToken),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+
+                        // 데이터 로드 중 에러 발생 시 오류 메세지 표시
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Error: ${snapshot.error}'),
+                        );
+
+                        // 데이터가 없거나 빈 리스트일 경우 '등록된 가게가 없습니다' 메시지 표시
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(
+                          child: Text('등록된 가게가 없습니다.'),
+                        );
+
+                        // 데이터가 성공적으로 로드될 경우 해당 가게 정보 표시
+                      } else {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            TextFormField(),
+                            storeTextFormField(
+                              controller: nameController,
+                              label: '음식점 이름',
+                              editable: saveColor ? false : true,
+                              onSaved: (val) {
+                                setState(() {
+                                  name = val ?? '';
+                                });
+                              },
+                              validator: (val) {
+                                if (val.isEmpty) {
+                                  return '이름을 입력하세요';
+                                }
+                                return null;
+                              },
+                              suffixText: '',
                             ),
-                          ),
-                          const SizedBox(width: 30),
-                          DropdownButton<String>(
-                            hint: const Text('카테고리 선택'),
-                            value: category,
-                            items: categories.map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: saveColor
-                                ? (String? val) {
-                                    setState(() {
-                                      category = val;
-                                    });
-                                  }
-                                : null,
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.7,
-                            child: GestureDetector(
-                              onTap: () {
-                                saveColor
-                                    ? Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => AddressPage(
-                                            onAddressSelected:
-                                                _onAddressSelected,
-                                            sendAddress: sendAddress,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '카테고리: $category',
+                                  style: TextStyle(
+                                    color: saveColor
+                                        ? Colors.black
+                                        : const Color(0xFFD9D9D9),
+                                  ),
+                                ),
+                                const SizedBox(width: 30),
+                                DropdownButton<String>(
+                                  hint: const Text('카테고리 선택'),
+                                  value: category,
+                                  items: categories.map((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                  onChanged: saveColor
+                                      ? (String? val) {
+                                          setState(() {
+                                            category = val;
+                                          });
+                                        }
+                                      : null,
+                                ),
+                              ],
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      saveColor
+                                          ? Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AddressPage(
+                                                  onAddressSelected:
+                                                      _onAddressSelected,
+                                                  sendAddress: sendAddress,
+                                                ),
+                                              ),
+                                            )
+                                          : null;
+                                    },
+                                    child: storeTextFormField(
+                                      controller: addrController,
+                                      label: '음식점 주소',
+                                      editable: saveColor ? false : true,
+                                      onSaved: (val) {
+                                        setState(() {
+                                          fullAddress = val ?? '';
+                                        });
+                                      },
+                                      validator: (val) {
+                                        if (val.isEmpty) {
+                                          return '주소를 입력하세요';
+                                        }
+                                        return null;
+                                      },
+                                      suffixText: '',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            storeTextFormField(
+                              controller: infoController,
+                              label: '가게 설명',
+                              editable: saveColor ? false : true,
+                              onSaved: (val) {
+                                setState(() {
+                                  explanation = val ?? '';
+                                });
+                              },
+                              validator: (val) {
+                                if (val.isEmpty) {
+                                  return '가게 설명 입력하세요';
+                                }
+                                return null;
+                              },
+                              suffixText: '',
+                            ),
+                            storeTextFormField(
+                              controller: priceController,
+                              label: '최소 주문 가격',
+                              editable: saveColor ? false : true,
+                              onSaved: (val) {
+                                setState(() {
+                                  minOrderPrice = val ?? '';
+                                });
+                              },
+                              validator: (val) {
+                                if (val.isEmpty) {
+                                  return '최소주문가격을 입력하세요';
+                                }
+                                return null;
+                              },
+                              suffixText: '(원)',
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      '오픈 시간',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF7E7EB2),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      // saveColor가 true일 경우에만 press 적용
+                                      onPressed: saveColor
+                                          ? () async {
+                                              // 시간 설정 화면 표시
+                                              final TimeOfDay? timeOfDay =
+                                                  await showTimePicker(
+                                                context: context,
+                                                initialTime: openInitialTime,
+                                              );
+                                              // 시간 설정 시 초기 시간에 설정한 시간 저장 후 boolean 값 변경
+                                              if (timeOfDay != null) {
+                                                setState(() {
+                                                  openInitialTime = timeOfDay;
+                                                  openTimeBoolean =
+                                                      !openTimeBoolean;
+                                                });
+                                              }
+                                            }
+                                          : null,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        minimumSize: const Size(120, 50),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        elevation: 0,
+                                      ),
+                                      child: Text(
+                                        // timeOfDay != null로 해서 삼항연산자를 할려고 했으나 정의되지 않는 변수이고 boolean일 때만 사용하라고 해서
+                                        // timeBoolean이라는 불리안 변수를 만들어 설정을 안할 시 false를, 시간을 설정할 때는 true로 지정해
+                                        // true일 때는 설정한 시간을, false일 때는 "오픈 마감 시간"을 보이게 구현
+                                        openTimeBoolean
+                                            ? '${openInitialTime.hour}:${openInitialTime.minute}'
+                                            : '00:00',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF7E7EB2),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                // 마감 시간
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      '마감 시간',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF7E7EB2),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: saveColor
+                                          ? () async {
+                                              final TimeOfDay? timeOfDay =
+                                                  await showTimePicker(
+                                                context: context,
+                                                initialTime: closeInitialTime,
+                                              );
+                                              if (timeOfDay != null) {
+                                                setState(() {
+                                                  closeInitialTime = timeOfDay;
+                                                  closeTimeBoolean =
+                                                      !closeTimeBoolean;
+                                                });
+                                              }
+                                            }
+                                          : null,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        minimumSize: const Size(120, 50),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        elevation: 0,
+                                      ),
+                                      child: Text(
+                                        closeTimeBoolean
+                                            ? '${closeInitialTime.hour}:${closeInitialTime.minute}'
+                                            : '00:00',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF7E7EB2),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 30),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _image != null
+                                    ? // 이미지가 선택된 경우
+                                    SizedBox(
+                                        width: 100,
+                                        height: 100,
+                                        child: Image.file(
+                                            _menuImage!), // 선택된 이미지 표시
+                                      )
+                                    : GestureDetector(
+                                        onTap: _showImageSelectionDialog,
+                                        child: Container(
+                                          width: 100,
+                                          height: 100,
+                                          decoration: BoxDecoration(
+                                            border:
+                                                Border.all(color: Colors.grey),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: const Icon(
+                                            Icons.add_photo_alternate,
+                                            size: 40,
+                                            color: Colors.grey,
                                           ),
                                         ),
-                                      )
-                                    : null;
-                              },
-                              child: storeTextFormField(
-                                controller: addrController,
-                                label: '음식점 주소',
-                                editable: saveColor ? false : true,
-                                onSaved: (val) {
-                                  setState(() {
-                                    fullAddress = val ?? '';
-                                  });
-                                },
-                                validator: (val) {
-                                  if (val.isEmpty) {
-                                    return '주소를 입력하세요';
-                                  }
-                                  return null;
-                                },
-                                suffixText: '',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      storeTextFormField(
-                        controller: infoController,
-                        label: '가게 설명',
-                        editable: saveColor ? false : true,
-                        onSaved: (val) {
-                          setState(() {
-                            explanation = val ?? '';
-                          });
-                        },
-                        validator: (val) {
-                          if (val.isEmpty) {
-                            return '가게 설명 입력하세요';
-                          }
-                          return null;
-                        },
-                        suffixText: '',
-                      ),
-                      storeTextFormField(
-                        controller: priceController,
-                        label: '최소 주문 가격',
-                        editable: saveColor ? false : true,
-                        onSaved: (val) {
-                          setState(() {
-                            minOrderPrice = val ?? '';
-                          });
-                        },
-                        validator: (val) {
-                          if (val.isEmpty) {
-                            return '최소주문가격을 입력하세요';
-                          }
-                          return null;
-                        },
-                        suffixText: '(원)',
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                '오픈 시간',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF7E7EB2),
-                                ),
-                              ),
-                              ElevatedButton(
-                                // saveColor가 true일 경우에만 press 적용
-                                onPressed: saveColor
-                                    ? () async {
-                                        // 시간 설정 화면 표시
-                                        final TimeOfDay? timeOfDay =
-                                            await showTimePicker(
-                                          context: context,
-                                          initialTime: openInitialTime,
-                                        );
-                                        // 시간 설정 시 초기 시간에 설정한 시간 저장 후 boolean 값 변경
-                                        if (timeOfDay != null) {
-                                          setState(() {
-                                            openInitialTime = timeOfDay;
-                                            openTimeBoolean = !openTimeBoolean;
-                                          });
-                                        }
-                                      }
-                                    : null,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  minimumSize: const Size(120, 50),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  // timeOfDay != null로 해서 삼항연산자를 할려고 했으나 정의되지 않는 변수이고 boolean일 때만 사용하라고 해서
-                                  // timeBoolean이라는 불리안 변수를 만들어 설정을 안할 시 false를, 시간을 설정할 때는 true로 지정해
-                                  // true일 때는 설정한 시간을, false일 때는 "오픈 마감 시간"을 보이게 구현
-                                  openTimeBoolean
-                                      ? '${openInitialTime.hour}:${openInitialTime.minute}'
-                                      : '00:00',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF7E7EB2),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          // 마감 시간
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                '마감 시간',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF7E7EB2),
-                                ),
-                              ),
-                              ElevatedButton(
-                                onPressed: saveColor
-                                    ? () async {
-                                        final TimeOfDay? timeOfDay =
-                                            await showTimePicker(
-                                          context: context,
-                                          initialTime: closeInitialTime,
-                                        );
-                                        if (timeOfDay != null) {
-                                          setState(() {
-                                            closeInitialTime = timeOfDay;
-                                            closeTimeBoolean =
-                                                !closeTimeBoolean;
-                                          });
-                                        }
-                                      }
-                                    : null,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  minimumSize: const Size(120, 50),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  closeTimeBoolean
-                                      ? '${closeInitialTime.hour}:${closeInitialTime.minute}'
-                                      : '00:00',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF7E7EB2),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 30),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _image != null
-                              ? // 이미지가 선택된 경우
-                              SizedBox(
-                                  width: 100,
-                                  height: 100,
-                                  child: Image.file(_menuImage!), // 선택된 이미지 표시
-                                )
-                              : GestureDetector(
-                                  onTap: _showImageSelectionDialog,
-                                  child: Container(
-                                    width: 100,
-                                    height: 100,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey),
-                                      borderRadius: BorderRadius.circular(8),
+                                      ),
+                                const SizedBox(width: 25),
+                                SizedBox(
+                                  width: 110,
+                                  height: 34,
+                                  child: TextButton(
+                                    onPressed: () {},
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              const Color(0xff374AA3)
+                                                  .withOpacity(0.66)),
+                                      shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                      ),
                                     ),
-                                    child: const Icon(
-                                      Icons.add_photo_alternate,
-                                      size: 40,
-                                      color: Colors.grey,
+                                    child: const Text(
+                                      '사진 등록',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                   ),
                                 ),
-                          const SizedBox(width: 25),
-                          SizedBox(
-                            width: 110,
-                            height: 34,
-                            child: TextButton(
-                              onPressed: () {},
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all<
-                                        Color>(
-                                    const Color(0xff374AA3).withOpacity(0.66)),
-                                shape: MaterialStateProperty.all<
-                                    RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                ),
-                              ),
-                              child: const Text(
-                                '사진 등록',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        );
+                      }
+                    },
                   ),
                 ),
               ],

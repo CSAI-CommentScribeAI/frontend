@@ -51,6 +51,7 @@ dependencies:
   shared_preferences: ^2.2.3
   kpostal: ^0.5.1
   kakao_flutter_sdk: ^1.9.0
+  image: ^4.2.0
 
 dev_dependencies:
   flutter_test:
