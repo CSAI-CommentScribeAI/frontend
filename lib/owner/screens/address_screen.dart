@@ -4,21 +4,21 @@ import 'package:kpostal/kpostal.dart';
 
 class AddressPage extends StatefulWidget {
   final Function(String) onAddressSelected;
+  Function(String, String, String, String, String) sendAddress;
 
-  const AddressPage({super.key, required this.onAddressSelected});
+  AddressPage(
+      {super.key, required this.onAddressSelected, required this.sendAddress});
 
   @override
   State<AddressPage> createState() => _AddressPageState();
 }
 
 class _AddressPageState extends State<AddressPage> {
-  String postCode = '';
-  String address = '';
-  String jibunAddress = '';
-  String latitude = '';
-  String longitude = '';
-  String kakaoLatitude = '';
-  String kakaoLongitude = '';
+  String sentPostalCode = ''; // 우편 번호
+  String sentAddress = ''; // 도로명 주소
+  String sentJibun = ''; // 지번 주소
+  String sentLatitude = '';
+  String sentLlongitude = '';
   TextEditingController detailController = TextEditingController();
 
   @override
@@ -81,11 +81,12 @@ class _AddressPageState extends State<AddressPage> {
                         callback: (Kpostal result) {
                           // Kpostal 패키지에서 갖고있는 검색 결과 처리
                           setState(() {
-                            postCode = result.postCode;
-                            address = result.address;
-                            jibunAddress = result.jibunAddress;
-                            latitude = result.latitude?.toString() ?? '-';
-                            longitude = result.longitude?.toString() ?? '-';
+                            sentPostalCode = result.postCode;
+                            sentAddress = result.address;
+                            sentJibun = result.jibunAddress;
+                            sentLatitude = result.latitude?.toString() ?? '-';
+                            sentLlongitude =
+                                result.longitude?.toString() ?? '-';
                           });
                         },
                       ),
@@ -140,7 +141,7 @@ class _AddressPageState extends State<AddressPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => MapPage(
-                      address: address,
+                      address: sentAddress,
                       detailAddress: detailController.text,
                     ),
                   ),
@@ -154,22 +155,23 @@ class _AddressPageState extends State<AddressPage> {
                   child: Column(
                     children: [
                       Text(
-                        '우편번호 : $postCode',
+                        '우편번호 : $sentPostalCode',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        '주소: $address',
+                        '주소: $sentAddress',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        '지번 주소: $jibunAddress',
+                        '지번 주소: $sentJibun',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const Text(
                         '위도',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Text('latitude: $latitude, longitude: $longitude'),
+                      Text(
+                          'latitude: $sentLatitude, longitude: $sentLlongitude'),
 
                       // 상세 주소 입력 필드
                       const Text(
@@ -196,11 +198,24 @@ class _AddressPageState extends State<AddressPage> {
       ),
       bottomNavigationBar: ElevatedButton(
         onPressed: () {
+          // kpostal에서 받은 주소값들을 변수를 선언해 저장
           String detailAddress = detailController.text;
-          String fullAddress = '$address $detailAddress'; // 상세 주소 생성
+          String fullAddress = '$sentAddress $detailAddress'; // 상세 주소 생성
+          String roadAddress = sentAddress;
+          String jibunAddress = sentJibun;
+          String postalCode = sentPostalCode;
+          String latitude = sentLatitude;
+          String longitude = sentLlongitude;
+
+          print(roadAddress);
+          print(jibunAddress);
+          print(postalCode);
 
           widget.onAddressSelected(
               fullAddress); // StorePage에서 임무 받은 fullAddress 값을 전달
+          widget.sendAddress(
+              roadAddress, jibunAddress, postalCode, latitude, longitude);
+
           Navigator.pop(context);
         },
         style: ElevatedButton.styleFrom(

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/charts/feedback_chart.dart';
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/feedback_screen.dart';
 import 'package:frontend/owner/screens/menu_screen.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
 import 'package:frontend/owner/screens/store_screen.dart';
+import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/circle_widget.dart';
 import 'package:frontend/owner/widgets/current_widget.dart';
 import 'package:frontend/owner/widgets/menuItem_widget.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String accessToken;
+  const HomePage({required this.accessToken, super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -22,27 +25,6 @@ class _HomePageState extends State<HomePage> {
   bool titleOpacity = false; // 가게명 투명도
   bool thisColor = true; // 선택되었을 때 원 색깔
   bool lastColor = false;
-
-  List<Map<String, dynamic>> storeList = [
-    {
-      "title": "BBQ 코엑스점",
-      "style": const TextStyle(
-        color: Colors.black,
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
-      "showCircle": false,
-    },
-    {
-      "title": "이남장 서초점",
-      "style": const TextStyle(
-        color: Colors.black,
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
-      "showCircle": false,
-    },
-  ];
 
   void chooseStore(BuildContext context) async {
     await showModalBottomSheet(
@@ -98,90 +80,93 @@ class _HomePageState extends State<HomePage> {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                      // Listview를 쓸 때 자주 발생하는 오류를 막기 위해 singlechildscrollview 함수 사용
-                      // Column 자체를 스크롤하게끔 하는 코드 (SingleChildScrollView)
-                      child: SingleChildScrollView(
-                        physics: const ScrollPhysics(),
-                        child: Column(
-                          children: [
-                            ListView.separated(
-                              shrinkWrap: true, // child 크기만큼만 높이를 정해줌
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: storeList.length,
+                      child: FutureBuilder<List<StoreModel>>(
+                        // getStore() 메서드를 호출해서 데이터를 가져옴
+                        future: StoreService().getStore(widget.accessToken),
+                        builder: (context, snapshot) {
+                          // 데이터가 로드되는 동안 로딩 스피너 표시
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+
+                            // 데이터 로드 중 에러 발생 시 오류 메세지 표시
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+
+                            // 데이터가 없거나 빈 리스트일 경우 '등록된 가게가 없습니다' 메시지 표시
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return const Center(
+                              child: Text('등록된 가게가 없습니다.'),
+                            );
+
+                            // 데이터가 성공적으로 로드될 경우 가게 목록 표시
+                          } else {
+                            return ListView.separated(
+                              shrinkWrap: true,
+                              physics: const ScrollPhysics(),
+
+                              // snapshot.data: getStore에서 리턴한 리스트
+                              itemCount: snapshot.data!.length,
                               itemBuilder: (BuildContext context, int index) {
-                                final store = storeList[index];
+                                final store =
+                                    snapshot.data![index]; // 현재 인덱스의 가게 데이터
                                 return ListTile(
                                   onTap: () {
-                                    // 가게 선택 후 바텀시트 닫기
-                                    Navigator.pop(context);
-                                    // bottomState만 적용하면 bottomSheet 값은 즉시 반영되지만 parent 값은 변경되지 않음
-                                    // 그래서 꼭 setState()를 같이 추가해주어야 함
-                                    bottomState(() {
-                                      setState(() {
-                                        // 선택한 가게의 인덱스를 받아 index(선택 가게 인덱스)와 i값이 일치하면 true
-                                        // 나머지 가게는 false
-                                        for (int i = 0;
-                                            i < storeList.length;
-                                            i++) {
-                                          if (i == index) {
-                                            // 선택한 가게의 showCircle을 현재 상태의 반대로 설정
-                                            storeList[i]["showCircle"] =
-                                                !storeList[i]["showCircle"];
-                                            // 만약 선택한 가게의 showCircle이 true라면 선택한 가게의 이름을 저장
-                                            if (storeList[i]["showCircle"] ==
-                                                true) {
-                                              selectedStore = store["title"];
-                                            } else {
-                                              selectedStore =
-                                                  ''; // showCircle이 false이면 선택한 가게가 없으므로 ''로 초기화
-                                            }
-                                          } else {
-                                            storeList[i]["showCircle"] = false;
-                                          }
-                                        }
-                                      });
+                                    setState(() {
+                                      selectedStore =
+                                          store.name; // 선택한 가게의 이름을 저장
+                                      isExpanded = false; // 모달 닫기
                                     });
+                                    Navigator.pop(context);
                                   },
-                                  title: Text(
-                                    store["title"],
-                                    style: store["style"],
-                                  ),
-                                  trailing: store["showCircle"]
-                                      ? const Circle(Color(0xFF7B88C2), 10.0)
-                                      : null,
+                                  title: Text(store.name),
                                 );
                               },
+                              // trailing에서 showCircle 구현하기
                               separatorBuilder:
                                   (BuildContext context, int index) {
                                 return const Divider();
                               },
-                            ),
-                            const SizedBox(height: 15),
-                            Container(
-                              alignment: Alignment.center,
-                              child: ElevatedButton.icon(
-                                onPressed: () {},
-                                icon: const Icon(Icons.add),
-                                label: const Text(
-                                  '가게 등록',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF7B88C2),
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  shadowColor: Colors.white.withOpacity(0.25),
-                                  elevation: 10.0,
-                                ),
-                              ),
-                            ),
-                          ],
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 40.0),
+                    alignment: Alignment.center,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                StorePage(selectedStore, widget.accessToken),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text(
+                        '가게 등록',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF7B88C2),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        shadowColor: Colors.white.withOpacity(0.25),
+                        elevation: 10.0,
                       ),
                     ),
                   ),
@@ -343,6 +328,8 @@ class _HomePageState extends State<HomePage> {
                                             // expand_less,more
                                             GestureDetector(
                                               onTap: () {
+                                                StoreService().getStore(
+                                                    widget.accessToken);
                                                 setState(() {
                                                   isExpanded =
                                                       !isExpanded; // 확장되어 있을 때는 축소하고, 축소되어 있을 때는 확장
@@ -454,16 +441,15 @@ class _HomePageState extends State<HomePage> {
                             GestureDetector(
                               onTap: () {
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
-                                selectedStore.isNotEmpty
-                                    ? Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
-                                              StorePage(selectedStore),
-                                        ),
-                                      )
-                                    : '';
+                                if (selectedStore.isNotEmpty) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => StorePage(
+                                          selectedStore, widget.accessToken),
+                                    ),
+                                  );
+                                }
                               },
                               child: menuItem(
                                   imgPath: 'assets/images/store.png',
@@ -472,16 +458,15 @@ class _HomePageState extends State<HomePage> {
                             GestureDetector(
                               onTap: () {
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
-                                selectedStore.isNotEmpty
-                                    ? Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
-                                              MenuPage(selectedStore),
-                                        ),
-                                      )
-                                    : '';
+                                if (selectedStore.isNotEmpty) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          MenuPage(selectedStore),
+                                    ),
+                                  );
+                                }
                               },
                               child: menuItem(
                                   imgPath: 'assets/images/menu.png',
@@ -493,16 +478,15 @@ class _HomePageState extends State<HomePage> {
                             GestureDetector(
                               onTap: () {
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
-                                selectedStore.isNotEmpty
-                                    ? Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
-                                              ReviewPage(selectedStore),
-                                        ),
-                                      )
-                                    : '';
+                                if (selectedStore.isNotEmpty) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ReviewPage(selectedStore),
+                                    ),
+                                  );
+                                }
                               },
                               child: menuItem(
                                   imgPath: 'assets/images/review.png',
@@ -514,16 +498,15 @@ class _HomePageState extends State<HomePage> {
                             GestureDetector(
                               onTap: () {
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
-                                selectedStore.isNotEmpty
-                                    ? Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              // selectedStore에 들어간 가게 이름이 가게 관리 페이지 타이틀에 들어가게 설정
-                                              FeedbackPage(selectedStore),
-                                        ),
-                                      )
-                                    : '';
+                                if (selectedStore.isNotEmpty) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          FeedbackPage(selectedStore),
+                                    ),
+                                  );
+                                }
                               },
                               child: menuItem(
                                   imgPath: 'assets/images/feedback2.png',

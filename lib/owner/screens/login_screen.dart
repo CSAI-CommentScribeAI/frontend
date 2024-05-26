@@ -105,7 +105,9 @@ class _LoginPageState extends State<LoginPage> {
         sendDataToServer();
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(
+            builder: (context) => HomePage(accessToken: accessToken),
+          ),
         );
       } else {
         // 로그인 실패 시

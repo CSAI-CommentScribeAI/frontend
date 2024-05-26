@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/owner/screens/login_screen.dart';
 import 'package:get/get.dart';
@@ -19,6 +20,16 @@ void main() async {
   }
 
   AuthRepository.initialize(appKey: appKey);
+
+  HardwareKeyboard.instance.addHandler((event) {
+    if (event is KeyUpEvent) {
+      print('KeyUpEvent: ${event.physicalKey} - ${event.logicalKey}');
+    } else if (event is KeyDownEvent) {
+      print('KeyDownEvent: ${event.physicalKey} - ${event.logicalKey}');
+    }
+    return false;
+  });
+
   runApp(const MyApp());
 }
 
