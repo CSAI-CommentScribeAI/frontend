@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/letter_screen.dart';
 import 'package:frontend/screens/review_screen.dart';
 import 'package:frontend/widgets/store_widget.dart';
-import 'package:get/get.dart';
 
 class ReceiptPage extends StatefulWidget {
   const ReceiptPage({super.key});
@@ -42,6 +42,28 @@ class _ReceiptPageState extends State<ReceiptPage> {
     setState(() {
       orderList[index]['isAccepted'] =
           true; // isOrderAccepted 변수를 true로 설정하여 주문이 수락되었음을 나타냄
+    });
+
+    // 3초 후에 상태를 배차 / 출력 버튼으로 변경
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        orderList[index]['isPrinted'] = true; // 배차 혹은 출력 상태로 활성화
+      });
+    });
+  }
+
+  // 배차 혹은 출력시키는 메서드
+  void acceptDelivery(int index) {
+    setState(() {
+      orderList[index]['isDelivered'] = true; // 배달 중 상태로 활성화
+    });
+
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        // 배차 혹은 출력 상태는 비활성화, 완료 중 상태로 활성화
+        orderList[index]['isPrinted'] = false;
+        orderList[index]['isCompleted'] = true;
+      });
     });
   }
 
@@ -540,8 +562,11 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                         ),
                                       ),
                                     ),
+
                                   // 수락 버튼 클릭 시 점 아이콘과 "조리 중" 텍스트 표시
-                                  if (order['isAccepted'] == true) ...[
+                                  // "..." : if 조건문이 참일 때 "[ ]" 안에 코드 실행
+                                  if (order['isAccepted'] == true &&
+                                      order['isPrinted'] == null) ...[
                                     const SizedBox(width: 7),
                                     const Icon(
                                       Icons.brightness_1,
@@ -557,7 +582,82 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                           color: Colors.black),
                                     ),
                                   ],
+
+                                  // 배차 상태일 경우와 배달 중 상태가 아닐 경우 배차 버튼 표시
+                                  if (order['isPrinted'] == true &&
+                                      order['isDelivered'] == null) ...[
+                                    const SizedBox(width: 7),
+                                    SizedBox(
+                                      height: 20,
+                                      width: 70,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          acceptDelivery(index);
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const LetterPage()));
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0xFF374AA3)
+                                                    .withOpacity(0.66),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(6))),
+                                        child: const Text(
+                                          '배차',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+
+                                  // 배달 중 상태일 경우와 완료 중 상태가 아닐 경우 배달 중 표시
+                                  // isCompleted = null로 안하면 완료 중이 표시됨
+                                  if (order['isDelivered'] == true &&
+                                      order['isCompleted'] == null) ...[
+                                    const SizedBox(width: 7),
+                                    const Icon(
+                                      Icons.brightness_1,
+                                      color: Color(0xFF7E7EB2),
+                                      size: 12,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    const Text(
+                                      '배달 중',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.black),
+                                    ),
+                                  ],
+
+                                  // 완료 중 상태일 경우 완료 중 표시
+                                  if (order['isCompleted'] == true) ...[
+                                    const SizedBox(width: 7),
+                                    const Icon(
+                                      Icons.brightness_1,
+                                      color: Color(0xFF6DEA6D),
+                                      size: 12,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    const Text(
+                                      '완료',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.black),
+                                    ),
+                                  ],
+
                                   const SizedBox(width: 7),
+
                                   // 주문이 수락되지 않은 경우에만 "거절" 버튼 보이도록 설정 = 수락되면 사라지도록
                                   const SizedBox(width: 7),
                                   if (order['isAccepted'] == null)
@@ -623,38 +723,42 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ReviewPage(
-                                            order['title'],
-                                          ), // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
-                                        ),
-                                      );
-                                    },
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Colors.black,
-                                      minimumSize: Size.zero,
-                                      padding: EdgeInsets.zero,
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                    ),
-                                    child: const Row(
-                                      children: [
-                                        Text(
-                                          '리뷰 보기',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
+
+                                  // 완료 중 상태 일 경우 리뷰 보기 버튼 표시
+                                  if (order['isCompleted'] == true) ...[
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ReviewPage(
+                                              order['title'],
+                                            ), // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
                                           ),
-                                        ),
-                                        SizedBox(width: 11),
-                                        Icon(Icons.arrow_forward_ios),
-                                      ],
+                                        );
+                                      },
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: Colors.black,
+                                        minimumSize: Size.zero,
+                                        padding: EdgeInsets.zero,
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                      child: const Row(
+                                        children: [
+                                          Text(
+                                            '리뷰 보기',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          SizedBox(width: 11),
+                                          Icon(Icons.arrow_forward_ios),
+                                        ],
+                                      ),
                                     ),
-                                  ),
+                                  ]
                                 ],
                               ),
                             ],
@@ -675,7 +779,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
         child: GridView.count(
           physics: const NeverScrollableScrollPhysics(), // Gridview의 스크롤 방지
           crossAxisCount: 5, // 1개의 행에 보여줄 item의 개수
-          crossAxisSpacing: 10.0, // 같은 행의 iteme들 사이의 간격
+          // crossAxisSpacing: 5.0, // 같은 행의 iteme들 사이의 간격, 주석 달음(overflow 생겨서)
           children: [
             storeItem(imgPath: 'assets/images/bottom_home.png', title: '홈'),
             storeItem(
