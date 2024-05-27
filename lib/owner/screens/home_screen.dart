@@ -4,6 +4,7 @@ import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/feedback_screen.dart';
 import 'package:frontend/owner/screens/menu_screen.dart';
 import 'package:frontend/owner/screens/register_store.dart';
+import 'package:frontend/owner/screens/receipt_screen.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
 import 'package:frontend/owner/screens/store_screen.dart';
 import 'package:frontend/owner/services/store_service.dart';
@@ -25,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   String selectedStore = ''; // 선택한 가게의 이름을 저장할 변수
   int storeIndex = 0; // 가게 리스트 인덱스
   bool titleOpacity = false; // 가게명 투명도
+  int storeIndex = 0;
   bool thisColor = true; // 선택되었을 때 원 색깔
   bool lastColor = false;
 
@@ -124,6 +126,7 @@ class _HomePageState extends State<HomePage> {
                                           store.name; // 선택한 가게의 이름을 저장
                                       storeIndex = index;
                                       isExpanded = true; // 모달 닫기
+                                      storeIndex = index;
                                     });
                                     Navigator.pop(context);
                                   },
@@ -473,8 +476,10 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          MenuPage(selectedStore),
+                                      builder: (context) => MenuPage(
+                                          selectedStore,
+                                          storeIndex,
+                                          widget.accessToken),
                                     ),
                                   );
                                 }
@@ -483,9 +488,19 @@ class _HomePageState extends State<HomePage> {
                                   imgPath: 'assets/images/menu.png',
                                   title: '메뉴관리'),
                             ),
-                            menuItem(
-                                imgPath: 'assets/images/receipt.png',
-                                title: '접수관리'),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ReceiptPage(),
+                                  ),
+                                );
+                              },
+                              child: menuItem(
+                                  imgPath: 'assets/images/receipt.png',
+                                  title: '접수관리'),
+                            ),
                             GestureDetector(
                               onTap: () {
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
