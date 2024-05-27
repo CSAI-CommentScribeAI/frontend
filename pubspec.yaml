@@ -30,7 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
@@ -104,6 +103,7 @@ flutter:
     - assets/images/handWriting.png
     - assets/images/good.png
     - assets/images/bad.png
+    - assets/images/delivery.png
     - assets/templates/christmas.png
     - assets/templates/leaf.png
     - assets/templates/autumn.png
@@ -134,25 +134,25 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  fonts:
-    - family: PyeongChangPeace
-      fonts:
-        - asset: assets/fonts/PyeongChangPeace-Bold.otf
-    - family: KyoboHandwriting2023wsa
-      fonts:
-        - asset: assets/fonts/KyoboHandwriting2023wsa.otf
-    - family: EF_jejudoldam
-      fonts:
-        - asset: assets/fonts/EF_jejudoldam.otf
-    - family: YClover
-      fonts:
-        - asset: assets/fonts/YClover-Bold.otf
-    - family: DungGeunMo
-      fonts:
-        - asset: assets/fonts/DungGeunMo.otf
-    - family: Adultkid
-      fonts:
-        - asset: assets/fonts/Adultkid.otf
+fonts:
+  - family: PyeongChangPeace
+    fonts:
+      - asset: assets/fonts/PyeongChangPeace-Bold.otf
+  - family: KyoboHandwriting2023wsa
+    fonts:
+      - asset: assets/fonts/KyoboHandwriting2023wsa.otf
+  - family: EF_jejudoldam
+    fonts:
+      - asset: assets/fonts/EF_jejudoldam.otf
+  - family: YClover
+    fonts:
+      - asset: assets/fonts/YClover-Bold.otf
+  - family: DungGeunMo
+    fonts:
+      - asset: assets/fonts/DungGeunMo.otf
+  - family: Adultkid
+    fonts:
+      - asset: assets/fonts/Adultkid.otf
 
   #  - family: Jersey25Charted
   #    fonts:
