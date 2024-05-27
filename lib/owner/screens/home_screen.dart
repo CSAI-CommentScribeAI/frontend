@@ -26,7 +26,6 @@ class _HomePageState extends State<HomePage> {
   String selectedStore = ''; // 선택한 가게의 이름을 저장할 변수
   int storeIndex = 0; // 가게 리스트 인덱스
   bool titleOpacity = false; // 가게명 투명도
-  int storeIndex = 0;
   bool thisColor = true; // 선택되었을 때 원 색깔
   bool lastColor = false;
 
