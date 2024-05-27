@@ -103,6 +103,7 @@ flutter:
     - assets/images/handWriting.png
     - assets/images/good.png
     - assets/images/bad.png
+    - assets/images/delivery.png
     - assets/templates/christmas.png
     - assets/templates/leaf.png
     - assets/templates/autumn.png
