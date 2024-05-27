@@ -24,8 +24,8 @@ class _HomePageState extends State<HomePage> {
   bool light = true;
   bool isExpanded = false; // 확장 유무(Expaned_less,more)
   String selectedStore = ''; // 선택한 가게의 이름을 저장할 변수
+  int storeIndex = 0; // 가게 리스트 인덱스
   bool titleOpacity = false; // 가게명 투명도
-  int storeIndex = 0;
   bool thisColor = true; // 선택되었을 때 원 색깔
   bool lastColor = false;
 
@@ -123,6 +123,7 @@ class _HomePageState extends State<HomePage> {
                                     setState(() {
                                       selectedStore =
                                           store.name; // 선택한 가게의 이름을 저장
+                                      storeIndex = index;
                                       isExpanded = true; // 모달 닫기
                                       storeIndex = index;
                                     });
@@ -456,7 +457,9 @@ class _HomePageState extends State<HomePage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => StorePage(
-                                          selectedStore, widget.accessToken),
+                                          selectedStore: selectedStore,
+                                          storeIndex: storeIndex,
+                                          accessToken: widget.accessToken),
                                     ),
                                   );
                                 }

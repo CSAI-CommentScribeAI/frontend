@@ -28,29 +28,30 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-    flutter:
-        sdk: flutter
-    # The following adds the Cupertino Icons font to your application.
-    # Use with the CupertinoIcons class for iOS style icons.
-    cupertino_icons: ^1.0.6
-    email_validator: ^2.1.17
-    flutter_pw_validator: ^1.6.0
-    syncfusion_flutter_charts: ^25.1.38
-    get: ^4.6.6
-    toggle_switch: ^2.3.0
-    image_picker: ^1.0.8
-    flutter_rating_bar: ^4.0.1
-    percent_indicator: 4.2.3
-    carousel_slider: ^4.2.1
-    flutter_font_picker: ^1.4.0
-    google_fonts: ^5.1.0
-    http: ^1.2.0
-    kakao_map_plugin: ^0.2.5
-    flutter_dotenv: ^5.1.0
-    shared_preferences: ^2.2.3
-    kpostal: ^0.5.1
-    kakao_flutter_sdk: ^1.9.0
-    image: ^4.2.0
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.6
+  email_validator: ^2.1.17
+  flutter_pw_validator: ^1.6.0
+  syncfusion_flutter_charts: ^25.1.38
+  get: ^4.6.6
+  toggle_switch: ^2.3.0
+  image_picker: ^1.0.8
+  flutter_rating_bar: ^4.0.1
+  percent_indicator: 4.2.3
+  carousel_slider: ^4.2.1
+  flutter_font_picker: ^1.4.0
+  google_fonts: ^5.1.0
+  http: ^1.2.0
+  kakao_map_plugin: ^0.2.5
+  flutter_dotenv: ^5.1.0
+  shared_preferences: ^2.2.3
+  kpostal: ^0.5.1
+  kakao_flutter_sdk: ^1.9.0
+  image: ^4.2.0
 
 dev_dependencies:
     flutter_test:
@@ -130,30 +131,30 @@ flutter:
     # For details regarding adding assets from package dependencies, see
     # https://flutter.dev/assets-and-images/#from-packages
 
-    # To add custom fonts to your application, add a fonts section here,
-    # in this "flutter" section. Each entry in this list should have a
-    # "family" key with the font family name, and a "fonts" key with a
-    # list giving the asset and other descriptors for the font. For
-    # example:
-    fonts:
-        - family: PyeongChangPeace
-          fonts:
-              - asset: assets/fonts/PyeongChangPeace-Bold.otf
-        - family: KyoboHandwriting2023wsa
-          fonts:
-              - asset: assets/fonts/KyoboHandwriting2023wsa.otf
-        - family: EF_jejudoldam
-          fonts:
-              - asset: assets/fonts/EF_jejudoldam.otf
-        - family: YClover
-          fonts:
-              - asset: assets/fonts/YClover-Bold.otf
-        - family: DungGeunMo
-          fonts:
-              - asset: assets/fonts/DungGeunMo.otf
-        - family: Adultkid
-          fonts:
-              - asset: assets/fonts/Adultkid.otf
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    - family: PyeongChangPeace
+      fonts:
+        - asset: assets/fonts/PyeongChangPeace-Bold.otf
+    - family: KyoboHandwriting2023wsa
+      fonts:
+        - asset: assets/fonts/KyoboHandwriting2023wsa.otf
+    - family: EF_jejudoldam
+      fonts:
+        - asset: assets/fonts/EF_jejudoldam.otf
+    - family: YClover
+      fonts:
+        - asset: assets/fonts/YClover-Bold.otf
+    - family: DungGeunMo
+      fonts:
+        - asset: assets/fonts/DungGeunMo.otf
+    - family: Adultkid
+      fonts:
+        - asset: assets/fonts/Adultkid.otf
 
     #  - family: Jersey25Charted
     #    fonts:
