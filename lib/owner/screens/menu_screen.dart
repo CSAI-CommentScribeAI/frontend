@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/addMenu_screen.dart';
-import 'package:frontend/widgets/store_widget.dart';
+import 'package:frontend/owner/screens/addMenu_screen.dart';
+import 'package:frontend/owner/widgets/store_widget.dart';
 
 class MenuPage extends StatefulWidget {
   final String selectedStore;

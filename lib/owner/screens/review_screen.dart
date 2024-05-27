@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/filtering_screen.dart';
-import 'package:frontend/screens/reply_screen.dart';
-import 'package:frontend/widgets/circle_widget.dart';
+import 'package:frontend/owner/screens/filtering_screen.dart';
+import 'package:frontend/owner/screens/reply_screen.dart';
+import 'package:frontend/owner/widgets/circle_widget.dart';
+import 'package:frontend/owner/widgets/userReview_widget.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:frontend/widgets/userReview_widget.dart';
 
 class ReviewPage extends StatefulWidget {
   final String selectedStore;

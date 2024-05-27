@@ -45,7 +45,12 @@ dependencies:
   carousel_slider: ^4.2.1
   flutter_font_picker: ^1.4.0
   google_fonts: ^5.1.0
-
+  http: ^1.2.0
+  kakao_map_plugin: ^0.2.5
+  flutter_dotenv: ^5.1.0
+  shared_preferences: ^2.2.3
+  kpostal: ^0.5.1
+  kakao_flutter_sdk: ^1.9.0
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +75,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/env/.env
     - assets/images/black.png
     - assets/images/connexion.png
     - assets/images/feedback.png
@@ -116,7 +122,6 @@ flutter:
     - assets/characters/chick.png
     - assets/characters/flower.png
     - assets/characters/smile.png
-   
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
