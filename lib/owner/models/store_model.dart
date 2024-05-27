@@ -1,4 +1,5 @@
 class StoreModel {
+  final int id;
   final String businessLicense;
   final String name;
   final String info;
@@ -11,9 +12,11 @@ class StoreModel {
   final double latitude;
   final double longitude;
   final String openTime;
-  final String endTime;
+  final String closeTime;
+  final String storeImageUrl;
 
   StoreModel({
+    required this.id,
     required this.businessLicense,
     required this.name,
     required this.info,
@@ -26,24 +29,30 @@ class StoreModel {
     required this.latitude,
     required this.longitude,
     required this.openTime,
-    required this.endTime,
+    required this.closeTime,
+    required this.storeImageUrl,
   });
 
   factory StoreModel.fromJson(Map<String, dynamic> json) {
     return StoreModel(
+      id: json['id'] ?? 0,
       businessLicense: json['businessLicense'] ?? '',
       name: json['name'] ?? '',
       info: json['info'] ?? '',
       category: json['category'] ?? '',
       minOrderPrice: json['minOrderPrice'] ?? 0,
-      fullAddress: json['fullAddress'] ?? '',
-      roadAddress: json['roadAddress'] ?? '',
-      jibunAddress: json['jibunAddress'] ?? '',
-      postalCode: json['postalCode'] ?? '',
-      latitude: (json['latitude'] ?? 0.0).toDouble(),
-      longitude: (json['longitude'] ?? 0.0).toDouble(),
+      fullAddress: json['storeAddress']?['fullAddress'] ??
+          '', // fullAddress가 객체 storeAdress 안에 위치(storeAddress : {fullAddress: '주소 값'})
+      roadAddress:
+          json['storeAddress']?['roadAddress'] ?? '', // roadAddress도 동일
+      jibunAddress:
+          json['storeAddress']?['jibunAddress'] ?? '', // jibunAddress도 동일
+      postalCode: json['storeAddress']?['postalCode'] ?? '',
+      latitude: (json['storeAddress']?['latitude'] ?? 0.0).toDouble(),
+      longitude: (json['storeAddress']?['longitude'] ?? 0.0).toDouble(),
       openTime: json['openTime'] ?? '',
-      endTime: json['endTime'] ?? '',
+      closeTime: json['closeTime'] ?? '',
+      storeImageUrl: json['storeImageUrl'] ?? '',
     );
   }
 }
