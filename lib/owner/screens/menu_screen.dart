@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/screens/addMenu_screen.dart';
+import 'package:frontend/owner/services/menu_service.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
 
 class MenuPage extends StatefulWidget {
   final String selectedStore;
-  const MenuPage(this.selectedStore, {super.key});
+  final int storeIndex;
+  final String accessToken;
+  const MenuPage(this.selectedStore, this.storeIndex, this.accessToken,
+      {super.key});
 
   @override
   State<MenuPage> createState() => _MenuPageState();
@@ -55,7 +60,7 @@ class _MenuPageState extends State<MenuPage> {
             ),
           ),
         ),
-        body: ListView(
+        body: Column(
           children: [
             Container(
               padding: const EdgeInsets.only(top: 14.0),
@@ -73,7 +78,8 @@ class _MenuPageState extends State<MenuPage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const AddMenuPage()));
+                              builder: (context) => AddMenuPage(
+                                  widget.storeIndex, widget.accessToken)));
                     },
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
@@ -181,9 +187,117 @@ class _MenuPageState extends State<MenuPage> {
                 ],
               ),
             ),
+            // 보유 가게 리스트
+            // Column 위젯의 높이가 자식 위젯들의 높이보다 작아서 발생을 막기 위해 사용(Expanded)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                child: FutureBuilder<List<AddMenuModel>>(
+                  // getMenu() 메서드를 호출해서 데이터를 가져옴
+                  future: MenuService().getMenu(widget.storeIndex),
+                  builder: (context, snapshot) {
+                    // 데이터가 로드되는 동안 로딩 스피너 표시
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+
+                      // 데이터 로드 중 에러 발생 시 오류 메세지 표시
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error: ${snapshot.error}'),
+                      );
+
+                      // 데이터가 없거나 빈 리스트일 경우 '등록된 가게가 없습니다' 메시지 표시
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(
+                        child: Text('등록된 메뉴가 없습니다.'),
+                      );
+
+                      // 데이터가 성공적으로 로드될 경우 가게 목록 표시
+                    } else {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const ScrollPhysics(),
+
+                        // snapshot.data: getMenu에서 리턴한 리스트
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final menu = snapshot.data![index]; // 현재 인덱스의 가게 데이터
+                          return Align(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: Container(
+                                height: 150,
+                                width: 380,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF374AA3)
+                                          .withOpacity(0.5),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ListTile(
+                                      // 메뉴 사진
+                                      leading: Image.network(
+                                        menu.imageUrl,
+                                        width: 100,
+                                        height: 70,
+                                        fit: BoxFit.fill,
+                                      ),
+                                      // 메뉴 이름
+                                      title: Text(
+                                        menu.name,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      // 소개글과 가격
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            menu.menuDetail,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Color(0xFF808080),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8.0),
+                                          Text(
+                                            menu.price.toString(),
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
           ],
         ),
-
         bottomNavigationBar: BottomAppBar(
           color: const Color(0xFF374AA3),
           child: GridView.count(

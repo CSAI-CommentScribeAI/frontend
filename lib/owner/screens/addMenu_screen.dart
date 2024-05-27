@@ -1,18 +1,20 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:get/get.dart';
+import 'package:frontend/owner/services/menu_service.dart';
 
 class AddMenuPage extends StatefulWidget {
-  const AddMenuPage({super.key});
+  final int storeIndex;
+  final String accessToken;
+  const AddMenuPage(this.storeIndex, this.accessToken, {super.key});
 
   @override
   State<AddMenuPage> createState() => _AddMenuPageState();
 }
 
 class _AddMenuPageState extends State<AddMenuPage> {
-  String? _selectedCategory; // 카테고리 선택
-  String? _salesStatus; // 노출상태 선택
+  // String? _selectedCategory; // 카테고리 선택
   File? _menuImage; // 이미지 선택
   XFile? _image; //이미지를 담을 변수 선언
   final ImagePicker picker = ImagePicker(); //ImagePicker 초기화
@@ -20,19 +22,36 @@ class _AddMenuPageState extends State<AddMenuPage> {
 
   final formKey = GlobalKey<FormState>();
 
-  String name = 'BBQ 양념치킨';
-  String setMenu = '닭, 소스';
-  int price = 0;
-  String memuImage = '이미지';
+  final List<String> categories = [
+    '햄버거',
+    '피자',
+    '커피',
+    '디저트',
+    '한식',
+    '중식',
+    '분식',
+    '일식',
+    '치킨'
+  ];
+
+  String name = '';
+  String? category;
+  String price = '';
+  String menuDetail = '';
+  String? status = '';
 
   void printFormValues() {
     print('메뉴명: $name');
-    print('메뉴설정(선택): $setMenu');
+    print('매뉴 설정: $menuDetail');
     print('가격: $price');
-    print('카테고리: $_selectedCategory');
-    print('노출상태: $_salesStatus');
-    print('메뉴사진(선택): $memuImage');
+    // print('카테고리: $category');
+    print('노출상태: $status');
+    print('이미지: $_menuImage');
   }
+
+  TextEditingController menuController = TextEditingController();
+  TextEditingController menuDetailContoller = TextEditingController();
+  TextEditingController priceController = TextEditingController();
 
   //이미지를 가져오는 함수
   Future getImage(ImageSource imageSource) async {
@@ -120,7 +139,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
   @override
   void initState() {
     super.initState();
-    _salesStatus = ''; // 기본값 설정
+    status = ''; // 기본값 설정
   }
 
   @override
@@ -176,6 +195,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
                     height: 74,
                     width: 380,
                     child: TextFormField(
+                      controller: menuController,
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5),
@@ -198,7 +218,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
                       },
                       onSaved: (val) {
                         setState(() {
-                          name = val!;
+                          name = val ?? '';
                         });
                       },
                     ),
@@ -214,6 +234,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
                     height: 86,
                     width: 380,
                     child: TextFormField(
+                      controller: menuDetailContoller,
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5),
@@ -236,7 +257,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
                       },
                       onSaved: (val) {
                         setState(() {
-                          setMenu = val!;
+                          menuDetail = val!;
                         });
                       },
                     ),
@@ -278,13 +299,13 @@ class _AddMenuPageState extends State<AddMenuPage> {
                   ),
                   const SizedBox(height: 25),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       SizedBox(
                         height: 58,
                         width: 180,
                         child: TextFormField(
-                          initialValue: '',
+                          controller: priceController,
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(5),
@@ -312,67 +333,67 @@ class _AddMenuPageState extends State<AddMenuPage> {
                           },
                           onSaved: (val) {
                             setState(() {
-                              price = int.parse(val!.replaceAll(',', ''));
+                              price = val!;
                             });
                           },
                         ),
                       ),
                       const SizedBox(width: 12),
-                      SizedBox(
-                        height: 58,
-                        width: 180,
-                        child: DropdownButtonFormField<String>(
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                              borderSide:
-                                  const BorderSide(color: Color(0xFF808080)),
-                            ),
-                            labelText: '카테고리',
-                            labelStyle: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w100,
-                              color: Color(0xFF808080),
-                            ),
-                          ),
-                          value: _selectedCategory,
-                          items: const [
-                            DropdownMenuItem(
-                              value: '한식',
-                              child: Text(
-                                '한식',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ),
-                            DropdownMenuItem(
-                              value: '중식',
-                              child: Text(
-                                '중식',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ),
-                            DropdownMenuItem(
-                              value: '일식',
-                              child: Text(
-                                '일식',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ),
-                            DropdownMenuItem(
-                              value: '양식',
-                              child: Text(
-                                '양식',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedCategory = value;
-                            });
-                          },
-                        ),
-                      ),
+                      // SizedBox(
+                      //   height: 58,
+                      //   width: 180,
+                      //   child: DropdownButtonFormField<String>(
+                      //     decoration: InputDecoration(
+                      //       enabledBorder: OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(5),
+                      //         borderSide:
+                      //             const BorderSide(color: Color(0xFF808080)),
+                      //       ),
+                      //       labelText: '카테고리',
+                      //       labelStyle: const TextStyle(
+                      //         fontSize: 13,
+                      //         fontWeight: FontWeight.w100,
+                      //         color: Color(0xFF808080),
+                      //       ),
+                      //     ),
+                      //     value: _selectedCategory,
+                      //     items: const [
+                      //       DropdownMenuItem(
+                      //         value: '한식',
+                      //         child: Text(
+                      //           '한식',
+                      //           style: TextStyle(fontSize: 14),
+                      //         ),
+                      //       ),
+                      //       DropdownMenuItem(
+                      //         value: '중식',
+                      //         child: Text(
+                      //           '중식',
+                      //           style: TextStyle(fontSize: 14),
+                      //         ),
+                      //       ),
+                      //       DropdownMenuItem(
+                      //         value: '일식',
+                      //         child: Text(
+                      //           '일식',
+                      //           style: TextStyle(fontSize: 14),
+                      //         ),
+                      //       ),
+                      //       DropdownMenuItem(
+                      //         value: '양식',
+                      //         child: Text(
+                      //           '양식',
+                      //           style: TextStyle(fontSize: 14),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //     onChanged: (value) {
+                      //       setState(() {
+                      //         _selectedCategory = value;
+                      //       });
+                      //     },
+                      //   ),
+                      // ),
                     ],
                   ),
                   const SizedBox(height: 25),
@@ -400,28 +421,28 @@ class _AddMenuPageState extends State<AddMenuPage> {
                             text: '판매중',
                             onPressed: () {
                               setState(() {
-                                _salesStatus = '판매중';
+                                status = '판매중';
                               });
                             },
-                            isSelected: _salesStatus == '판매중',
+                            isSelected: status == '판매중',
                           ),
                           ToggleButton(
                             text: '품절',
                             onPressed: () {
                               setState(() {
-                                _salesStatus = '품절';
+                                status = '품절';
                               });
                             },
-                            isSelected: _salesStatus == '품절',
+                            isSelected: status == '품절',
                           ),
                           ToggleButton(
                             text: '숨김',
                             onPressed: () {
                               setState(() {
-                                _salesStatus = '숨김';
+                                status = '숨김';
                               });
                             },
-                            isSelected: _salesStatus == '숨김',
+                            isSelected: status == '숨김',
                           ),
                         ],
                       ),
@@ -507,21 +528,20 @@ class _AddMenuPageState extends State<AddMenuPage> {
         ),
         bottomNavigationBar: saveColor
             ? ElevatedButton(
-                onPressed: () async {
-                  // 설정한 유효성에 맞으면 true를 리턴
+                onPressed: () {
                   if (formKey.currentState!.validate()) {
-                    // validation 이 성공하면 폼 저장
                     formKey.currentState!.save();
-
-                    // 스낵바를 보여줌
-                    Get.snackbar(
-                      "저장완료",
-                      '폼 저장이 완료되었습니다!',
-                      backgroundColor: Colors.white,
+                    printFormValues();
+                    MenuService().registerMenu(
+                      name,
+                      price,
+                      menuDetail,
+                      _menuImage!,
+                      status!,
+                      widget.accessToken,
+                      widget.storeIndex,
                     );
                   }
-                  // 저장이 되는지 안되는지 확인하기 위해 호출
-                  printFormValues();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF274AA3),
