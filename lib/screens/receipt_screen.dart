@@ -68,7 +68,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
   }
 
   // 거절 버튼 누를 시 작용하는 Bottomsheet
-  void _showRejectBottomSheet() {
+  void _showRejectBottomSheet(int index) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -115,11 +115,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                           height: 40,
                           child: TextButton(
                             onPressed: () {
-                              setState(() {
-                                // 버튼 클릭 시 해당하는 거절 사유 선택
-                                bottomState(() {
-                                  handleButtonSelection(0);
-                                });
+                              bottomState(() {
+                                handleButtonSelection(0);
                               });
                             },
                             style: TextButton.styleFrom(
@@ -153,11 +150,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             height: 40,
                             child: TextButton(
                               onPressed: () {
-                                setState(() {
-                                  // 버튼 클릭 시 해당하는 거절 사유 선택
-                                  bottomState(() {
-                                    handleButtonSelection(1);
-                                  });
+                                bottomState(() {
+                                  handleButtonSelection(1);
                                 });
                               },
                               style: TextButton.styleFrom(
@@ -197,11 +191,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                           height: 40,
                           child: TextButton(
                             onPressed: () {
-                              setState(() {
-                                // 버튼 클릭 시 해당하는 거절 사유 선택
-                                bottomState(() {
-                                  handleButtonSelection(2);
-                                });
+                              bottomState(() {
+                                handleButtonSelection(2);
                               });
                             },
                             style: TextButton.styleFrom(
@@ -235,11 +226,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             height: 40,
                             child: TextButton(
                               onPressed: () {
-                                setState(() {
-                                  // 버튼 클릭 시 해당하는 거절 사유 선택
-                                  bottomState(() {
-                                    handleButtonSelection(3);
-                                  });
+                                bottomState(() {
+                                  handleButtonSelection(3);
                                 });
                               },
                               style: TextButton.styleFrom(
@@ -279,11 +267,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                           height: 40,
                           child: TextButton(
                             onPressed: () {
-                              setState(() {
-                                // 버튼 클릭 시 해당하는 거절 사유 선택
-                                bottomState(() {
-                                  handleButtonSelection(4);
-                                });
+                              bottomState(() {
+                                handleButtonSelection(4);
                               });
                             },
                             style: TextButton.styleFrom(
@@ -317,11 +302,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             height: 40,
                             child: TextButton(
                               onPressed: () {
-                                setState(() {
-                                  // 버튼 클릭 시 해당하는 거절 사유 선택
-                                  bottomState(() {
-                                    handleButtonSelection(5);
-                                  });
+                                bottomState(() {
+                                  handleButtonSelection(5);
                                 });
                               },
                               style: TextButton.styleFrom(
@@ -362,11 +344,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             height: 40,
                             child: TextButton(
                               onPressed: () {
-                                setState(() {
-                                  // 버튼 클릭 시 해당하는 거절 사유 선택
-                                  bottomState(() {
-                                    handleButtonSelection(6);
-                                  });
+                                bottomState(() {
+                                  handleButtonSelection(6);
                                 });
                               },
                               style: TextButton.styleFrom(
@@ -404,8 +383,10 @@ class _ReceiptPageState extends State<ReceiptPage> {
                         height: 52,
                         child: TextButton(
                           onPressed: () {
+                            Navigator.pop(context);
+                            // 주문 거절 완료 시 주문 내역 리스트(orderList)에 삭제
                             setState(() {
-                              // 버튼 클릭 상태를 반전
+                              orderList.remove(orderList[index]);
                             });
                           },
                           style: TextButton.styleFrom(
@@ -666,7 +647,9 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                       width: 70,
                                       child: ElevatedButton(
                                         onPressed: () {
-                                          _showRejectBottomSheet();
+                                          // 해당 인덱스 받아 거절 사유 함수로 전달
+                                          // 주문 내역 삭제를 위해 사용
+                                          _showRejectBottomSheet(index);
                                         },
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor:
@@ -776,19 +759,23 @@ class _ReceiptPageState extends State<ReceiptPage> {
       ),
       bottomNavigationBar: BottomAppBar(
         color: const Color(0xFF374AA3),
-        child: GridView.count(
-          physics: const NeverScrollableScrollPhysics(), // Gridview의 스크롤 방지
-          crossAxisCount: 5, // 1개의 행에 보여줄 item의 개수
-          // crossAxisSpacing: 5.0, // 같은 행의 iteme들 사이의 간격, 주석 달음(overflow 생겨서)
-          children: [
-            storeItem(imgPath: 'assets/images/bottom_home.png', title: '홈'),
-            storeItem(
-                imgPath: 'assets/images/bottom_store.png', title: '가게 관리'),
-            storeItem(imgPath: 'assets/images/bottom_menu.png', title: '메뉴 관리'),
-            storeItem(
-                imgPath: 'assets/images/bottom_review.png', title: '리뷰 관리'),
-            storeItem(imgPath: 'assets/images/bottom_my.png', title: 'MY'),
-          ],
+        child: SizedBox(
+          height: 70, // 높이 제한 설정
+          child: GridView.count(
+            physics: const NeverScrollableScrollPhysics(), // Gridview의 스크롤 방지
+            crossAxisCount: 5, // 1개의 행에 보여줄 item의 개수
+            // crossAxisSpacing: 5.0, // 같은 행의 iteme들 사이의 간격, 주석 달음(overflow 생겨서)
+            children: [
+              storeItem(imgPath: 'assets/images/bottom_home.png', title: '홈'),
+              storeItem(
+                  imgPath: 'assets/images/bottom_store.png', title: '가게 관리'),
+              storeItem(
+                  imgPath: 'assets/images/bottom_menu.png', title: '메뉴 관리'),
+              storeItem(
+                  imgPath: 'assets/images/bottom_review.png', title: '리뷰 관리'),
+              storeItem(imgPath: 'assets/images/bottom_my.png', title: 'MY'),
+            ],
+          ),
         ),
       ),
     );
