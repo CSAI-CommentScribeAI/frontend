@@ -3,6 +3,7 @@ import 'package:frontend/owner/charts/feedback_chart.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/feedback_screen.dart';
 import 'package:frontend/owner/screens/menu_screen.dart';
+import 'package:frontend/owner/screens/register_store.dart';
 import 'package:frontend/owner/screens/receipt_screen.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
 import 'package:frontend/owner/screens/store_screen.dart';
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   bool isExpanded = false; // 확장 유무(Expaned_less,more)
   String selectedStore = ''; // 선택한 가게의 이름을 저장할 변수
   bool titleOpacity = false; // 가게명 투명도
+  int storeIndex = 0;
   bool thisColor = true; // 선택되었을 때 원 색깔
   bool lastColor = false;
 
@@ -121,11 +123,19 @@ class _HomePageState extends State<HomePage> {
                                     setState(() {
                                       selectedStore =
                                           store.name; // 선택한 가게의 이름을 저장
-                                      isExpanded = false; // 모달 닫기
+                                      isExpanded = true; // 모달 닫기
+                                      storeIndex = index;
                                     });
                                     Navigator.pop(context);
                                   },
-                                  title: Text(store.name),
+                                  title: Text(
+                                    store.name,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 );
                               },
                               // trailing에서 showCircle 구현하기
@@ -147,9 +157,8 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                StorePage(selectedStore, widget.accessToken),
-                          ),
+                              builder: (context) => RegisterStorePage(
+                                  selectedStore, widget.accessToken)),
                         );
                       },
                       icon: const Icon(Icons.add),
@@ -463,8 +472,10 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          MenuPage(selectedStore),
+                                      builder: (context) => MenuPage(
+                                          selectedStore,
+                                          storeIndex,
+                                          widget.accessToken),
                                     ),
                                   );
                                 }

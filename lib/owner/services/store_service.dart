@@ -9,10 +9,9 @@ class StoreService {
   late String serverAddress;
 
   // 가게 조회 api
-  Future<List<StoreModel>> getStore(
-    String accessToken,
-  ) async {
+  Future<List<StoreModel>> getStore(String accessToken) async {
     List<StoreModel> storeInstance = [];
+
     if (Platform.isAndroid) {
       serverAddress = 'http://10.0.2.2:9000/api/v1/store/my';
     } else if (Platform.isIOS) {
@@ -29,22 +28,26 @@ class StoreService {
       );
 
       if (response.statusCode == 200) {
-        final utf8Response = utf8.decode(
-            response.bodyBytes); // JSON 데이터에서 한글이 깨지는 걸 방지하기 위해 UTF-8로 디코딩
-        // 등록된 가게 정보를 stores에 저장
-        final List<dynamic> stores = jsonDecode(utf8Response);
-        print('JSON 데이터: $stores');
+        final utf8Response = utf8.decode(response.bodyBytes);
+        final dynamic jsonResponse = jsonDecode(utf8Response);
 
-        // 리스트만큼 StoreModel에 객체 json에 집어넣어서 값 저장
+        if (jsonResponse is List) {
+          final List<dynamic> stores = jsonResponse;
+          print('JSON 데이터: $stores');
 
-        for (var store in stores) {
-          storeInstance.add(StoreModel.fromJson(store));
+          for (var store in stores) {
+            storeInstance.add(StoreModel.fromJson(store));
+          }
+
+          print('조회 성공 $storeInstance');
+          return storeInstance;
+        } else {
+          print('응답이 예상과 다름: $jsonResponse');
+          return [];
         }
-
-        print('조회 성공 $storeInstance');
-        return storeInstance;
       } else {
         print('조회 실패: ${response.statusCode}');
+        print('응답 본문: ${response.body}');
         return [];
       }
     } catch (e) {
@@ -110,15 +113,15 @@ class StoreService {
       storeInfo.fields['postalCode'] = postalCode;
       storeInfo.fields['latitude'] = latitude;
       storeInfo.fields['longitude'] = longitude;
-      storeInfo.fields['openTime'] = '${openTime.hour}:${openTime.minute}';
-      storeInfo.fields['closeTime'] = '${closeTime.hour}:${closeTime.minute}';
+      storeInfo.fields['openTime'] = formatTimeOfDay(openTime);
+      storeInfo.fields['closeTime'] = formatTimeOfDay(closeTime);
 
       // 이미지 파일 추가
       final imageStream = http.ByteStream(file.openRead());
       final imageLength = await file.length();
 
       final multipartFile = http.MultipartFile(
-        'multipartFile',
+        'file',
         imageStream,
         imageLength,
         filename: file.path.split('/').last,
@@ -151,5 +154,12 @@ class StoreService {
     } catch (e) {
       print('Exception: ${e.toString()}');
     }
+  }
+
+  // 시간을 두 자리 형식으로 변환하는 함수
+  String formatTimeOfDay(TimeOfDay time) {
+    final String hour = time.hour.toString().padLeft(2, '0');
+    final String minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
   }
 }
