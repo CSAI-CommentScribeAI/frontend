@@ -8,7 +8,9 @@ Widget storeItem({
     padding: const EdgeInsets.all(11.0),
     child: Column(
       children: [
-        Image.asset(imgPath),
+        Image.asset(
+          imgPath,
+        ),
         const SizedBox(height: 6),
         Text(
           title,
