@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
+import 'package:frontend/user/screens/tossPayments_screen.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
+import 'package:frontend/user/widgets/orderAndPay_widget.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -293,11 +295,13 @@ class _PaymentPageState extends State<PaymentPage> {
                     color: Color(0xFF808080),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
       ),
+      bottomNavigationBar: const OrderAndPayBtn(
+          '20000원 결제하기', TosspaymentsPage()), // '20000'에 totalPrice 변수 넣을 예정
     );
   }
 
