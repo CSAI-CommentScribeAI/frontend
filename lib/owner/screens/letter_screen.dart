@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:frontend/owner/services/letter_service.dart';
 
 class LetterPage extends StatefulWidget {
-  const LetterPage({super.key});
+  final String accessToken;
+  const LetterPage({required this.accessToken, super.key});
 
   @override
   State<LetterPage> createState() => _LetterPageState();
@@ -19,9 +21,10 @@ class _LetterPageState extends State<LetterPage> {
   String selectedFont = 'Roboto';
   TextEditingController letterController = TextEditingController();
 
+  String fullLetterContent = '';
   List<Widget> overlayWidgets = [];
   int startIndex = 0;
-  int endIndex = 7;
+  int endIndex = 6;
 
   List<Map<String, dynamic>> templateList = [
     {'title': '크리스마스', 'url': 'assets/templates/christmas.png'},
@@ -58,15 +61,47 @@ class _LetterPageState extends State<LetterPage> {
 
   String letterContent = '';
 
+  @override
+  void initState() {
+    super.initState();
+    fetchLetterContent(); // fetchLetterContent() 메서드를 호출하여 편지 내용을 가져옵니다.
+  }
+
+  void fetchLetterContent() async {
+    String content = await LetterService().getLetter(widget.accessToken, 3);
+    setState(() {
+      fullLetterContent = content;
+    });
+    startTyping();
+  }
+
+  void startTyping() async {
+    // 비동기 메서드로, async 키워드를 사용
+    for (int i = 0; i < fullLetterContent.length; i++) {
+      // fullLetterContent의 길이만큼 반복, 루프의 각 반복마다 한 글자씩 letterContent에 추가
+      await Future.delayed(const Duration(milliseconds: 100), () {
+        // 100밀리초씩 지연
+        // Future.delayed는 지정된 시간 동안 대기하는 Future를 반환
+        // 텍스트가 한 글자씩 천천히 추가되는 효과
+        setState(() {
+          letterContent += fullLetterContent[i];
+          // letterContent에 fullLetterContent의 한 글자씩 추가
+          letterController.text = letterContent;
+          // letterController.text에 업데이트된 letterContent를 설정 -> 텍스트 필드의 내용을 업데이트
+        });
+      });
+    }
+  }
+
   void loadNextIcons() {
     setState(() {
       // index 7번 뒤로 이동
-      startIndex += 7;
-      endIndex += 7;
+      startIndex += 6;
+      endIndex += 6;
       if (endIndex > iconList.length) {
         // endIndex가 iconList의 길이를 초과하면
         endIndex = iconList.length; // endIndex를 iconList의 길이로 설정하여 초과하지 않도록 보정
-        startIndex = endIndex - 7; // startIndex도 맞춰서 수정
+        startIndex = endIndex - 6; // startIndex도 맞춰서 수정
       }
     });
   }
@@ -75,12 +110,12 @@ class _LetterPageState extends State<LetterPage> {
   void loadPreviousIcons() {
     setState(() {
       // 7개를 보여주기 때문에 index 7번 앞으로 이동
-      startIndex -= 7;
-      endIndex -= 7;
+      startIndex -= 6;
+      endIndex -= 6;
       if (startIndex < 0) {
         // startIndex가 음수가 되면
         startIndex = 0; // startIndex를 0으로 설정하여 음수가 되지 않도록 보정
-        endIndex = startIndex + 7; // endIndex도 맞춰서 수정
+        endIndex = startIndex + 6; // endIndex도 맞춰서 수정
       }
     });
   }
@@ -139,6 +174,7 @@ class _LetterPageState extends State<LetterPage> {
                   SizedBox(
                     height: 55,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: iconList
                           // iconList의 startIndex부터 endIndex까지의 아이콘 이미지를 가져옴
                           .sublist(startIndex, endIndex)
@@ -176,8 +212,8 @@ class _LetterPageState extends State<LetterPage> {
                                       top: relative.dy - 230,
                                       child: Image.asset(
                                         icon['url'],
-                                        height: 53,
-                                        width: 53,
+                                        height: 45,
+                                        width: 45,
                                       ),
                                     ),
                                   );
@@ -347,62 +383,62 @@ class _LetterPageState extends State<LetterPage> {
 
             isCompleted
                 ? const SizedBox(height: 0)
-                : Row(
+                : const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       // 캐릭터, 글씨체 버튼
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            characterOpened = !characterOpened;
-                            fontOpened = false; // 캐릭터 버튼 눌렀을 때 글씨체 선택 창 닫기
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: characterOpened
-                              ? const Color(0xFF7B88C2)
-                              : const Color(0xFFD9D9D9),
-                          elevation: 3.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          minimumSize: const Size(120, 40),
-                        ),
-                        child: const Text(
-                          '캐릭터',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            fontOpened = !fontOpened;
-                            characterOpened = false; // 글씨체 버튼 눌렀을 때 캐릭터 창 닫기
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: fontOpened
-                              ? const Color(0xFF7B88C2)
-                              : const Color(0xFFD9D9D9),
-                          elevation: 3.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          minimumSize: const Size(120, 40),
-                        ),
-                        child: const Text(
-                          '글씨체',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                      // ElevatedButton(
+                      //   onPressed: () {
+                      //     setState(() {
+                      //       characterOpened = !characterOpened;
+                      //       fontOpened = false; // 캐릭터 버튼 눌렀을 때 글씨체 선택 창 닫기
+                      //     });
+                      //   },
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: characterOpened
+                      //         ? const Color(0xFF7B88C2)
+                      //         : const Color(0xFFD9D9D9),
+                      //     elevation: 3.0,
+                      //     shape: RoundedRectangleBorder(
+                      //       borderRadius: BorderRadius.circular(10.0),
+                      //     ),
+                      //     minimumSize: const Size(100, 30),
+                      //   ),
+                      //   child: const Text(
+                      //     '캐릭터',
+                      //     style: TextStyle(
+                      //       color: Colors.white,
+                      //       fontSize: 16,
+                      //       fontWeight: FontWeight.bold,
+                      //     ),
+                      //   ),
+                      // ),
+                      // ElevatedButton(
+                      //   onPressed: () {
+                      //     setState(() {
+                      //       fontOpened = !fontOpened;
+                      //       characterOpened = false; // 글씨체 버튼 눌렀을 때 캐릭터 창 닫기
+                      //     });
+                      //   },
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: fontOpened
+                      //         ? const Color(0xFF7B88C2)
+                      //         : const Color(0xFFD9D9D9),
+                      //     elevation: 3.0,
+                      //     shape: RoundedRectangleBorder(
+                      //       borderRadius: BorderRadius.circular(10.0),
+                      //     ),
+                      //     minimumSize: const Size(100, 30),
+                      //   ),
+                      //   child: const Text(
+                      //     '글씨체',
+                      //     style: TextStyle(
+                      //       color: Colors.white,
+                      //       fontSize: 16,
+                      //       fontWeight: FontWeight.bold,
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
             const SizedBox(height: 15),
@@ -413,7 +449,9 @@ class _LetterPageState extends State<LetterPage> {
       // 하단바
       bottomNavigationBar: isCompleted
           ? ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pop(context);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF374AA3),
                 minimumSize: const Size(
@@ -463,7 +501,7 @@ class _LetterPageState extends State<LetterPage> {
                 Stack(
                   children: [
                     Container(
-                      height: 450,
+                      height: 500,
                       width: 320,
                       decoration: BoxDecoration(
                         color: Colors.brown,
@@ -496,6 +534,7 @@ class _LetterPageState extends State<LetterPage> {
                             border: InputBorder.none, // underline 제거
                           ),
                           style: TextStyle(
+                            fontSize: 15,
                             fontFamily: selectedFont,
                           ),
                           maxLines: null, // 다중 라인을 지원하기 위해 null로 설정

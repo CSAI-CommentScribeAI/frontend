@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/letter_screen.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
+import 'package:frontend/owner/services/letter_service.dart';
+import 'package:frontend/owner/services/order_service.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
 
 class ReceiptPage extends StatefulWidget {
-  const ReceiptPage({super.key});
+  final String accessToken;
+  const ReceiptPage({required this.accessToken, super.key});
 
   @override
   State<ReceiptPage> createState() => _ReceiptPageState();
@@ -18,17 +21,11 @@ class _ReceiptPageState extends State<ReceiptPage> {
 
   List<Map<String, dynamic>> orderList = [
     {
-      'title': 'BBQ 코엑스점',
+      'title': '중찬미식',
       'time': '10:56',
-      'information': '황금올리브 1마리 세트 + 콜라 1.5L',
-      'price': 25000,
+      'information': '짜장면',
+      'price': 6500,
     },
-    {
-      'title': '이남장 서초점',
-      'time': '13:45',
-      'information': '설렁탕(특)',
-      'price': 15000,
-    }
   ];
 
   void handleButtonSelection(int index) {
@@ -38,25 +35,30 @@ class _ReceiptPageState extends State<ReceiptPage> {
   }
 
   // 주문을 수락하는 메서드
-  void acceptOrder(int index) {
+  Future<void> acceptOrder(int index) async {
     setState(() {
-      orderList[index]['isAccepted'] =
-          true; // isOrderAccepted 변수를 true로 설정하여 주문이 수락되었음을 나타냄
+      orderList[index]['isAccepted'] = true;
     });
+
+    // OrderService를 사용하여 주문 생성 후 orderId를 얻음
+
+    await LetterService().saveLetter(true, widget.accessToken, 3);
 
     // 3초 후에 상태를 배차 / 출력 버튼으로 변경
     Future.delayed(const Duration(seconds: 3), () {
       setState(() {
-        orderList[index]['isPrinted'] = true; // 배차 혹은 출력 상태로 활성화
+        orderList[index]['isPrinted'] = true;
       });
     });
   }
 
   // 배차 혹은 출력시키는 메서드
-  void acceptDelivery(int index) {
+  void acceptDelivery(int index) async {
     setState(() {
       orderList[index]['isDelivered'] = true; // 배달 중 상태로 활성화
     });
+
+    await LetterService().getLetter(widget.accessToken, 3);
 
     Future.delayed(const Duration(seconds: 3), () {
       setState(() {
@@ -463,8 +465,13 @@ class _ReceiptPageState extends State<ReceiptPage> {
           vertical: 23.0,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            ElevatedButton(
+                onPressed: () {
+                  OrderService().order(widget.accessToken);
+                },
+                child: const Text('주문하기')),
             // 완료된 주문 정보 갯수
             const Row(
               children: [
@@ -521,10 +528,9 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                       height: 20,
                                       width: 70,
                                       child: ElevatedButton(
-                                        onPressed: () {
-                                          acceptOrder(
+                                        onPressed: () async {
+                                          await acceptOrder(
                                               index); // 주문 수락 시 acceptOrder() 함수가 호출되어 isOrderAccepted가 true
-                                          // 주문을 수락할 때 추가적으로 해야 할 작업
                                         },
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor:
@@ -578,7 +584,10 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      const LetterPage()));
+                                                      LetterPage(
+                                                        accessToken:
+                                                            widget.accessToken,
+                                                      )));
                                         },
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor:
