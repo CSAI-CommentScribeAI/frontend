@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
 import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/storeForm_widget.dart';
-import 'package:get/get.dart';
 import 'dart:io' show File;
 import 'package:image_picker/image_picker.dart';
 
@@ -355,9 +354,8 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => AddressPage(
-                                            onAddressSelected:
-                                                _onAddressSelected,
-                                            sendAddress: sendAddress,
+                                            _onAddressSelected,
+                                            sendAddress,
                                           ),
                                         ),
                                       )
