@@ -28,8 +28,8 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  flutter:
-    sdk: flutter
+    flutter:
+        sdk: flutter
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -54,6 +54,7 @@ dependencies:
   image: ^4.2.0
   cart_stepper: ^4.3.0
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -75,87 +76,94 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
-  assets:
-    - assets/env/.env
-    - assets/images/black.png
-    - assets/images/connexion.png
-    - assets/images/feedback.png
-    - assets/images/feedback2.png
-    - assets/images/menu.png
-    - assets/images/receipt.png
-    - assets/images/review.png
-    - assets/images/status.png
-    - assets/images/store.png
-    - assets/images/olive.png
-    - assets/images/jamaican.png
-    - assets/images/wing.png
-    - assets/images/bottom_home.png
-    - assets/images/bottom_store.png
-    - assets/images/bottom_record.png
-    - assets/images/bottom_review.png
-    - assets/images/bottom_my.png
-    - assets/images/bottom_menu.png
-    - assets/images/profile1.png
-    - assets/images/profile2.png
-    - assets/images/chicken.png
-    - assets/images/jamaica.png
-    - assets/images/sajang.png
-    - assets/images/AIWriting.png
-    - assets/images/handWriting.png
-    - assets/images/good.png
-    - assets/images/bad.png
-    - assets/images/delivery.png
-    - assets/images/pizza.png
-    - assets/templates/christmas.png
-    - assets/templates/leaf.png
-    - assets/templates/autumn.png
-    - assets/templates/frog.png
-    - assets/characters/christmasBall.png
-    - assets/characters/christmasGift.png
-    - assets/characters/christmasPenguin.png
-    - assets/characters/christmasPlants.png
-    - assets/characters/christmasStocking.png
-    - assets/characters/christmasTree.png
-    - assets/characters/gingerbreadMan.png
-    - assets/characters/rainbow.png
-    - assets/characters/santaClausBag.png
-    - assets/characters/snowflake.png
-    - assets/characters/sun.png
-    - assets/characters/chick.png
-    - assets/characters/flower.png
-    - assets/characters/smile.png
-
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/assets-and-images/#resolution-aware
+    # To add assets to your application, add an assets section, like this:
+    assets:
+        - assets/env/.env
+        - assets/images/black.png
+        - assets/images/connexion.png
+        - assets/images/feedback.png
+        - assets/images/feedback2.png
+        - assets/images/menu.png
+        - assets/images/receipt.png
+        - assets/images/review.png
+        - assets/images/status.png
+        - assets/images/store.png
+        - assets/images/olive.png
+        - assets/images/jamaican.png
+        - assets/images/wing.png
+        - assets/images/bottom_home.png
+        - assets/images/bottom_store.png
+        - assets/images/bottom_record.png
+        - assets/images/bottom_review.png
+        - assets/images/bottom_my.png
+        - assets/images/bottom_menu.png
+        - assets/images/profile1.png
+        - assets/images/profile2.png
+        - assets/images/chicken.png
+        - assets/images/jamaica.png
+        - assets/images/sajang.png
+        - assets/images/AIWriting.png
+        - assets/images/handWriting.png
+        - assets/images/good.png
+        - assets/images/bad.png
+        - assets/images/delivery.png
+        - assets/images/light.png
+        - assets/images/free.png
+        - assets/images/chicken1.png
+        - assets/images/chinesefood.png
+        - assets/images/coffee.png
+        - assets/images/dessert.png
+        - assets/images/hamburger.png
+        - assets/images/japanesefood.png
+        - assets/images/koreanfood.png
+        - assets/images/koreanstreetfood.png
+        - assets/images/pizza.png
+        - assets/templates/christmas.png
+        - assets/templates/leaf.png
+        - assets/templates/autumn.png
+        - assets/templates/frog.png
+        - assets/characters/christmasBall.png
+        - assets/characters/christmasGift.png
+        - assets/characters/christmasPenguin.png
+        - assets/characters/christmasPlants.png
+        - assets/characters/christmasStocking.png
+        - assets/characters/christmasTree.png
+        - assets/characters/gingerbreadMan.png
+        - assets/characters/rainbow.png
+        - assets/characters/santaClausBag.png
+        - assets/characters/snowflake.png
+        - assets/characters/sun.png
+        - assets/characters/chick.png
+        - assets/characters/flower.png
+        - assets/characters/smile.png
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
 
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  fonts:
+    # To add custom fonts to your application, add a fonts section here,
+    # in this "flutter" section. Each entry in this list should have a
+    # "family" key with the font family name, and a "fonts" key with a
+    # list giving the asset and other descriptors for the font. For
+    # example:
+fonts:
     - family: PyeongChangPeace
       fonts:
-        - asset: assets/fonts/PyeongChangPeace-Bold.otf
+          - asset: assets/fonts/PyeongChangPeace-Bold.otf
     - family: KyoboHandwriting2023wsa
       fonts:
-        - asset: assets/fonts/KyoboHandwriting2023wsa.otf
+          - asset: assets/fonts/KyoboHandwriting2023wsa.otf
     - family: EF_jejudoldam
       fonts:
-        - asset: assets/fonts/EF_jejudoldam.otf
+          - asset: assets/fonts/EF_jejudoldam.otf
     - family: YClover
       fonts:
-        - asset: assets/fonts/YClover-Bold.otf
+          - asset: assets/fonts/YClover-Bold.otf
     - family: DungGeunMo
       fonts:
-        - asset: assets/fonts/DungGeunMo.otf
+          - asset: assets/fonts/DungGeunMo.otf
     - family: Adultkid
       fonts:
-        - asset: assets/fonts/Adultkid.otf
+          - asset: assets/fonts/Adultkid.otf
 
   #  - family: Jersey25Charted
   #    fonts:
