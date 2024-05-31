@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
+import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/tossPayments_screen.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:frontend/user/widgets/orderAndPay_widget.dart';
 
-class PaymentPage extends StatefulWidget {
-  const PaymentPage({super.key});
+class UserOrderPage extends StatefulWidget {
+  const UserOrderPage({super.key});
 
   @override
-  State<PaymentPage> createState() => _PaymentPageState();
+  State<UserOrderPage> createState() => _UserOrderPageState();
 }
 
-class _PaymentPageState extends State<PaymentPage> {
+class _UserOrderPageState extends State<UserOrderPage> {
   bool isChecked = false;
   bool ownerChecked = false;
   bool riderChecked = false;
@@ -143,48 +144,6 @@ class _PaymentPageState extends State<PaymentPage> {
               const CartWidget(),
               const SizedBox(height: 17),
 
-              // 결제수단
-              const Card(
-                color: Colors.white,
-                shadowColor: Color(0xFF374AA3),
-                elevation: 3.0, // 그림자 설정
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 15.0,
-                        vertical: 15.0,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '결제수단',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF808080),
-                            ),
-                          ),
-                          SizedBox(height: 6),
-                          Text('선택한 결제수단'), // 나중에 페이 선택 시 나오게 구현 예정
-                          SizedBox(height: 10),
-                          Divider(),
-                          SizedBox(height: 10),
-                          Text(
-                            '페이로 결제 시 포인트 적립',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF808080),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 17),
-
               // 요청사항
               Card(
                 color: Colors.white,
@@ -301,7 +260,9 @@ class _PaymentPageState extends State<PaymentPage> {
         ),
       ),
       bottomNavigationBar: const OrderAndPayBtn(
-          '20000원 결제하기', TosspaymentsPage()), // '20000'에 totalPrice 변수 넣을 예정
+        '20000원 결제하기',
+        true,
+      ), // '20000'에 totalPrice 변수 넣을 예정
     );
   }
 

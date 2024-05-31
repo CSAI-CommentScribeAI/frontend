@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/user/screens/payment_screen.dart';
+import 'package:frontend/user/screens/userOrder_screen.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:frontend/user/widgets/orderAndPay_widget.dart';
 
@@ -41,7 +41,7 @@ class _CartPageState extends State<CartPage> {
       ),
       bottomNavigationBar: const OrderAndPayBtn(
         '주문하기',
-        PaymentPage(),
+        false,
       ),
     );
   }

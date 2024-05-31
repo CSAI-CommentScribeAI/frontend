@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/user/screens/tossPayments_screen.dart';
+import 'package:frontend/user/screens/userOrder_screen.dart';
 
+// 하단바 공통 위젯 해결해야함
 class OrderAndPayBtn extends StatelessWidget {
   final String title;
-  final Widget nextPage;
-  const OrderAndPayBtn(this.title, this.nextPage, {super.key});
+  final bool cart;
+  const OrderAndPayBtn(this.title, this.cart, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.push(context, downToUpRoute());
+        Navigator.push(
+            context,
+            cart
+                ? MaterialPageRoute(
+                    builder: (context) => const TosspaymentsPage())
+                : downToUpRoute());
       }, // 결제 화면으로 이동
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF274AA3),
@@ -31,8 +39,8 @@ class OrderAndPayBtn extends StatelessWidget {
   // 아래에서 위로 페이지 이동하는 애니메이션 함수
   Route downToUpRoute() {
     return PageRouteBuilder(
-      // 새 페이지 생성(animation: 주 애니메이션, secondaryAnimation: 보조 애니메이션)
-      pageBuilder: (context, animation, secondaryAnimation) => nextPage,
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          const UserOrderPage(),
 
       // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
