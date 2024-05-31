@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/owner/screens/login_screen.dart';
 import 'package:frontend/user/screens/home_screen.dart';
-import 'package:frontend/user/screens/menuselect_screen.dart';
+import 'package:frontend/user/screens/storeselect_screen.dart';
 import 'package:get/get.dart';
 import 'package:kakao_map_plugin/kakao_map_plugin.dart';
 
