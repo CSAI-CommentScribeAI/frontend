@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/user/screens/tossPayments_screen.dart';
+import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/screens/userOrder_screen.dart';
 
 // 하단바 공통 위젯 해결해야함
@@ -15,8 +15,7 @@ class OrderAndPayBtn extends StatelessWidget {
         Navigator.push(
             context,
             cart
-                ? MaterialPageRoute(
-                    builder: (context) => const TosspaymentsPage())
+                ? MaterialPageRoute(builder: (context) => const CompletePage())
                 : downToUpRoute());
       }, // 결제 화면으로 이동
       style: ElevatedButton.styleFrom(
