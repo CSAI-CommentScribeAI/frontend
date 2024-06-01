@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// 결제 완료 후 이 페이지로 넘어가는 동시에 스낵바로 '주문 완료되었습니다'라고 뜨게 구현(API 할 때 구현할 예정)
 class CompletePage extends StatelessWidget {
   const CompletePage({super.key});
 
