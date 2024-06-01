@@ -11,6 +11,9 @@ class CompletePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 70,
+        leading: const BackButton(
+          color: Colors.white,
+        ),
         title: const Text(
           '주문 내역',
           style: TextStyle(
