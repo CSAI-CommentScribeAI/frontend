@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
-import 'package:frontend/owner/widgets/userReview_widget.dart';
+import 'package:frontend/all/widgets/userReview_widget.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/home_screen.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk_talk.dart';
@@ -179,7 +179,7 @@ class _UserReviewPageState extends State<UserReviewPage> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: userReviewList.length,
+                itemCount: userReviewList.length, // 리뷰 수 표시
                 physics: const ScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
                   final userReview = userReviewList[index];
