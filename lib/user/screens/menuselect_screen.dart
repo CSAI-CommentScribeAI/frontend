@@ -255,150 +255,161 @@ class _UserMenuselectPageState extends State<UserMenuselectPage> {
 
   Widget allMenuSection() {
     // 전체 메뉴 섹션
-    return Container(
+    return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Column(
         children: [
-          ListTile(
-            // 메뉴 1
-            contentPadding: EdgeInsets.zero,
-            title: const Text(
-              '페퍼로니 알리오올리오',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
-                const Text(
-                  '20,000원',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  '토마토 소스 위에 페퍼로니를 크리스피하게 굽고, 버진 올리브유와 편마늘, 페퍼론치노의 조화',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF808080),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                // 첫 번째 메뉴
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        // 여기에 원하는 동작을 추가하세요.
-                      },
-                      child: Image.asset(
-                        'assets/images/goodjob.png',
-                        width: 24, // 이미지 크기 조정
-                        height: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
                     const Text(
-                      '211명',
+                      '페퍼로니 알리오올리오',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      '20,000원',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      '토마토 소스 위에 페퍼로니를 크리스피하게 굽고, 버진 올리브유와 편마늘, 페퍼론치노의 조화',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF808080),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            // 여기에 원하는 동작을 추가하세요.
+                          },
+                          child: Image.asset(
+                            'assets/images/goodjob.png',
+                            width: 24, // 이미지 크기 조정
+                            height: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          '211명',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
-            ),
-            trailing: ClipRRect(
-              borderRadius: BorderRadius.circular(10.0),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width / 2.5,
-                height: 132,
-                child: Image.asset(
-                  'assets/images/menupizza.png',
-                  fit: BoxFit.fill,
+              ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(5.0),
+                child: SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Image.asset(
+                    'assets/images/menupizza.png',
+                    fit: BoxFit.fill,
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-          const Divider(), // 구분선
-          ListTile(
-            // 메뉴 2
-            contentPadding: EdgeInsets.zero,
-            title: const Text(
-              '시칠리안 갈릭쉬림프',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
-                const Text(
-                  '19,900원',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  '매콤한 살사 소스와 도톰한 새우와 베이컨, 마늘을 곁들인 뒤 루꼴라와 샤워크림으로 마무리',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF808080),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
+          const SizedBox(height: 20), // 메뉴 간의 간격
+          const Divider(), // 구분선 추가
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                // 두 번째 메뉴
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        // 여기에 원하는 동작을 추가하세요.
-                      },
-                      child: Image.asset(
-                        'assets/images/goodjob.png',
-                        width: 24, // 이미지 크기 조정
-                        height: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
                     const Text(
-                      '189명',
+                      '시칠리안 갈릭쉬림프',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      '19,900원',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      '매콤한 살사 소스와 도톰한 새우와 베이컨, 마늘을 곁들인 뒤 루꼴라와 샤워크림으로 마무리',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF808080),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            // 여기에 원하는 동작을 추가하세요.
+                          },
+                          child: Image.asset(
+                            'assets/images/goodjob.png',
+                            width: 24, // 이미지 크기 조정
+                            height: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          '189명',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
-            ),
-            trailing: ClipRRect(
-              borderRadius: BorderRadius.circular(10.0),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width / 2.5,
-                height: 132,
-                child: Image.asset(
-                  'assets/images/menushrimp.png',
-                  fit: BoxFit.fill,
+              ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(5.0),
+                child: SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Image.asset(
+                    'assets/images/menushrimp.png',
+                    fit: BoxFit.fill,
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ],
       ),
