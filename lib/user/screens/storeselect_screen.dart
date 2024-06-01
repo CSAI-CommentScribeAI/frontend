@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/user/screens/menuselect_screen.dart';
+import 'package:frontend/user/screens/menuSelect_screen.dart';
 
-class userMenuPage extends StatefulWidget {
-  const userMenuPage({super.key});
+class UserMenuPage extends StatefulWidget {
+  const UserMenuPage({super.key});
 
   @override
-  State<userMenuPage> createState() => _userMenuPageState();
+  State<UserMenuPage> createState() => _UserMenuPageState();
 }
 
-class _userMenuPageState extends State<userMenuPage> {
+class _UserMenuPageState extends State<UserMenuPage> {
   int selectedButtonIndex = -1;
   double _rating = 1.0; // 별점
   double _deliveryFee = 0; // 배달비
@@ -645,7 +645,7 @@ class _userMenuPageState extends State<userMenuPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const UserMenuselectPage(),
+                      builder: (context) => const UserMenuSelectPage(),
                     ),
                   );
                 },

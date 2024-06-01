@@ -2,14 +2,99 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class UserMenuselectPage extends StatefulWidget {
-  const UserMenuselectPage({super.key});
+class UserMenuSelectPage extends StatefulWidget {
+  const UserMenuSelectPage({super.key});
 
   @override
-  State<UserMenuselectPage> createState() => _UserMenuselectPageState();
+  State<UserMenuSelectPage> createState() => _UserMenuSelectPageState();
 }
 
-class _UserMenuselectPageState extends State<UserMenuselectPage> {
+void showReviewsBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return Container(
+          padding: const EdgeInsets.all(30.0),
+          height: 270,
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  '리뷰 유형',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 40),
+            // 여기에 리뷰 목록을 추가하세요.
+            Row(
+              children: [
+                const Text(
+                  '우리 배달앱 리뷰보기',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(width: 184),
+                ClipRRect(
+                  // 둥근 정도 조절
+                  borderRadius: BorderRadius.circular(5.0),
+                  child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: Image.asset(
+                      'assets/images/mydelivery.png',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 21),
+            const Divider(), // 구분선 생성
+            const SizedBox(height: 21),
+            Row(
+              children: [
+                const Text(
+                  '우리 배달앱 리뷰보기',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(width: 180),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(5.0),
+                  child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: Image.asset(
+                      'assets/images/maindelivery.png',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ]));
+    },
+  );
+}
+
+class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,12 +214,17 @@ class _UserMenuselectPageState extends State<UserMenuselectPage> {
                 children: [
                   Row(
                     children: [
-                      const Text(
-                        '리뷰 93개',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                      TextButton(
+                        onPressed: () {
+                          showReviewsBottomSheet(context);
+                        },
+                        child: const Text(
+                          '리뷰 93개',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                       const SizedBox(
@@ -229,6 +319,7 @@ class _UserMenuselectPageState extends State<UserMenuselectPage> {
                 ],
               ),
             ),
+
             const SizedBox(height: 30),
             const Align(
               alignment: Alignment.centerLeft,
