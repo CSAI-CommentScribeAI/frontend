@@ -53,6 +53,8 @@ dependencies:
   kakao_flutter_sdk: ^1.9.0
   image: ^4.2.0
   cart_stepper: ^4.3.0
+  tosspayments_widget_sdk_flutter: ^1.0.3
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:

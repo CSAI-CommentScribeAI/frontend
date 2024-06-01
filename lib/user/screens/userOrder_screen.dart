@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
-import 'package:frontend/user/screens/cart_screen.dart';
-import 'package:frontend/user/screens/tossPayments_screen.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:frontend/user/widgets/orderAndPay_widget.dart';
 
