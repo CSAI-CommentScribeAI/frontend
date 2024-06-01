@@ -117,6 +117,8 @@ flutter:
     - assets/images/koreanfood.png
     - assets/images/koreanstreetfood.png
     - assets/images/pizza.png
+    - assets/images/testReviewImg1.png
+    - assets/images/testReviewImg2.png
     - assets/templates/christmas.png
     - assets/templates/leaf.png
     - assets/templates/autumn.png
