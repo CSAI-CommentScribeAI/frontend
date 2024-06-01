@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cart_stepper/cart_stepper.dart';
+import 'package:intl/intl.dart';
 
 class CartWidget extends StatefulWidget {
-  const CartWidget({super.key});
+  final Map<String, dynamic> menu;
+  const CartWidget(this.menu, {super.key});
 
   @override
   State<CartWidget> createState() => _CartWidgetState();
@@ -10,6 +12,7 @@ class CartWidget extends StatefulWidget {
 
 class _CartWidgetState extends State<CartWidget> {
   int counterLimit = 1;
+  var f = NumberFormat('###,###,###,###'); // 숫자 세자리마다 콤마 넣는 코드
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +35,9 @@ class _CartWidgetState extends State<CartWidget> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     // 주문 가게 이름
                     children: [
-                      const Text(
-                        '피자에 미치다 교대역점',
-                        style: TextStyle(
+                      Text(
+                        widget.menu['store'],
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Color(0xFF808080),
                         ),
@@ -53,9 +56,9 @@ class _CartWidgetState extends State<CartWidget> {
                   const SizedBox(height: 10),
 
                   // 주문 메뉴 이름
-                  const Text(
-                    '페퍼로니 알리오올리오',
-                    style: TextStyle(
+                  Text(
+                    widget.menu['title'],
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -67,9 +70,9 @@ class _CartWidgetState extends State<CartWidget> {
                     children: [
                       Column(
                         children: [
-                          const Text(
-                            '⋅ 가격: 2000원\n⋅ 주문날짜: 2024.04.25 11:43',
-                            style: TextStyle(
+                          Text(
+                            '⋅ 가격: ${f.format(widget.menu['price'])}원\n⋅ 주문날짜: 2024.04.25 11:43',
+                            style: const TextStyle(
                               fontSize: 13,
                               color: Color(0xFF808080),
                             ),
@@ -77,7 +80,7 @@ class _CartWidgetState extends State<CartWidget> {
                           const SizedBox(height: 47),
                           Row(
                             children: [
-                              const Text('20,000원'),
+                              Text('${f.format(widget.menu['price'])}원'),
                               const SizedBox(width: 10),
 
                               // 수량 증가/감소 버튼
@@ -105,7 +108,7 @@ class _CartWidgetState extends State<CartWidget> {
                         ],
                       ),
                       // 주문 메뉴 사진
-                      Image.asset('assets/images/pizza.png'),
+                      Image.asset(widget.menu['menuImg']),
                     ],
                   ),
                 ],
