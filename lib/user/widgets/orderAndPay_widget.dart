@@ -6,7 +6,9 @@ import 'package:frontend/user/screens/userOrder_screen.dart';
 class OrderAndPayBtn extends StatelessWidget {
   final String title;
   final bool cart;
-  const OrderAndPayBtn(this.title, this.cart, {super.key});
+  final Map<String, dynamic> menu;
+
+  const OrderAndPayBtn(this.title, this.cart, this.menu, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +41,7 @@ class OrderAndPayBtn extends StatelessWidget {
   Route downToUpRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
-          const UserOrderPage(),
+          UserOrderPage(menu),
 
       // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
       transitionsBuilder: (context, animation, secondaryAnimation, child) {

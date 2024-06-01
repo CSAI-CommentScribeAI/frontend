@@ -8,7 +8,8 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class UserReviewPage extends StatefulWidget {
-  const UserReviewPage({super.key});
+  final Map<String, dynamic>? menu;
+  const UserReviewPage(this.menu, {super.key});
 
   @override
   State<UserReviewPage> createState() => _UserReviewPageState();
@@ -77,7 +78,7 @@ class _UserReviewPageState extends State<UserReviewPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const CartPage(),
+                        builder: (context) => CartPage(widget.menu!),
                       ),
                     );
                   },

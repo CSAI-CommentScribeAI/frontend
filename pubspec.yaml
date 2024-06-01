@@ -1,8 +1,8 @@
 name: frontend
-description: 'A new Flutter project.'
+description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-    sdk: '>=3.2.1 <4.0.0'
+  sdk: ">=3.2.1 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+
     flutter:
         sdk: flutter
 
@@ -57,132 +58,163 @@ dependencies:
     intl: ^0.19.0
     flutter_pannable_rating_bar: ^2.7.2+1
 
-dev_dependencies:
-    flutter_test:
-        sdk: flutter
+  flutter:
+    sdk: flutter
 
-    # The "flutter_lints" package below contains a set of recommended lints to
-    # encourage good coding practices. The lint set provided by the package is
-    # activated in the `analysis_options.yaml` file located at the root of your
-    # package. See that file for information about deactivating specific lint
-    # rules and activating additional ones.
-    flutter_lints: ^3.0.0
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.6
+  email_validator: ^2.1.17
+  flutter_pw_validator: ^1.6.0
+  syncfusion_flutter_charts: ^25.1.38
+  get: ^4.6.6
+  toggle_switch: ^2.3.0
+  image_picker: ^1.0.8
+  flutter_rating_bar: ^4.0.1
+  percent_indicator: 4.2.3
+  carousel_slider: ^4.2.1
+  flutter_font_picker: ^1.4.0
+  google_fonts: ^5.1.0
+  http: ^1.2.0
+  kakao_map_plugin: ^0.2.5
+  flutter_dotenv: ^5.1.0
+  shared_preferences: ^2.2.3
+  kpostal: ^0.5.1
+  kakao_flutter_sdk: ^1.9.0
+  image: ^4.2.0
+  cart_stepper: ^4.3.0
+  tosspayments_widget_sdk_flutter: ^1.0.3
+  intl: ^0.19.0
+  flutter_pannable_rating_bar: ^2.7.2+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^3.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
-    # The following line ensures that the Material Icons font is
-    # included with your application, so that you can use the icons in
-    # the material Icons class.
-    uses-material-design: true
 
-    # To add assets to your application, add an assets section, like this:
-    assets:
-        - assets/env/.env
-        - assets/images/black.png
-        - assets/images/connexion.png
-        - assets/images/feedback.png
-        - assets/images/feedback2.png
-        - assets/images/menu.png
-        - assets/images/receipt.png
-        - assets/images/review.png
-        - assets/images/status.png
-        - assets/images/store.png
-        - assets/images/olive.png
-        - assets/images/jamaican.png
-        - assets/images/wing.png
-        - assets/images/bottom_home.png
-        - assets/images/bottom_store.png
-        - assets/images/bottom_record.png
-        - assets/images/bottom_review.png
-        - assets/images/bottom_my.png
-        - assets/images/bottom_menu.png
-        - assets/images/profile1.png
-        - assets/images/profile2.png
-        - assets/images/chicken.png
-        - assets/images/jamaica.png
-        - assets/images/sajang.png
-        - assets/images/AIWriting.png
-        - assets/images/handWriting.png
-        - assets/images/good.png
-        - assets/images/bad.png
-        - assets/images/delivery.png
-        - assets/images/light.png
-        - assets/images/free.png
-        - assets/images/chicken1.png
-        - assets/images/chinesefood.png
-        - assets/images/coffee.png
-        - assets/images/dessert.png
-        - assets/images/hamburger.png
-        - assets/images/japanesefood.png
-        - assets/images/koreanfood.png
-        - assets/images/koreanstreetfood.png
-        - assets/images/pizza.png
-        - assets/images/pizzalogo.png
-        - assets/images/pizzalogo1.png
-        - assets/images/goodjob.png
-        - assets/images/menupizza.png
-        - assets/images/menushrimp.png
-        - assets/images/testReviewImg1.png
-        - assets/images/testReviewImg2.png
-        - assets/images/mydelivery.png
-        - assets/images/maindelivery.png
-        - assets/images/coupangeats.png
-        - assets/images/yogiyo.png
-        - assets/images/baemin.png
-        - assets/templates/christmas.png
-        - assets/templates/leaf.png
-        - assets/templates/autumn.png
-        - assets/templates/frog.png
-        - assets/characters/christmasBall.png
-        - assets/characters/christmasGift.png
-        - assets/characters/christmasPenguin.png
-        - assets/characters/christmasPlants.png
-        - assets/characters/christmasStocking.png
-        - assets/characters/christmasTree.png
-        - assets/characters/gingerbreadMan.png
-        - assets/characters/rainbow.png
-        - assets/characters/santaClausBag.png
-        - assets/characters/snowflake.png
-        - assets/characters/sun.png
-        - assets/characters/chick.png
-        - assets/characters/flower.png
-        - assets/characters/smile.png
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
 
-    # For details regarding adding assets from package dependencies, see
-    # https://flutter.dev/assets-and-images/#from-packages
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/env/.env
+    - assets/images/black.png
+    - assets/images/connexion.png
+    - assets/images/feedback.png
+    - assets/images/feedback2.png
+    - assets/images/menu.png
+    - assets/images/receipt.png
+    - assets/images/review.png
+    - assets/images/status.png
+    - assets/images/store.png
+    - assets/images/olive.png
+    - assets/images/jamaican.png
+    - assets/images/wing.png
+    - assets/images/bottom_home.png
+    - assets/images/bottom_store.png
+    - assets/images/bottom_record.png
+    - assets/images/bottom_review.png
+    - assets/images/bottom_my.png
+    - assets/images/bottom_menu.png
+    - assets/images/profile1.png
+    - assets/images/profile2.png
+    - assets/images/chicken.png
+    - assets/images/jamaica.png
+    - assets/images/sajang.png
+    - assets/images/AIWriting.png
+    - assets/images/handWriting.png
+    - assets/images/good.png
+    - assets/images/bad.png
+    - assets/images/delivery.png
+    - assets/images/light.png
+    - assets/images/free.png
+    - assets/images/chicken1.png
+    - assets/images/chinesefood.png
+    - assets/images/coffee.png
+    - assets/images/dessert.png
+    - assets/images/hamburger.png
+    - assets/images/japanesefood.png
+    - assets/images/koreanfood.png
+    - assets/images/koreanstreetfood.png
+    - assets/images/pizza.png
+    - assets/images/pizzalogo.png
+    - assets/images/pizzalogo1.png
+    - assets/images/goodjob.png
+    - assets/images/menupizza.png
+    - assets/images/menushrimp.png
+    - assets/images/mydelivery.png
+    - assets/images/maindelivery.png
+    - assets/images/coupangeats.png
+    - assets/images/yogiyo.png
+    - assets/images/baemin.png
+    - assets/images/testReviewImg1.png
+    - assets/images/testReviewImg2.png
+    - assets/templates/christmas.png
+    - assets/templates/leaf.png
+    - assets/templates/autumn.png
+    - assets/templates/frog.png
+    - assets/characters/christmasBall.png
+    - assets/characters/christmasGift.png
+    - assets/characters/christmasPenguin.png
+    - assets/characters/christmasPlants.png
+    - assets/characters/christmasStocking.png
+    - assets/characters/christmasTree.png
+    - assets/characters/gingerbreadMan.png
+    - assets/characters/rainbow.png
+    - assets/characters/santaClausBag.png
+    - assets/characters/snowflake.png
+    - assets/characters/sun.png
+    - assets/characters/chick.png
+    - assets/characters/flower.png
+    - assets/characters/smile.png
 
-    # To add custom fonts to your application, add a fonts section here,
-    # in this "flutter" section. Each entry in this list should have a
-    # "family" key with the font family name, and a "fonts" key with a
-    # list giving the asset and other descriptors for the font. For
-    # example:
-    fonts:
-        - family: PyeongChangPeace
-          fonts:
-              - asset: assets/fonts/PyeongChangPeace-Bold.otf
-        - family: KyoboHandwriting2023wsa
-          fonts:
-              - asset: assets/fonts/KyoboHandwriting2023wsa.otf
-        - family: EF_jejudoldam
-          fonts:
-              - asset: assets/fonts/EF_jejudoldam.otf
-        - family: YClover
-          fonts:
-              - asset: assets/fonts/YClover-Bold.otf
-        - family: DungGeunMo
-          fonts:
-              - asset: assets/fonts/DungGeunMo.otf
-        - family: Adultkid
-          fonts:
-              - asset: assets/fonts/Adultkid.otf
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
 
-    #  - family: Jersey25Charted
-    #    fonts:
-    #      - asset: assets/google_fonts/Jersey25Charted-Regular.ttf
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    - family: PyeongChangPeace
+      fonts:
+        - asset: assets/fonts/PyeongChangPeace-Bold.otf
+    - family: KyoboHandwriting2023wsa
+      fonts:
+        - asset: assets/fonts/KyoboHandwriting2023wsa.otf
+    - family: EF_jejudoldam
+      fonts:
+        - asset: assets/fonts/EF_jejudoldam.otf
+    - family: YClover
+      fonts:
+        - asset: assets/fonts/YClover-Bold.otf
+    - family: DungGeunMo
+      fonts:
+        - asset: assets/fonts/DungGeunMo.otf
+    - family: Adultkid
+      fonts:
+        - asset: assets/fonts/Adultkid.otf
 
-    #
-    # For details regarding fonts from package dependencies,
-    # see https://flutter.dev/custom-fonts/#from-packages
+  #  - family: Jersey25Charted
+  #    fonts:
+  #      - asset: assets/google_fonts/Jersey25Charted-Regular.ttf
+
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages
+
