@@ -119,6 +119,9 @@ flutter:
         - assets/images/pizza.png
         - assets/images/pizzalogo.png
         - assets/images/pizzalogo1.png
+        - assets/images/goodjob.png
+        - assets/images/menupizza.png
+        - assets/images/menushrimp.png
         - assets/templates/christmas.png
         - assets/templates/leaf.png
         - assets/templates/autumn.png

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class UserMenuselectPage extends StatefulWidget {
   const UserMenuselectPage({super.key});
@@ -9,8 +10,6 @@ class UserMenuselectPage extends StatefulWidget {
 }
 
 class _UserMenuselectPageState extends State<UserMenuselectPage> {
-  bool isRecommendSelected = true; // 추천, 전체 메뉴 선택 여부
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -231,85 +230,25 @@ class _UserMenuselectPageState extends State<UserMenuselectPage> {
               ),
             ),
             const SizedBox(height: 30),
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isRecommendSelected = true;
-                        });
-                      },
-                      child: Text(
-                        '추천메뉴',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                          color: isRecommendSelected
-                              ? Colors.black
-                              : const Color(0xFF808080),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isRecommendSelected = false;
-                        });
-                      },
-                      child: Text(
-                        '전체메뉴',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                          color: isRecommendSelected
-                              ? const Color(0xFF808080)
-                              : Colors.black,
-                        ),
-                      ),
-                    ),
-                  ],
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding:
+                    EdgeInsets.only(bottom: 0, left: 10), // 텍스트와 구분선 사이 간격 조정
+                child: Text(
+                  '전체 메뉴',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.black,
+                  ),
                 ),
-                const SizedBox(height: 2),
-                Stack(
-                  // Stack 위젯은 자식 위젯들을 서로 겹쳐놓는 데 사용
-                  children: [
-                    // Align 위젯: 자식 위젯을 특정 위치에 정렬하는 위젯
-                    Align(
-                      // alignment 속성: isRecommendSelected 변수에 따라 정렬 위치를 결정
-                      alignment: isRecommendSelected
-                          ? Alignment.centerLeft // 추천메뉴가 선택되었을 때 왼쪽 정렬
-                          : Alignment.centerRight, // 전체메뉴가 선택되었을 때 오른쪽 정렬
-                      child: Container(
-                        // width: 화면 너비의 절반에서 20픽셀을 뺀 값
-                        width: MediaQuery.of(context).size.width * 0.5 - 20,
-                        height: 2,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-                isRecommendSelected
-                    ? recommendMenuSection()
-                    : allMenuSection(), // 추천 메뉴 위젯, 전체 메뉴 위젯 호출
-              ],
+              ),
             ),
+            const Divider(), // 구분선
+            allMenuSection(), // 전체 메뉴 위젯 호출
           ],
         ),
-      ),
-    );
-  }
-
-  Widget recommendMenuSection() {
-    // 추천 메뉴 섹션
-    return Container(
-      padding: const EdgeInsets.all(10.0),
-      child: const Text(
-        '추천 메뉴 섹션입니다.',
-        style: TextStyle(fontSize: 16, color: Colors.black),
       ),
     );
   }
@@ -318,9 +257,150 @@ class _UserMenuselectPageState extends State<UserMenuselectPage> {
     // 전체 메뉴 섹션
     return Container(
       padding: const EdgeInsets.all(10.0),
-      child: const Text(
-        '전체 메뉴 섹션입니다.',
-        style: TextStyle(fontSize: 16, color: Colors.black),
+      child: Column(
+        children: [
+          ListTile(
+            // 메뉴 1
+            contentPadding: EdgeInsets.zero,
+            title: const Text(
+              '페퍼로니 알리오올리오',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 12),
+                const Text(
+                  '20,000원',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  '토마토 소스 위에 페퍼로니를 크리스피하게 굽고, 버진 올리브유와 편마늘, 페퍼론치노의 조화',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF808080),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        // 여기에 원하는 동작을 추가하세요.
+                      },
+                      child: Image.asset(
+                        'assets/images/goodjob.png',
+                        width: 24, // 이미지 크기 조정
+                        height: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Text(
+                      '211명',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            trailing: ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width / 2.5,
+                height: 132,
+                child: Image.asset(
+                  'assets/images/menupizza.png',
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
+          ),
+          const Divider(), // 구분선
+          ListTile(
+            // 메뉴 2
+            contentPadding: EdgeInsets.zero,
+            title: const Text(
+              '시칠리안 갈릭쉬림프',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 12),
+                const Text(
+                  '19,900원',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  '매콤한 살사 소스와 도톰한 새우와 베이컨, 마늘을 곁들인 뒤 루꼴라와 샤워크림으로 마무리',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF808080),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        // 여기에 원하는 동작을 추가하세요.
+                      },
+                      child: Image.asset(
+                        'assets/images/goodjob.png',
+                        width: 24, // 이미지 크기 조정
+                        height: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Text(
+                      '189명',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            trailing: ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width / 2.5,
+                height: 132,
+                child: Image.asset(
+                  'assets/images/menushrimp.png',
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
