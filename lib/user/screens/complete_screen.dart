@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/user/screens/write_screen.dart';
 import 'package:intl/intl.dart';
 
 // 결제 완료 후 이 페이지로 넘어가는 동시에 스낵바로 '주문 완료되었습니다'라고 뜨게 구현(API 할 때 구현할 예정)
 class CompletePage extends StatelessWidget {
-  const CompletePage({super.key});
+  final bool? isWritten;
+  const CompletePage(
+      {this.isWritten = false, super.key}); // null일 경우를 대비하여 기본값을 설정
 
   @override
   Widget build(BuildContext context) {
@@ -12,9 +15,6 @@ class CompletePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 70,
-        leading: const BackButton(
-          color: Colors.white,
-        ),
         title: const Text(
           '주문 내역',
           style: TextStyle(
@@ -105,7 +105,15 @@ class CompletePage extends StatelessWidget {
                     // 리뷰 쓰기 버튼
                     Center(
                       child: ElevatedButton(
-                        onPressed: () {}, // 리뷰 페이지로 이동
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const writeReviewPage(
+                                  '피자에 미치다 교대역점'), // 나중에 변수로 집어넣을 계획
+                            ),
+                          );
+                        }, // 리뷰 페이지로 이동
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           minimumSize: const Size(302, 39),
@@ -117,9 +125,10 @@ class CompletePage extends StatelessWidget {
                             width: 2.0,
                           ),
                         ),
-                        child: const Text(
-                          '리뷰 쓰기',
-                          style: TextStyle(fontSize: 14, color: Colors.black),
+                        child: Text(
+                          isWritten! ? '작성된 리뷰' : '리뷰 쓰기',
+                          style: const TextStyle(
+                              fontSize: 14, color: Colors.black),
                         ),
                       ),
                     ),
