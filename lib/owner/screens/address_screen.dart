@@ -3,11 +3,10 @@ import 'package:frontend/owner/screens/map_screen.dart';
 import 'package:kpostal/kpostal.dart';
 
 class AddressPage extends StatefulWidget {
-  final Function(String) onAddressSelected;
-  Function(String, String, String, String, String) sendAddress;
+  final Function(String)? onAddressSelected;
+  Function(String, String, String, String, String)? sendAddress;
 
-  AddressPage(
-      {super.key, required this.onAddressSelected, required this.sendAddress});
+  AddressPage(this.onAddressSelected, this.sendAddress, {super.key});
 
   @override
   State<AddressPage> createState() => _AddressPageState();
@@ -211,9 +210,9 @@ class _AddressPageState extends State<AddressPage> {
           print(jibunAddress);
           print(postalCode);
 
-          widget.onAddressSelected(
+          widget.onAddressSelected!(
               fullAddress); // StorePage에서 임무 받은 fullAddress 값을 전달
-          widget.sendAddress(
+          widget.sendAddress!(
               roadAddress, jibunAddress, postalCode, latitude, longitude);
 
           Navigator.pop(context);
