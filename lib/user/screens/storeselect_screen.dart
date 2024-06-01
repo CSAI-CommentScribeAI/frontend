@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frontend/user/screens/menuselect_screen.dart';
 
 class userMenuPage extends StatefulWidget {
@@ -12,11 +10,398 @@ class userMenuPage extends StatefulWidget {
 
 class _userMenuPageState extends State<userMenuPage> {
   int selectedButtonIndex = -1;
+  double _rating = 1.0; // 별점
+  double _deliveryFee = 0; // 배달비
+  double _minOrder = 3000; // 최소주문
 
   void handleButtonSelection(int index) {
     setState(() {
       selectedButtonIndex = index;
+      if (index == 5) {
+        // 버튼 인덱스가 5번일 경우 Bottomsheet 생성 = 필터순 텍스트 버튼
+        showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return buildBottomSheet(context);
+          },
+        );
+      }
     });
+  }
+
+  Widget buildBottomSheet(BuildContext context) {
+    return SingleChildScrollView(
+      // Bottomsheet 내 스크롤 적용
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        height: 600,
+        child: StatefulBuilder(
+          // Bottomsheet에서 실시간으로 업데이트 하기위해선 StatefulBuilder 사용 필수
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    '별점',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Slider(
+                  // 별점 범위 필터링
+                  value: _rating,
+                  min: 1,
+                  max: 5,
+                  divisions: 4,
+                  label: '${_rating.toStringAsFixed(1)}점 이상',
+                  activeColor: const Color(0xFF7E7EB2), // 채워진 부분의 색상
+                  onChanged: (value) {
+                    setState(() {
+                      _rating = value;
+                    });
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _rating = 1;
+                        });
+                      },
+                      child: const Text(
+                        '1점 이상',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _rating = 2;
+                        });
+                      },
+                      child: const Text(
+                        '2점 이상',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _rating = 3;
+                        });
+                      },
+                      child: const Text(
+                        '3점 이상',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _rating = 4;
+                        });
+                      },
+                      child: const Text(
+                        '4점 이상',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _rating = 5;
+                        });
+                      },
+                      child: const Text(
+                        '5점 이상',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    '배달비',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Slider(
+                  // 배달비 범위 필터링
+                  value: _deliveryFee,
+                  min: 0,
+                  max: 4000,
+                  divisions: 4,
+                  label:
+                      _deliveryFee == 0 ? '무료배달' : '${_deliveryFee.toInt()}원',
+                  activeColor: const Color(0xFF7E7EB2), // 채워진 부분의 색상
+                  onChanged: (value) {
+                    setState(() {
+                      _deliveryFee = value;
+                    });
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _deliveryFee = 0;
+                        });
+                      },
+                      child: const Text(
+                        '무료배달',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _deliveryFee = 1000;
+                        });
+                      },
+                      child: const Text(
+                        '1,000원',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _deliveryFee = 2000;
+                        });
+                      },
+                      child: const Text(
+                        '2,000원',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _deliveryFee = 3000;
+                        });
+                      },
+                      child: const Text(
+                        '3,000원',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _deliveryFee = 4000;
+                        });
+                      },
+                      child: const Text(
+                        '4000원',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    '최소주문',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Slider(
+                  // 최소주문 범위 필터링
+                  value: _minOrder,
+                  min: 3000,
+                  max: 15000,
+                  divisions: 4,
+                  label: '${_minOrder.toInt()}원',
+                  activeColor: const Color(0xFF7E7EB2), // 채워진 부분의 색상
+                  onChanged: (value) {
+                    setState(() {
+                      _minOrder = value;
+                    });
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _minOrder = 3000;
+                        });
+                      },
+                      child: const Text(
+                        '3,000원',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _minOrder = 6000;
+                        });
+                      },
+                      child: const Text(
+                        '6,000원',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _minOrder = 9000;
+                        });
+                      },
+                      child: const Text(
+                        '9,000원',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _minOrder = 12000;
+                        });
+                      },
+                      child: const Text(
+                        '12,000원',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _minOrder = 15000;
+                        });
+                      },
+                      child: const Text(
+                        '15,000원',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 43),
+                Center(
+                  child: SizedBox(
+                    width: 251,
+                    height: 43,
+                    child: TextButton(
+                      onPressed: () {},
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            const Color(0xff7E7EB2)),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      child: const Text(
+                        '적용하기',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
   }
 
   @override
