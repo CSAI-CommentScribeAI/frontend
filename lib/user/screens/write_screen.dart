@@ -8,7 +8,9 @@ import 'package:image_picker/image_picker.dart';
 
 class writeReviewPage extends StatefulWidget {
   final String store;
-  const writeReviewPage(this.store, {super.key});
+  final Map<String, dynamic>? menu;
+
+  const writeReviewPage(this.store, this.menu, {super.key});
 
   @override
   State<writeReviewPage> createState() => _writeReviewPageState();
@@ -152,7 +154,7 @@ class _writeReviewPageState extends State<writeReviewPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const CartPage(),
+                        builder: (context) => CartPage(widget.menu!),
                       ),
                     );
                   },

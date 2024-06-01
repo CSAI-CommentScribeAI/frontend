@@ -4,7 +4,8 @@ import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:frontend/user/widgets/orderAndPay_widget.dart';
 
 class UserOrderPage extends StatefulWidget {
-  const UserOrderPage({super.key});
+  final Map<String, dynamic> menu;
+  const UserOrderPage(this.menu, {super.key});
 
   @override
   State<UserOrderPage> createState() => _UserOrderPageState();
@@ -139,7 +140,7 @@ class _UserOrderPageState extends State<UserOrderPage> {
               const SizedBox(height: 17),
 
               // 주문 내용
-              const CartWidget(),
+              CartWidget(widget.menu),
               const SizedBox(height: 17),
 
               // 요청사항
@@ -257,9 +258,10 @@ class _UserOrderPageState extends State<UserOrderPage> {
           ),
         ),
       ),
-      bottomNavigationBar: const OrderAndPayBtn(
+      bottomNavigationBar: OrderAndPayBtn(
         '20000원 결제하기',
         true,
+        widget.menu,
       ), // '20000'에 totalPrice 변수 넣을 예정
     );
   }
