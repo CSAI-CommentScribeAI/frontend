@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_pannable_rating_bar/flutter_pannable_rating_bar.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/screens/home_screen.dart';
+import 'package:image_picker/image_picker.dart';
 
 class writeReviewPage extends StatefulWidget {
   final String store;
@@ -16,9 +18,109 @@ class _writeReviewPageState extends State<writeReviewPage> {
   double rating = 0.0;
   TextEditingController reviewController = TextEditingController();
 
+  File? _menuImage; // 이미지 선택
+  XFile? _image; //이미지를 담을 변수 선언
+  final ImagePicker picker = ImagePicker(); //ImagePicker 초기화
+  bool isImagePicked = false;
+
   // 별점을 설정하고 리뷰를 작성하면 등록버튼 활성화 위해 isWritten이 true로 반환
   bool get isWritten {
     return rating > 0 && reviewController.text.isNotEmpty;
+  }
+
+  //이미지를 가져오는 함수
+  Future getImage(ImageSource imageSource) async {
+    if (isImagePicked) return; // 이미지 선택 중복 방지
+    // 이미지를 선택할 수 있게 다이얼로그 열림으로 변경
+    setState(() {
+      isImagePicked = true;
+    });
+    //pickedFile에 ImagePicker로 가져온 이미지가 담긴다.
+    final XFile? pickedFile = await picker.pickImage(source: imageSource);
+    if (pickedFile != null) {
+      setState(() {
+        _image = XFile(pickedFile.path); // 가져온 이미지를 _image에 저장
+        _menuImage = File(pickedFile.path); // 가져온 이미지를 _menuImage에 저장
+      });
+    }
+
+    // 선택이 완료되면 다이얼로그 닫음으로 변경
+    setState(() {
+      isImagePicked = false;
+    });
+  }
+
+  // 카메락 / 갤러리 선택 다이얼로그
+  void _showImageSelectionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  // 이미지가 선택되었을 때 이미지 표시
+                  _image != null
+                      ? SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: Image.file(File(_image!.path)),
+                        )
+                      // 이미지가 선택되지 않았을 때 기본 컨테이너 표시
+                      : Container(
+                          width: 100,
+                          height: 100,
+                          color: Colors.grey,
+                        ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      ElevatedButton(
+                        onPressed: () {
+                          getImage(ImageSource.camera).then((_) {
+                            // 이미지가 선택되면 상태를 갱신하여 다이얼로그를 다시 그립니다.
+                            setState(() {});
+                            // 이미지가 선택되면 _menuImage에도 할당합니다.
+                            if (_image != null) {
+                              _menuImage = File(_image!.path);
+                            }
+                          });
+                        },
+                        child: const Text("카메라"),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          getImage(ImageSource.gallery).then((_) {
+                            // 이미지가 선택되면 상태를 갱신하여 다이얼로그를 다시 그립니다.
+                            setState(() {});
+                            // 이미지가 선택되면 _menuImage에도 할당합니다.
+                            if (_image != null) {
+                              _menuImage = File(_image!.path);
+                            }
+                          });
+                        },
+                        child: const Text("갤러리"),
+                      ),
+                      const SizedBox(width: 20),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Close"),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -154,7 +256,9 @@ class _writeReviewPageState extends State<writeReviewPage> {
 
               // 사진 추가 버튼
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  _showImageSelectionDialog();
+                },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5.0),
@@ -182,6 +286,32 @@ class _writeReviewPageState extends State<writeReviewPage> {
                   ],
                 ),
               ),
+              const SizedBox(height: 5),
+              // null값이면 이미지 삭제
+              if (_menuImage != null)
+                Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: Image.file(_menuImage!),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          // 삭제 시 가져온 이미지에 있는 값들 다 null 값으로 전환
+                          _menuImage = null;
+                          _image = null;
+                        });
+                      },
+                      icon: const Icon(
+                        Icons.close_outlined,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ),
