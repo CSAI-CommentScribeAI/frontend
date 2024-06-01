@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/owner/screens/login_screen.dart';
+import 'package:frontend/user/screens/home_screen.dart';
+import 'package:frontend/user/screens/storeselect_screen.dart';
 import 'package:get/get.dart';
 import 'package:kakao_map_plugin/kakao_map_plugin.dart';
 
@@ -21,15 +23,6 @@ void main() async {
 
   AuthRepository.initialize(appKey: appKey);
 
-  HardwareKeyboard.instance.addHandler((event) {
-    if (event is KeyUpEvent) {
-      print('KeyUpEvent: ${event.physicalKey} - ${event.logicalKey}');
-    } else if (event is KeyDownEvent) {
-      print('KeyDownEvent: ${event.physicalKey} - ${event.logicalKey}');
-    }
-    return false;
-  });
-
   runApp(const MyApp());
 }
 
@@ -41,7 +34,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // snackbar를 사용하기 위해 GetX 컨텍스트 초기화를 위해 작성
     return const GetMaterialApp(
-      home: LoginPage(),
+      home: userMenuPage(),
     );
   }
 }
