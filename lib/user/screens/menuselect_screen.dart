@@ -354,7 +354,6 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                 ],
               ),
             ),
-
             const SizedBox(height: 30),
             const Align(
               alignment: Alignment.centerLeft,
