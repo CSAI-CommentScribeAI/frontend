@@ -115,6 +115,14 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
       'detailMenu': '매콤한 살사 소스와 도톰한 새우와 베이컨, 마늘을 곁들인 뒤 루꼴라와 샤워크림으로 마무리',
       'goodNum': 189,
       'menuImg': 'assets/images/menushrimp.png',
+    },
+    {
+      'store': '피자에 미치다 교대역점',
+      'title': '시칠리안 갈릭쉬림프',
+      'price': 19900,
+      'detailMenu': '매콤한 살사 소스와 도톰한 새우와 베이컨, 마늘을 곁들인 뒤 루꼴라와 샤워크림으로 마무리',
+      'goodNum': 189,
+      'menuImg': 'assets/images/menushrimp.png',
     }
   ];
 
@@ -329,8 +337,9 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                       SizedBox(
                         width: 42,
                       ),
+
+                      // overflow 방지로 Row 위젯의 경계를 벗어나지 않기 위해 줄바꿈 사용
                       Expanded(
-                        // overflow 방지로 Row 위젯의 경계를 벗어나지 않기 위해 줄바꿈 사용
                         child: Text(
                           '서울특별시 서초구 서초대로50길 63 2층 202호',
                           style: TextStyle(
@@ -370,106 +379,109 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
   }
 
   Widget allMenuSection() {
-    // 전체 메뉴 섹션
-    return Column(
-      children: menuList.map((menu) {
-        return Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CartPage(menu),
-                ),
-              );
-            },
-            child: Card(
-              color: const Color(0xFFF3F3FF),
-              elevation: 0,
-              child: Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+    return Expanded(
+      child: SingleChildScrollView(
+        // 전체 메뉴 스크롤
+        child: Column(
+          children: menuList.map((menu) {
+            return Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CartPage(menu),
+                    ),
+                  );
+                },
+                child: Card(
+                  color: const Color(0xFFF3F3FF),
+                  elevation: 0,
+                  child: Column(
                     children: [
-                      Flexible(
-                        // 메뉴
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              menu['title'], // 메뉴 이름
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              '${f.format(menu['price'])}원', // 메뉴 가격
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              menu['detailMenu'], // 메뉴 상세 정보
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF808080),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            flex: 2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                GestureDetector(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/images/goodjob.png',
-                                    width: 24, // 이미지 크기 조정
-                                    height: 24,
-                                  ),
-                                ), // 좋아요
-                                const SizedBox(width: 6),
                                 Text(
-                                  '${menu['goodNum']}명', // 메뉴 좋아요 수
+                                  menu['title'],
                                   style: const TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black,
                                   ),
                                 ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  '${f.format(menu['price'])}원',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  menu['detailMenu'],
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF808080),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {},
+                                      child: Image.asset(
+                                        'assets/images/goodjob.png',
+                                        width: 24,
+                                        height: 24,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '${menu['goodNum']}명',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
-                          ],
-                        ),
-                      ),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(5.0),
-                        child: SizedBox(
-                          width: 100,
-                          height: 100,
-                          child: Image.asset(
-                            menu['menuImg'], // 메뉴 이미지
-                            fit: BoxFit.fill,
                           ),
-                        ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(5.0),
+                            child: SizedBox(
+                              width: 100,
+                              height: 100,
+                              child: Image.asset(
+                                menu['menuImg'],
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 20),
+                      const Divider(),
                     ],
                   ),
-                  const SizedBox(height: 20), // 메뉴 간의 간격
-                  const Divider(), // 구분선 추가
-                ],
+                ),
               ),
-            ),
-          ),
-        );
-      }).toList(),
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 }

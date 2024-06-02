@@ -1,5 +1,7 @@
 name: frontend
 description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1
@@ -39,11 +41,20 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
   flutter_lints: ^3.0.0
 
 flutter:
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
   uses-material-design: true
 
+  # To add assets to your application, add an assets section, like this:
   assets:
     - assets/env/.env
     - assets/images/black.png
@@ -95,6 +106,7 @@ flutter:
     - assets/images/coupangeats.png
     - assets/images/yogiyo.png
     - assets/images/baemin.png
+    - assets/images/deliverylogo.png
     - assets/images/testReviewImg1.png
     - assets/images/testReviewImg2.png
     - assets/templates/christmas.png
@@ -116,6 +128,14 @@ flutter:
     - assets/characters/flower.png
     - assets/characters/smile.png
 
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
   fonts:
     - family: PyeongChangPeace
       fonts:
@@ -135,3 +155,11 @@ flutter:
     - family: Adultkid
       fonts:
         - asset: assets/fonts/Adultkid.otf
+
+  #  - family: Jersey25Charted
+  #    fonts:
+  #      - asset: assets/google_fonts/Jersey25Charted-Regular.ttf
+
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages
