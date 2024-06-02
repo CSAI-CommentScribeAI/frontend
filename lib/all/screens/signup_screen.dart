@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:frontend/all/screens/login_screen.dart';

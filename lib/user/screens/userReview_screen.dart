@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
 import 'package:frontend/all/widgets/userReview_widget.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
-import 'package:frontend/user/screens/home_screen.dart';
+import 'package:frontend/user/screens/userHome_screen.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk_talk.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -62,7 +62,7 @@ class _UserReviewPageState extends State<UserReviewPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const userHomePage(),
+                      builder: (context) => const UserHomePage(''),
                     ),
                   );
                 },

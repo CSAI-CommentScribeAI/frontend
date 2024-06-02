@@ -1,10 +1,10 @@
 import 'package:frontend/all/screens/choose_screen.dart';
 import 'package:frontend/owner/screens/home_screen.dart';
+import 'package:frontend/user/screens/userHome_screen.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
-
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -68,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-// 로그인 API 처리 함수
+  // 로그인 API 처리 함수
   Future<void> handleLogin(String userId, String password) async {
     try {
       // 1. 현재 플랫폼에 따라 로그인을 위한 주소를 설정합니다.
@@ -95,6 +95,7 @@ class _LoginPageState extends State<LoginPage> {
         final responseData = jsonDecode(response.body);
         final accessToken = responseData['accessToken']; // 엑세스 토큰
         final refreshToken = responseData['refreshToken']; // 리프레시 토큰
+        // final userRole = responseData['userRole']; // 사용자 역할
 
         // 4. 토큰을 SharedPreferences에 저장합니다.
         final prefs = await SharedPreferences.getInstance();
@@ -103,12 +104,22 @@ class _LoginPageState extends State<LoginPage> {
 
         print('로그인 성공');
         sendDataToServer();
+        // final user = searchUser(); // userRole 값을 user에 저장
+        // print(user);
+
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(accessToken: accessToken),
+            builder: (context) => UserHomePage(accessToken),
           ),
         );
+
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => HomePage(accessToken: accessToken),
+        //   ),
+        // );
       } else {
         // 로그인 실패 시
         print('로그인 실패');
@@ -125,6 +136,35 @@ class _LoginPageState extends State<LoginPage> {
       print(e.toString());
     }
   }
+
+  // Future<String> searchUser() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final accessToken = prefs.getString('accessToken') ?? '';
+  //   try {
+  //     if (Platform.isAndroid) {
+  //       serverAddress = 'http://10.0.2.2:9000/api/v1/user/info';
+  //     } else if (Platform.isIOS) {
+  //       serverAddress = 'http://127.0.0.1:9000/api/v1/user/info';
+  //     }
+
+  //     final url = Uri.parse(serverAddress);
+  //     final response = await http.get(
+  //       url,
+  //       headers: {'Authorization': 'Bearer $accessToken'},
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       final responseData = jsonDecode(response.body);
+  //       print(responseData['userRole']);
+  //       return responseData['userRole'];
+  //     } else {
+  //       return '';
+  //     }
+  //   } catch (e) {
+  //     print(e.toString());
+  //     return '';
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

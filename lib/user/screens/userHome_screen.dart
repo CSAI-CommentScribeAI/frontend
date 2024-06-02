@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/user/screens/userAddress_screen.dart';
 
-class userHomePage extends StatefulWidget {
-  const userHomePage({super.key});
+class UserHomePage extends StatefulWidget {
+  final String accessToken;
+  const UserHomePage(this.accessToken, {super.key});
 
   @override
-  State<userHomePage> createState() => _userHomePageState();
+  State<UserHomePage> createState() => _UserHomePageState();
 }
 
-class _userHomePageState extends State<userHomePage> {
+class _UserHomePageState extends State<UserHomePage> {
   final List<Map<String, String>> menuItems = [
     {'image': 'assets/images/hamburger.png', 'name': '햄버거'},
     {'image': 'assets/images/chicken1.png', 'name': '치킨'},
@@ -22,6 +24,8 @@ class _userHomePageState extends State<userHomePage> {
 
   List<Map<String, String>> filteredMenuItems = [];
   TextEditingController searchController = TextEditingController();
+  String userAddress = '주소를 설정하세요'; // 고객 주소
+  String fullAddress = '';
 
   @override
   void initState() {
@@ -50,6 +54,13 @@ class _userHomePageState extends State<userHomePage> {
     }
   }
 
+  // 받아온 주소 값을 사용자 주소(userAddress)에  실시간저장
+  void onUserAdddressSelected(String fullAddress) {
+    setState(() {
+      userAddress = fullAddress;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,23 +73,38 @@ class _userHomePageState extends State<userHomePage> {
         title: Padding(
           padding: const EdgeInsets.only(left: 10.0),
           child: RichText(
-            text: const TextSpan(
+            text: TextSpan(
               children: [
                 TextSpan(
-                  text: '서울특별시 서초구 강남대로 311',
-                  style: TextStyle(
+                  text: userAddress, // 사용자 주소
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
                 ),
                 WidgetSpan(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 8.0),
-                    child: Icon(
-                      Icons.arrow_drop_down,
-                      color: Colors.white,
-                      size: 16,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserAddressPage(
+                            (p0, p1, p2, p3, p4) => null,
+                            widget.accessToken,
+                            onUserAddressSelected:
+                                onUserAdddressSelected, // 필수 요소
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                     ),
                   ),
                 ),
@@ -95,8 +121,8 @@ class _userHomePageState extends State<userHomePage> {
                 padding: const EdgeInsets.only(right: 10.0),
                 child: Image.asset(
                   'assets/images/bottom_my.png',
-                  width: 28.24,
-                  height: 32,
+                  width: 20,
+                  height: 24,
                   color: Colors.white,
                 ),
               ),
@@ -109,7 +135,7 @@ class _userHomePageState extends State<userHomePage> {
                 padding: EdgeInsets.only(right: 10.0),
                 child: Icon(
                   Icons.shopping_cart,
-                  size: 32, // 아이콘 크기 설정
+                  size: 26, // 아이콘 크기 설정
                   color: Colors.white, // 아이콘 색상 설정
                 ),
               ),
