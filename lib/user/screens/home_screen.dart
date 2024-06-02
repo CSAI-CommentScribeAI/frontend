@@ -334,7 +334,7 @@ class _userHomePageState extends State<userHomePage> {
                                 menuItems[index]['name']!,
                                 style: const TextStyle(
                                   color: Colors.black,
-                                  fontSize: 16,
+                                  fontSize: 17,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
