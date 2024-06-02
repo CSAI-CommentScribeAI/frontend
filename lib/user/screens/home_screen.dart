@@ -13,10 +13,10 @@ class _userHomePageState extends State<userHomePage> {
     {'image': 'assets/images/chicken1.png', 'name': '치킨'},
     {'image': 'assets/images/pizza.png', 'name': '피자'},
     {'image': 'assets/images/koreanfood.png', 'name': '한식'},
-    {'image': 'assets/images/chinesefood.png', 'name': '중식'},
+    {'image': 'assets/images/deliverylogo.png', 'name': 'CSAI'},
     {'image': 'assets/images/japanesefood.png', 'name': '일식'},
     {'image': 'assets/images/koreanstreetfood.png', 'name': '분식'},
-    {'image': 'assets/images/coffee.png', 'name': '커피'},
+    {'image': 'assets/images/chinesefood.png', 'name': '중식'},
     {'image': 'assets/images/dessert.png', 'name': '디저트'},
   ];
 
@@ -305,6 +305,8 @@ class _userHomePageState extends State<userHomePage> {
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                     children: List.generate(menuItems.length, (index) {
+                      bool isDeliveryLogo = menuItems[index]['image'] ==
+                          'assets/images/deliverylogo.png';
                       return Container(
                         padding: const EdgeInsets.all(8.0),
                         decoration: BoxDecoration(
@@ -323,18 +325,20 @@ class _userHomePageState extends State<userHomePage> {
                           children: [
                             Image.asset(
                               menuItems[index]['image']!,
-                              height: 50,
-                              width: 50,
+                              height: isDeliveryLogo ? 108 : 50,
+                              width: isDeliveryLogo ? 108 : 50,
                             ),
-                            const SizedBox(height: 10),
-                            Text(
-                              menuItems[index]['name']!,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                            if (!isDeliveryLogo) ...[
+                              const SizedBox(height: 10),
+                              Text(
+                                menuItems[index]['name']!,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
+                            ],
                           ],
                         ),
                       );
