@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:frontend/owner/screens/signup_screen.dart';
+import 'package:frontend/all/screens/signup_screen.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class ChoosePage extends StatefulWidget {

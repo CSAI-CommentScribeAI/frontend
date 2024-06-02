@@ -1,4 +1,4 @@
-import 'package:frontend/owner/screens/choose_screen.dart';
+import 'package:frontend/all/screens/choose_screen.dart';
 import 'package:frontend/owner/screens/home_screen.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
