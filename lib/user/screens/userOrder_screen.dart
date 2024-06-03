@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:frontend/user/widgets/orderAndPay_widget.dart';
 
 class UserOrderPage extends StatefulWidget {
-  final Map<String, dynamic> menu;
+  final AddMenuModel menu;
   const UserOrderPage(this.menu, {super.key});
 
   @override

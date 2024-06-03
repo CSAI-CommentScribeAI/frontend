@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/user/screens/menuSelect_screen.dart';
+import 'package:frontend/user/services/userMenu_service.dart';
 
 class UserMenuPage extends StatefulWidget {
-  const UserMenuPage({super.key});
+  final String? accessToken;
+  const UserMenuPage(this.accessToken, {super.key});
 
   @override
   State<UserMenuPage> createState() => _UserMenuPageState();
@@ -642,10 +644,12 @@ class _UserMenuPageState extends State<UserMenuPage> {
               const SizedBox(height: 18),
               GestureDetector(
                 onTap: () {
+                  userMenuService().fetchMenus();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const UserMenuSelectPage(),
+                      builder: (context) =>
+                          UserMenuSelectPage(widget.accessToken!),
                     ),
                   );
                 },

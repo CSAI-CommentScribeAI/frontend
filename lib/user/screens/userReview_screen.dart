@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/owner/screens/review_screen.dart';
 import 'package:frontend/all/widgets/userReview_widget.dart';
+import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/userHome_screen.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk_talk.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class UserReviewPage extends StatefulWidget {
-  final Map<String, dynamic>? menu;
-  const UserReviewPage(this.menu, {super.key});
+  final AddMenuModel? userMenu;
+  const UserReviewPage(this.userMenu, {super.key});
 
   @override
   State<UserReviewPage> createState() => _UserReviewPageState();
@@ -78,7 +77,7 @@ class _UserReviewPageState extends State<UserReviewPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CartPage(widget.menu!),
+                        builder: (context) => CartPage(widget.userMenu!),
                       ),
                     );
                   },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/screens/userOrder_screen.dart';
 
@@ -6,9 +7,9 @@ import 'package:frontend/user/screens/userOrder_screen.dart';
 class OrderAndPayBtn extends StatelessWidget {
   final String title;
   final bool cart;
-  final Map<String, dynamic> menu;
+  final AddMenuModel userMenu;
 
-  const OrderAndPayBtn(this.title, this.cart, this.menu, {super.key});
+  const OrderAndPayBtn(this.title, this.cart, this.userMenu, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,7 @@ class OrderAndPayBtn extends StatelessWidget {
   Route downToUpRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
-          UserOrderPage(menu),
+          UserOrderPage(userMenu),
 
       // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
       transitionsBuilder: (context, animation, secondaryAnimation, child) {

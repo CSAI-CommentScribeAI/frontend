@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/user/screens/storeselect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
 
 class UserHomePage extends StatefulWidget {
@@ -333,39 +334,50 @@ class _UserHomePageState extends State<UserHomePage> {
                     children: List.generate(menuItems.length, (index) {
                       bool isDeliveryLogo = menuItems[index]['image'] ==
                           'assets/images/deliverylogo.png';
-                      return Container(
-                        padding: const EdgeInsets.all(8.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF374AA3).withOpacity(0.5),
-                              blurRadius: 4,
-                              offset: const Offset(0, 4),
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  UserMenuPage(widget.accessToken),
                             ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              menuItems[index]['image']!,
-                              height: isDeliveryLogo ? 108 : 50,
-                              width: isDeliveryLogo ? 108 : 50,
-                            ),
-                            if (!isDeliveryLogo) ...[
-                              const SizedBox(height: 10),
-                              Text(
-                                menuItems[index]['name']!,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF374AA3).withOpacity(0.5),
+                                blurRadius: 4,
+                                offset: const Offset(0, 4),
                               ),
                             ],
-                          ],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                menuItems[index]['image']!,
+                                height: isDeliveryLogo ? 108 : 50,
+                                width: isDeliveryLogo ? 108 : 50,
+                              ),
+                              if (!isDeliveryLogo) ...[
+                                const SizedBox(height: 10),
+                                Text(
+                                  menuItems[index]['name']!,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                       );
                     }),
