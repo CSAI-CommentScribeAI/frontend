@@ -5,7 +5,8 @@ import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:intl/intl.dart';
 
 class UserMenuSelectPage extends StatefulWidget {
-  const UserMenuSelectPage({super.key});
+  final String accessToken;
+  const UserMenuSelectPage(this.accessToken, {super.key});
 
   @override
   State<UserMenuSelectPage> createState() => _UserMenuSelectPageState();

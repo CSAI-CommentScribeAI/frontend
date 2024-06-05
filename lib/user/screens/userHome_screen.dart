@@ -5,6 +5,9 @@ import 'package:frontend/user/screens/storeSelect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
 import 'package:frontend/user/models/selectCategory_model.dart';
 import 'package:frontend/user/services/selectCategory_service.dart';
+import 'package:frontend/user/services/userStore_service.dart';
+import 'package:frontend/user/widgets/menuSearch_widget.dart';
+
 
 class UserHomePage extends StatefulWidget {
   final String accessToken;
@@ -15,7 +18,10 @@ class UserHomePage extends StatefulWidget {
 }
 
 class _UserHomePageState extends State<UserHomePage> {
+
   List<SelectCategoryModel> categories = [];
+  late Future<List<StoreModel>> futureStores;
+
   TextEditingController searchController = TextEditingController();
   String userAddress = '주소를 설정하세요'; // 고객 주소
   String fullAddress = '';
@@ -48,6 +54,13 @@ class _UserHomePageState extends State<UserHomePage> {
     setState(() {
       userAddress = fullAddress;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    futureStores =
+        UserStoreService().getManyStores(); // 모든 가게 리스트를 futureStores에 저장
   }
 
   @override
@@ -141,7 +154,7 @@ class _UserHomePageState extends State<UserHomePage> {
         child: Center(
           child: Column(
             children: [
-              // 첫 번째 박스
+              // 오늘의 배달 Tip
               Container(
                 width: 400,
                 height: 88,
@@ -183,9 +196,10 @@ class _UserHomePageState extends State<UserHomePage> {
                   ],
                 ),
               ),
-              // 두 번째 박스
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 19.0),
+
+                // 검색 창
                 child: Container(
                   padding: const EdgeInsets.only(left: 14),
                   width: 400,
@@ -205,43 +219,39 @@ class _UserHomePageState extends State<UserHomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(left: 4.0),
-                            child: Icon(
-                              Icons.search,
-                              color: Color(0xFFC6C2C2),
-                              size: 14,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            child: TextField(
-                              onChanged: (value) {
-                                filterSearchResults(value);
-                              },
-                              controller: searchController,
-                              decoration: const InputDecoration(
-                                hintText: '뭐든 다 좋아 다 나와라!!!',
-                                hintStyle: TextStyle(
+                      TextButton(
+                          onPressed: () {
+                            // 검색 화면으로 이동
+                            showSearch(
+                              context: context,
+                              delegate: MenuSearchDelegate(futureStores),
+                            );
+                          },
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.search,
+                                color: Color(0xFFC6C2C2),
+                                size: 20,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                '뭐든 다 좋아 다 나와라!!!',
+                                style: TextStyle(
                                   color: Color(0xFFC6C2C2),
-                                  fontSize: 11,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
-                                border: InputBorder.none,
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
+                            ],
+                          ))
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 13),
+
+              // 광고
               Container(
                 // 세 번째 박스
                 height: 127,

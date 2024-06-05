@@ -9,10 +9,10 @@ class UserMenuPage extends StatefulWidget {
   const UserMenuPage({required this.category, super.key});
 
   @override
-  State<UserMenuPage> createState() => _UserMenuPageState();
+  State<UserStoreSelectPage> createState() => _UserStoreSelectPageState();
 }
 
-class _UserMenuPageState extends State<UserMenuPage> {
+class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
   int selectedButtonIndex = -1;
   double _rating = 1.0; // 별점
   double _deliveryFee = 0; // 배달비
