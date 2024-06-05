@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:frontend/owner/screens/login_screen.dart';
-import 'package:frontend/user/screens/home_screen.dart';
+import 'package:frontend/all/screens/login_screen.dart';
 import 'package:frontend/user/screens/menuSelect_screen.dart';
 import 'package:frontend/user/screens/storeSelect_screen.dart';
 import 'package:get/get.dart';
@@ -35,7 +34,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // snackbar를 사용하기 위해 GetX 컨텍스트 초기화를 위해 작성
     return const GetMaterialApp(
-      home: UserMenuPage(),
+      home: LoginPage(),
     );
   }
 }
