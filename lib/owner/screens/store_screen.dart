@@ -76,8 +76,9 @@ class _StorePageState extends State<StorePage> {
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Center(child: Text('No stores found.'));
                   } else {
-                    final store = snapshot.data![
-                        widget.storeIndex]; // 해당 가게의 인덱스를 가져와 가게 정보 객체를 가져옴
+                    // 해당 가게의 인덱스를 가져와 가게 정보 객체를 가져옴
+                    // 아이디마다 등록한 가게의 리스트가 다르기 때문에 들어온 순서대로 storeIndex 부여
+                    final store = snapshot.data![widget.storeIndex];
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 75.5, vertical: 10.0),

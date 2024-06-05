@@ -9,9 +9,8 @@ class MenuService {
   late String serverAddress;
 
   // 메뉴 조회 API
-  Future<List<AddMenuModel>> getMenu(int storeIndex) async {
+  Future<List<AddMenuModel>> getMenu(int storeId) async {
     List<AddMenuModel> menuInstance = [];
-    int storeId = storeIndex + 1;
 
     // 1. 현재 플랫폼에 따라 로그인을 위한 주소를 설정합니다.
     if (Platform.isAndroid) {
@@ -58,16 +57,10 @@ class MenuService {
   }
 
   // 메뉴 등록 API
-  Future<void> registerMenu(
-    String name,
-    String price,
-    String menuDetail,
-    File file,
-    String status,
-    String? accessToken,
-    int storeIndex,
-    // String category,
-  ) async {
+  Future<void> registerMenu(String name, String price, String menuDetail,
+      File file, String status, String? accessToken, String storeId
+      // String category,
+      ) async {
     final Map<String, String> statusMapping = {
       '판매중': 'SALE',
       '품절': 'SOLD',
@@ -76,7 +69,6 @@ class MenuService {
 
     try {
       String serverAddress;
-      int storeId = storeIndex + 1;
 
       if (Platform.isAndroid) {
         serverAddress = 'http://10.0.2.2:9000/api/v1/$storeId/menu/';

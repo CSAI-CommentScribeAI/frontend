@@ -5,9 +5,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:frontend/owner/services/menu_service.dart';
 
 class AddMenuPage extends StatefulWidget {
-  final int storeIndex;
+  final int storeId;
   final String accessToken;
-  const AddMenuPage(this.storeIndex, this.accessToken, {super.key});
+  const AddMenuPage(this.storeId, this.accessToken, {super.key});
 
   @override
   State<AddMenuPage> createState() => _AddMenuPageState();
@@ -539,7 +539,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
                       _menuImage!,
                       status!,
                       widget.accessToken,
-                      widget.storeIndex,
+                      '${widget.storeId}',
                     );
                   }
                 },

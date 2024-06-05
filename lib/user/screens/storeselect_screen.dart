@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/screens/menuselect_screen.dart';
+import 'package:frontend/user/services/selectCategory_service.dart';
 
-class UserStoreSelectPage extends StatefulWidget {
-  final String accessToken;
-  const UserStoreSelectPage(this.accessToken, {super.key});
+class UserMenuPage extends StatefulWidget {
+  final String category; // 선택된 카테고리
+  const UserMenuPage({required this.category, super.key});
 
   @override
-  State<UserStoreSelectPage> createState() => _UserStoreSelectPageState();
+  State<UserMenuPage> createState() => _UserMenuPageState();
 }
 
-class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
+class _UserMenuPageState extends State<UserMenuPage> {
   int selectedButtonIndex = -1;
-  double _rating = 1.0; // 별점
-  double _deliveryFee = 0; // 배달비
-  double _minOrder = 3000; // 최소주문
+  double rating = 1.0; // 별점
+  double deliveryFee = 0; // 배달비
+  double minOrder = 3000; // 최소주문
+  List<StoreModel> stores = [];
+  final SelectCategoryService selectCategoryService = SelectCategoryService();
+
+  @override
+  void initState() {
+    super.initState(); // initState 메서드를 호출하여 초기화
+    fetchStoresByCategory(widget.category); // 카테고리 기반으로 가게 정보를 가져오는 메서드 호출
+  }
 
   void handleButtonSelection(int index) {
     setState(() {
@@ -28,6 +38,23 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
         );
       }
     });
+  }
+
+  // 카테고리별 가게 정보를 가져오는 메서드
+  Future<void> fetchStoresByCategory(String category) async {
+    try {
+      // SelectCategoryService 인스턴스를 통해 카테고리에 해당하는 가게 정보를 가져옴
+      List<StoreModel> fetchedStores =
+          await selectCategoryService.getSelectCategory(category);
+
+      // 상태를 업데이트하여 가져온 가게 정보를 stores 리스트에 저장
+      setState(() {
+        stores = fetchedStores;
+      });
+    } catch (e) {
+      // 예외 발생 시 에러 메시지 출력
+      print('Error fetching stores: $e');
+    }
   }
 
   Widget buildBottomSheet(BuildContext context) {
@@ -66,15 +93,15 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                 ),
                 Slider(
                   // 별점 범위 필터링
-                  value: _rating,
+                  value: rating,
                   min: 1,
                   max: 5,
                   divisions: 4,
-                  label: '${_rating.toStringAsFixed(1)}점 이상',
+                  label: '${rating.toStringAsFixed(1)}점 이상',
                   activeColor: const Color(0xFF7E7EB2), // 채워진 부분의 색상
                   onChanged: (value) {
                     setState(() {
-                      _rating = value;
+                      rating = value;
                     });
                   },
                 ),
@@ -84,7 +111,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _rating = 1;
+                          rating = 1;
                         });
                       },
                       child: const Text(
@@ -99,7 +126,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _rating = 2;
+                          rating = 2;
                         });
                       },
                       child: const Text(
@@ -114,7 +141,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _rating = 3;
+                          rating = 3;
                         });
                       },
                       child: const Text(
@@ -129,7 +156,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _rating = 4;
+                          rating = 4;
                         });
                       },
                       child: const Text(
@@ -144,7 +171,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _rating = 5;
+                          rating = 5;
                         });
                       },
                       child: const Text(
@@ -171,16 +198,15 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                 ),
                 Slider(
                   // 배달비 범위 필터링
-                  value: _deliveryFee,
+                  value: deliveryFee,
                   min: 0,
                   max: 4000,
                   divisions: 4,
-                  label:
-                      _deliveryFee == 0 ? '무료배달' : '${_deliveryFee.toInt()}원',
+                  label: deliveryFee == 0 ? '무료배달' : '${deliveryFee.toInt()}원',
                   activeColor: const Color(0xFF7E7EB2), // 채워진 부분의 색상
                   onChanged: (value) {
                     setState(() {
-                      _deliveryFee = value;
+                      deliveryFee = value;
                     });
                   },
                 ),
@@ -190,7 +216,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _deliveryFee = 0;
+                          deliveryFee = 0;
                         });
                       },
                       child: const Text(
@@ -205,7 +231,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _deliveryFee = 1000;
+                          deliveryFee = 1000;
                         });
                       },
                       child: const Text(
@@ -220,7 +246,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _deliveryFee = 2000;
+                          deliveryFee = 2000;
                         });
                       },
                       child: const Text(
@@ -235,7 +261,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _deliveryFee = 3000;
+                          deliveryFee = 3000;
                         });
                       },
                       child: const Text(
@@ -250,7 +276,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _deliveryFee = 4000;
+                          deliveryFee = 4000;
                         });
                       },
                       child: const Text(
@@ -277,15 +303,15 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                 ),
                 Slider(
                   // 최소주문 범위 필터링
-                  value: _minOrder,
+                  value: minOrder,
                   min: 3000,
                   max: 15000,
                   divisions: 4,
-                  label: '${_minOrder.toInt()}원',
+                  label: '${minOrder.toInt()}원',
                   activeColor: const Color(0xFF7E7EB2), // 채워진 부분의 색상
                   onChanged: (value) {
                     setState(() {
-                      _minOrder = value;
+                      minOrder = value;
                     });
                   },
                 ),
@@ -295,7 +321,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _minOrder = 3000;
+                          minOrder = 3000;
                         });
                       },
                       child: const Text(
@@ -310,7 +336,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _minOrder = 6000;
+                          minOrder = 6000;
                         });
                       },
                       child: const Text(
@@ -325,7 +351,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _minOrder = 9000;
+                          minOrder = 9000;
                         });
                       },
                       child: const Text(
@@ -340,7 +366,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _minOrder = 12000;
+                          minOrder = 12000;
                         });
                       },
                       child: const Text(
@@ -355,7 +381,7 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _minOrder = 15000;
+                          minOrder = 15000;
                         });
                       },
                       child: const Text(
@@ -641,166 +667,105 @@ class _UserStoreSelectPageState extends State<UserStoreSelectPage> {
                 ),
               ),
               const SizedBox(height: 18),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          UserMenuSelectPage(widget.accessToken),
-                    ),
-                  );
-                },
-                child: Hero(
-                  tag: "selectMenu",
-                  child: Container(
-                    width: double.infinity,
-                    height: 132,
-                    padding: const EdgeInsets.only(right: 20.0),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFFFFF),
-                      borderRadius: BorderRadius.circular(15.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.25),
-                          offset: const Offset(0, 4),
-                          blurRadius: 4.0,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15.0),
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width / 3,
-                            height: 132,
-                            child: Image.asset(
-                              'assets/images/pizzalogo.png',
-                              fit: BoxFit.cover,
+
+              // 가게 리스트
+              Expanded(
+                child: ListView.builder(
+                  itemCount: stores.length,
+                  itemBuilder: (context, index) {
+                    final store = stores[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UserMenuSelectPage(
+                              store: store,
                             ),
                           ),
-                        ),
-                        const Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 16.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '피자에 미치다 교대역점',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                        );
+                      },
+                      child: Hero(
+                        tag: store.id, // 가게 아이디로 태그 설정
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 18),
+                          width: double.infinity,
+                          height: 132,
+                          padding: const EdgeInsets.only(right: 20.0),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFFFFF),
+                            borderRadius: BorderRadius.circular(15.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25),
+                                offset: const Offset(0, 4),
+                                blurRadius: 4.0,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(15.0),
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width / 3,
+                                  height: 132,
+                                  child: Image.network(
+                                    store.storeImageUrl,
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
-                                SizedBox(height: 8),
-                                Text(
-                                  '최소 주문 16,000원',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Color(0xFF808080),
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Icon(Icons.star,
-                                        color: Color(0xFFDFB300), size: 15),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      '4.75',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.black,
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        store.name,
+                                        style: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Container(
-                width: double.infinity,
-                height: 132,
-                padding: const EdgeInsets.only(right: 20.0),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFFFFF),
-                  borderRadius: BorderRadius.circular(15.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.25),
-                      offset: const Offset(0, 4),
-                      blurRadius: 4.0,
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0), // 둥근 정도
-                      child: SizedBox(
-                        width:
-                            MediaQuery.of(context).size.width / 3, // 가로 너비의 1/3
-                        height: 132,
-                        child: Image.asset(
-                          'assets/images/pizzalogo1.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 16.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '도치 피자 강남점',
-                              style: TextStyle(
-                                fontSize: 22, // 폰트 크기
-                                fontWeight: FontWeight.bold, // 폰트 굵기
-                                color: Colors.black, // 폰트 색상
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              '최소 주문 14,000원',
-                              style: TextStyle(
-                                fontSize: 12, // 폰트 크기
-                                color: Color(0xFF808080), // 폰트 색상
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Icon(Icons.star,
-                                    color: Color(0xFFDFB300), size: 15),
-                                SizedBox(width: 4), // 별점과 숫자 간의 간격
-                                Text(
-                                  '4.39',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black,
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        '최소 주문 ${store.minOrderPrice}원',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Color(0xFF808080),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      const Row(
+                                        children: [
+                                          Icon(Icons.star,
+                                              color: Color(0xFFDFB300),
+                                              size: 15),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            '4.5',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
             ],

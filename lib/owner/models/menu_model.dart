@@ -19,4 +19,14 @@ class AddMenuModel {
         menuDetail = json['menuDetail'] ?? '',
         imageUrl = json['imageUrl'] ?? '',
         status = json['status'] ?? '';
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'price': price,
+      'menuDetail': menuDetail,
+      'imageUrl': imageUrl,
+      'status': status,
+    };
+  }
 }

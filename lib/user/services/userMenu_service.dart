@@ -8,12 +8,12 @@ import 'package:get/get.dart';
 class userMenuService {
   String serverAddress = '';
 
-  Future<List<AddMenuModel>> fetchMenus() async {
+  Future<List<AddMenuModel>> fetchMenus(String storeId) async {
     List<AddMenuModel> userMenuInstance = [];
     if (Platform.isAndroid) {
-      serverAddress = 'http://10.0.2.2:9000/api/v1/1/menus';
+      serverAddress = 'http://10.0.2.2:9000/api/v1/$storeId/menus';
     } else if (Platform.isIOS) {
-      serverAddress = 'http://127.0.0.1:9000/api/v1/1/menus';
+      serverAddress = 'http://127.0.0.1:9000/api/v1/$storeId/menus';
     }
     try {
       final url = Uri.parse(serverAddress);
