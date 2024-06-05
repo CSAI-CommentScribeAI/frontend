@@ -686,7 +686,7 @@ class _UserMenuPageState extends State<UserMenuPage> {
                         );
                       },
                       child: Hero(
-                        tag: "selectMenu_$index",
+                        tag: store.id, // 가게 아이디로 태그 설정
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 18),
                           width: double.infinity,

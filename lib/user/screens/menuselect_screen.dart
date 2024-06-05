@@ -138,7 +138,7 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
         child: Column(
           children: [
             Hero(
-              tag: 'selectMenu',
+              tag: widget.store.id,
               child: Container(
                 width: double.infinity,
                 height: 132,
