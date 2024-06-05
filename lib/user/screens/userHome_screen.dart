@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
-import 'package:frontend/user/screens/menuSelect_screen.dart';
 import 'package:frontend/user/screens/storeselect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
-import 'package:frontend/user/models/selectCategory_model.dart';
 import 'package:frontend/user/services/selectCategory_service.dart';
 import 'package:frontend/user/services/userStore_service.dart';
 import 'package:frontend/user/widgets/menuSearch_widget.dart';
@@ -17,7 +15,7 @@ class UserHomePage extends StatefulWidget {
 }
 
 class _UserHomePageState extends State<UserHomePage> {
-  List<SelectCategoryModel> categories = [];
+  List<StoreModel> categories = [];
   late Future<List<StoreModel>> futureStores;
 
   TextEditingController searchController = TextEditingController();
@@ -38,8 +36,7 @@ class _UserHomePageState extends State<UserHomePage> {
     SelectCategoryService categoryService = SelectCategoryService();
 
     // categoryService를 사용하여 카테고리 정보를 비동기적으로 가져옴
-    List<SelectCategoryModel> fetchedCategories =
-        await categoryService.getCategory(0);
+    List<StoreModel> fetchedCategories = await categoryService.getCategory(0);
 
     // 상태를 업데이트하여 가져온 카테고리 정보를 categories 리스트에 저장
     setState(() {

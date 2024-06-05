@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
-import 'package:frontend/user/screens/cart_screen.dart';
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/services/userMenu_service.dart';
 import 'package:intl/intl.dart';
 
 class UserMenuSelectPage extends StatefulWidget {
-  const UserMenuSelectPage({super.key});
+  final StoreModel store;
+  const UserMenuSelectPage({required this.store, super.key});
 
   @override
   State<UserMenuSelectPage> createState() => _UserMenuSelectPageState();
@@ -99,33 +100,6 @@ void showReviewsBottomSheet(BuildContext context) {
 class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
   var f = NumberFormat('###,###,###,###'); // 숫자 세자리마다 콤마 넣는 코드
 
-  List<Map<String, dynamic>> menuList = [
-    {
-      'store': '피자에 미치다 교대역점',
-      'title': '페퍼로니 알리오올리오',
-      'price': 20000,
-      'detailMenu': '토마토 소스 위에 페퍼로니를 크리스피하게 굽고, 버진 올리브유와 편마늘, 페퍼론치노의 조화',
-      'goodNum': 211,
-      'menuImg': 'assets/images/menupizza.png',
-    },
-    {
-      'store': '피자에 미치다 교대역점',
-      'title': '시칠리안 갈릭쉬림프',
-      'price': 19900,
-      'detailMenu': '매콤한 살사 소스와 도톰한 새우와 베이컨, 마늘을 곁들인 뒤 루꼴라와 샤워크림으로 마무리',
-      'goodNum': 189,
-      'menuImg': 'assets/images/menushrimp.png',
-    },
-    {
-      'store': '피자에 미치다 교대역점',
-      'title': '시칠리안 갈릭쉬림프',
-      'price': 19900,
-      'detailMenu': '매콤한 살사 소스와 도톰한 새우와 베이컨, 마늘을 곁들인 뒤 루꼴라와 샤워크림으로 마무리',
-      'goodNum': 189,
-      'menuImg': 'assets/images/menushrimp.png',
-    }
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,44 +161,44 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width / 3,
                         height: 132,
-                        child: Image.asset(
-                          'assets/images/pizzalogo.png',
+                        child: Image.network(
+                          widget.store.storeImageUrl,
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
-                    const Expanded(
+                    Expanded(
                       child: Padding(
-                        padding: EdgeInsets.only(left: 16.0),
+                        padding: const EdgeInsets.only(left: 16.0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '피자에 미치다 교대역점',
-                              style: TextStyle(
+                              widget.store.name,
+                              style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
-                              '최소 주문 16,000원',
-                              style: TextStyle(
+                              '최소 주문 ${f.format(widget.store.minOrderPrice)}원',
+                              style: const TextStyle(
                                 fontSize: 12,
                                 color: Color(0xFF808080),
                               ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Row(
                               children: [
-                                Icon(Icons.star,
+                                const Icon(Icons.star,
                                     color: Color(0xFFDFB300), size: 15),
-                                SizedBox(width: 4),
+                                const SizedBox(width: 4),
                                 Text(
-                                  '4.75',
-                                  style: TextStyle(
+                                  '${widget.store.rating}',
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.black,
                                   ),
@@ -279,21 +253,21 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Row(
+                  Row(
                     children: [
-                      Text(
+                      const Text(
                         '최소주문',
                         style: TextStyle(
                           fontSize: 14,
                           color: Color(0xFF808080),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 42,
                       ),
                       Text(
-                        '17,000원',
-                        style: TextStyle(
+                        '${f.format(widget.store.minOrderPrice)}원',
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
@@ -302,47 +276,49 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const Row(
+                  Row(
                     children: [
-                      Text(
+                      const Text(
                         '가게설명',
                         style: TextStyle(
                           fontSize: 14,
                           color: Color(0xFF808080),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 42,
                       ),
-                      Text(
-                        '피자에 미쳐버린 당신을 위해~~',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                      Expanded(
+                        child: Text(
+                          widget.store.info,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const Row(
+                  Row(
                     children: [
-                      Text(
+                      const Text(
                         '가게주소',
                         style: TextStyle(
                           fontSize: 14,
                           color: Color(0xFF808080),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 42,
                       ),
 
                       // overflow 방지로 Row 위젯의 경계를 벗어나지 않기 위해 줄바꿈 사용
                       Expanded(
                         child: Text(
-                          '서울특별시 서초구 서초대로50길 63 2층 202호',
-                          style: TextStyle(
+                          widget.store.fullAddress,
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,

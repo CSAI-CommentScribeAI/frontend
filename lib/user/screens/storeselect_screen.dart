@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/screens/menuselect_screen.dart';
-import 'package:frontend/user/services/userMenu_service.dart';
-import 'package:frontend/user/models/selectCategory_model.dart';
 import 'package:frontend/user/services/selectCategory_service.dart';
 
 class UserMenuPage extends StatefulWidget {
@@ -18,7 +16,7 @@ class _UserMenuPageState extends State<UserMenuPage> {
   double rating = 1.0; // 별점
   double deliveryFee = 0; // 배달비
   double minOrder = 3000; // 최소주문
-  List<SelectCategoryModel> stores = [];
+  List<StoreModel> stores = [];
   final SelectCategoryService selectCategoryService = SelectCategoryService();
 
   @override
@@ -46,7 +44,7 @@ class _UserMenuPageState extends State<UserMenuPage> {
   Future<void> fetchStoresByCategory(String category) async {
     try {
       // SelectCategoryService 인스턴스를 통해 카테고리에 해당하는 가게 정보를 가져옴
-      List<SelectCategoryModel> fetchedStores =
+      List<StoreModel> fetchedStores =
           await selectCategoryService.getSelectCategory(category);
 
       // 상태를 업데이트하여 가져온 가게 정보를 stores 리스트에 저장
@@ -669,6 +667,8 @@ class _UserMenuPageState extends State<UserMenuPage> {
                 ),
               ),
               const SizedBox(height: 18),
+
+              // 가게 리스트
               Expanded(
                 child: ListView.builder(
                   itemCount: stores.length,
@@ -679,7 +679,9 @@ class _UserMenuPageState extends State<UserMenuPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const UserMenuSelectPage(),
+                            builder: (context) => UserMenuSelectPage(
+                              store: store,
+                            ),
                           ),
                         );
                       },
