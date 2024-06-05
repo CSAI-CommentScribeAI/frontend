@@ -356,7 +356,7 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
 
   Widget allMenuSection() {
     return FutureBuilder<List<AddMenuModel>>(
-      future: userMenuService().fetchMenus(),
+      future: userMenuService().fetchMenus('${widget.store.id}'),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
