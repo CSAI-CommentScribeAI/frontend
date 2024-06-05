@@ -181,69 +181,56 @@ class _UserHomePageState extends State<UserHomePage> {
                   ],
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 19.0),
 
-              // 검색창 필드
-              GestureDetector(
-                onTap: () {
-                  // 검색 화면으로 이동
-                  showSearch(
-                    context: context,
-                    delegate: MenuSearchDelegate(futureStores),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 19.0),
-                  child: Container(
-                    padding: const EdgeInsets.only(left: 14),
-                    width: 400,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF374AA3).withOpacity(0.5),
-                          blurRadius: 4,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // 검색창
-                        Row(
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(left: 4.0),
-                              child: Icon(
+                // 검색 창
+                child: Container(
+                  padding: const EdgeInsets.only(left: 14),
+                  width: 400,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF374AA3).withOpacity(0.5),
+                        blurRadius: 4,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                          onPressed: () {
+                            // 검색 화면으로 이동
+                            showSearch(
+                              context: context,
+                              delegate: MenuSearchDelegate(futureStores),
+                            );
+                          },
+                          child: const Row(
+                            children: [
+                              Icon(
                                 Icons.search,
                                 color: Color(0xFFC6C2C2),
-                                size: 14,
+                                size: 20,
                               ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: TextField(
-                                controller: searchController,
-                                decoration: const InputDecoration(
-                                  hintText: '뭐든 다 좋아 다 나와라!!!',
-                                  hintStyle: TextStyle(
-                                    color: Color(0xFFC6C2C2),
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  border: InputBorder.none,
+                              SizedBox(width: 10),
+                              Text(
+                                '뭐든 다 좋아 다 나와라!!!',
+                                style: TextStyle(
+                                  color: Color(0xFFC6C2C2),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                            ],
+                          ))
+                    ],
                   ),
                 ),
               ),
