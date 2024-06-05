@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/user/screens/menuSelect_screen.dart';
+import 'package:frontend/user/screens/storeSelect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
+import 'package:frontend/user/models/selectCategory_model.dart';
+import 'package:frontend/user/services/selectCategory_service.dart';
 
 class UserHomePage extends StatefulWidget {
   final String accessToken;
@@ -10,19 +14,7 @@ class UserHomePage extends StatefulWidget {
 }
 
 class _UserHomePageState extends State<UserHomePage> {
-  final List<Map<String, String>> menuItems = [
-    {'image': 'assets/images/hamburger.png', 'name': '햄버거'},
-    {'image': 'assets/images/chicken1.png', 'name': '치킨'},
-    {'image': 'assets/images/pizza.png', 'name': '피자'},
-    {'image': 'assets/images/koreanfood.png', 'name': '한식'},
-    {'image': 'assets/images/deliverylogo.png', 'name': 'CSAI'},
-    {'image': 'assets/images/japanesefood.png', 'name': '일식'},
-    {'image': 'assets/images/koreanstreetfood.png', 'name': '분식'},
-    {'image': 'assets/images/chinesefood.png', 'name': '중식'},
-    {'image': 'assets/images/dessert.png', 'name': '디저트'},
-  ];
-
-  List<Map<String, String>> filteredMenuItems = [];
+  List<SelectCategoryModel> categories = [];
   TextEditingController searchController = TextEditingController();
   String userAddress = '주소를 설정하세요'; // 고객 주소
   String fullAddress = '';
@@ -30,31 +22,27 @@ class _UserHomePageState extends State<UserHomePage> {
   @override
   void initState() {
     super.initState();
-    filteredMenuItems = menuItems;
+    fetchCategories(); // 카테고리 정보를 가져오는 메서드를 호출하여 초기화 시 데이터 로드
   }
 
-  void filterSearchResults(String query) {
-    List<Map<String, String>> dummySearchList = [];
-    dummySearchList.addAll(menuItems);
-    if (query.isNotEmpty) {
-      List<Map<String, String>> dummyListData = [];
-      for (var item in dummySearchList) {
-        if (item['name']!.contains(query)) {
-          dummyListData.add(item);
-        }
-      }
-      setState(() {
-        filteredMenuItems = dummyListData;
-      });
-      return;
-    } else {
-      setState(() {
-        filteredMenuItems = menuItems;
-      });
-    }
+// 카테고리 정보를 서버에서 가져오는 메서드
+  void fetchCategories() async {
+    // SelectCategoryService 인스턴스를 생성
+    SelectCategoryService categoryService = SelectCategoryService();
+
+    // categoryService를 사용하여 카테고리 정보를 비동기적으로 가져옴
+    List<SelectCategoryModel> fetchedCategories =
+        await categoryService.getCategory(0);
+
+    // 상태를 업데이트하여 가져온 카테고리 정보를 categories 리스트에 저장
+    setState(() {
+      categories = fetchedCategories;
+    });
   }
 
-  // 받아온 주소 값을 사용자 주소(userAddress)에  실시간저장
+  void filterSearchResults(String query) {}
+
+  // 받아온 주소 값을 사용자 주소(userAddress)에 실시간 저장
   void onUserAdddressSelected(String fullAddress) {
     setState(() {
       userAddress = fullAddress;
@@ -326,50 +314,67 @@ class _UserHomePageState extends State<UserHomePage> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 19.0),
-                  child: GridView.count(
-                    crossAxisCount: 3, // 3 x 3
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    children: List.generate(menuItems.length, (index) {
-                      bool isDeliveryLogo = menuItems[index]['image'] ==
-                          'assets/images/deliverylogo.png';
-                      return Container(
-                        padding: const EdgeInsets.all(8.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF374AA3).withOpacity(0.5),
-                              blurRadius: 4,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              menuItems[index]['image']!,
-                              height: isDeliveryLogo ? 108 : 50,
-                              width: isDeliveryLogo ? 108 : 50,
-                            ),
-                            if (!isDeliveryLogo) ...[
-                              const SizedBox(height: 10),
-                              Text(
-                                menuItems[index]['name']!,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
+                  child: categories.isEmpty
+                      ? const Center(child: CircularProgressIndicator())
+                      : GridView.count(
+                          crossAxisCount: 3, // 3 x 3
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          children: List.generate(categories.length, (index) {
+                            bool isDeliveryLogo =
+                                categories[index].category == 'CSAI';
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => UserMenuPage(
+                                      category: categories[index].category,
+                                    ),
+                                  ),
+                                );
+                                print(
+                                    "Food item ${categories[index].category} clicked!"); // Example
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF374AA3)
+                                          .withOpacity(0.5),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/${categories[index].category.toLowerCase()}.png',
+                                      height: isDeliveryLogo ? 108 : 50,
+                                      width: isDeliveryLogo ? 108 : 50,
+                                    ),
+                                    if (!isDeliveryLogo) ...[
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        categories[index].category,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                               ),
-                            ],
-                          ],
+                            );
+                          }),
                         ),
-                      );
-                    }),
-                  ),
                 ),
               ),
             ],
