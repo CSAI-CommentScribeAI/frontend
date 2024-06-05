@@ -5,8 +5,7 @@ import 'package:frontend/user/services/userMenu_service.dart';
 import 'package:intl/intl.dart';
 
 class UserMenuSelectPage extends StatefulWidget {
-  final String accessToken;
-  const UserMenuSelectPage(this.accessToken, {super.key});
+  const UserMenuSelectPage({super.key});
 
   @override
   State<UserMenuSelectPage> createState() => _UserMenuSelectPageState();
