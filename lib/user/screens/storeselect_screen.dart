@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/screens/menuSelect_screen.dart';
 import 'package:frontend/user/models/selectCategory_model.dart';
 import 'package:frontend/user/services/selectCategory_service.dart';
@@ -707,8 +708,8 @@ class _UserMenuPageState extends State<UserMenuPage> {
                                 child: SizedBox(
                                   width: MediaQuery.of(context).size.width / 3,
                                   height: 132,
-                                  child: Image.asset(
-                                    'assets/images/pizzalogo.png',
+                                  child: Image.network(
+                                    store.storeImageUrl,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -731,22 +732,22 @@ class _UserMenuPageState extends State<UserMenuPage> {
                                       ),
                                       const SizedBox(height: 8),
                                       Text(
-                                        '최소 주문 ${store.minOrder}원',
+                                        '최소 주문 ${store.minOrderPrice}원',
                                         style: const TextStyle(
                                           fontSize: 12,
                                           color: Color(0xFF808080),
                                         ),
                                       ),
                                       const SizedBox(height: 4),
-                                      Row(
+                                      const Row(
                                         children: [
-                                          const Icon(Icons.star,
+                                          Icon(Icons.star,
                                               color: Color(0xFFDFB300),
                                               size: 15),
-                                          const SizedBox(width: 4),
+                                          SizedBox(width: 4),
                                           Text(
-                                            store.rating.toString(),
-                                            style: const TextStyle(
+                                            '4.5',
+                                            style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.black,
                                             ),

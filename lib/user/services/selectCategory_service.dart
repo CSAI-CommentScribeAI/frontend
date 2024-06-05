@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:frontend/user/models/selectCategory_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';

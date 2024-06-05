@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/screens/menuSelect_screen.dart';
 import 'package:frontend/user/screens/storeSelect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
