@@ -5,6 +5,7 @@ class MenuSearchDelegate extends SearchDelegate {
   final Future<List<StoreModel>> storeItems; // 모든 가게 정보 리스트
   late Future<List<StoreModel>> filteredStoreItems;
 
+  // query가 변경될 때마다 filterSearchResults 메서드를 호출하여 즉시 filteredStoreItems를 업데이트
   MenuSearchDelegate(this.storeItems) {
     storeItems.then((value) {
       filteredStoreItems = Future.value(value);
@@ -42,7 +43,7 @@ class MenuSearchDelegate extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     return FutureBuilder<List<StoreModel>>(
-      future: filterSearchResults(query),
+      future: filterSearchResults(query), // 필터링된 결과 가져오기
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -63,7 +64,7 @@ class MenuSearchDelegate extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     return FutureBuilder<List<StoreModel>>(
-      future: filterSearchResults(query),
+      future: filterSearchResults(query), //
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -85,13 +86,14 @@ class MenuSearchDelegate extends SearchDelegate {
       List<StoreModel> filteredList = [];
 
       for (var item in userStores) {
+        // 검색어가 가게 이름에 포함이 되어있으면
         if (item.name.toLowerCase().contains(query.toLowerCase())) {
           filteredList.add(item);
         }
       }
-      return Future.value(filteredList);
+      return Future.value(filteredList); // 해당 검색 결과 리스트 반환
     } else {
-      return Future.value(userStores);
+      return Future.value(userStores); // 없으면 모든 가게 리스트 반환
     }
   }
 
@@ -100,8 +102,89 @@ class MenuSearchDelegate extends SearchDelegate {
     return ListView.builder(
       itemCount: items.length,
       itemBuilder: (context, index) {
-        return ListTile(
-          title: Text(items[index].name),
+        // 가게 정보 박스
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                height: 132,
+                padding: const EdgeInsets.only(right: 20.0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFFFF),
+                  borderRadius: BorderRadius.circular(15.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.25),
+                      offset: const Offset(0, 4),
+                      blurRadius: 4.0,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(15.0), // 둥근 정도
+                      child: SizedBox(
+                        width:
+                            MediaQuery.of(context).size.width / 3, // 가로 너비의 1/3
+                        height: 132,
+                        // 주소를 사용하기 때문에 network 사용
+                        child: Image.network(
+                          items[index].storeImageUrl,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              items[index].name,
+                              style: const TextStyle(
+                                fontSize: 22, // 폰트 크기
+                                fontWeight: FontWeight.bold, // 폰트 굵기
+                                color: Colors.black, // 폰트 색상
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '최소 주문 ${items[index].minOrderPrice}원',
+                              style: const TextStyle(
+                                fontSize: 12, // 폰트 크기
+                                color: Color(0xFF808080), // 폰트 색상
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Row(
+                              children: [
+                                Icon(Icons.star,
+                                    color: Color(0xFFDFB300), size: 15),
+                                SizedBox(width: 4), // 별점과 숫자 간의 간격
+                                Text(
+                                  '4.39',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
         );
       },
     );
