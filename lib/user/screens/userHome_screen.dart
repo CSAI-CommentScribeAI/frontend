@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/screens/menuselect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
+import 'package:frontend/user/services/userStore_service.dart';
+import 'package:frontend/user/widgets/menuSearch_widget.dart';
+// import 'package:frontend/user/services/userStore_service.dart';
+// import 'package:frontend/user/widgets/menuSearch_widget.dart';
 
 class UserHomePage extends StatefulWidget {
   final String accessToken;
@@ -10,6 +16,7 @@ class UserHomePage extends StatefulWidget {
 }
 
 class _UserHomePageState extends State<UserHomePage> {
+  // 카테고리에 사용할 리스트
   final List<Map<String, String>> menuItems = [
     {'image': 'assets/images/hamburger.png', 'name': '햄버거'},
     {'image': 'assets/images/chicken1.png', 'name': '치킨'},
@@ -22,43 +29,23 @@ class _UserHomePageState extends State<UserHomePage> {
     {'image': 'assets/images/dessert.png', 'name': '디저트'},
   ];
 
-  List<Map<String, String>> filteredMenuItems = [];
+  late Future<List<StoreModel>> futureStores;
   TextEditingController searchController = TextEditingController();
   String userAddress = '주소를 설정하세요'; // 고객 주소
   String fullAddress = '';
-
-  @override
-  void initState() {
-    super.initState();
-    filteredMenuItems = menuItems;
-  }
-
-  void filterSearchResults(String query) {
-    List<Map<String, String>> dummySearchList = [];
-    dummySearchList.addAll(menuItems);
-    if (query.isNotEmpty) {
-      List<Map<String, String>> dummyListData = [];
-      for (var item in dummySearchList) {
-        if (item['name']!.contains(query)) {
-          dummyListData.add(item);
-        }
-      }
-      setState(() {
-        filteredMenuItems = dummyListData;
-      });
-      return;
-    } else {
-      setState(() {
-        filteredMenuItems = menuItems;
-      });
-    }
-  }
 
   // 받아온 주소 값을 사용자 주소(userAddress)에  실시간저장
   void onUserAdddressSelected(String fullAddress) {
     setState(() {
       userAddress = fullAddress;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    futureStores =
+        UserStoreService().getManyStores(); // 모든 가게 리스트를 futureStores에 저장
   }
 
   @override
@@ -152,7 +139,7 @@ class _UserHomePageState extends State<UserHomePage> {
         child: Center(
           child: Column(
             children: [
-              // 첫 번째 박스
+              // 오늘의 배달 Tip
               Container(
                 width: 400,
                 height: 88,
@@ -194,9 +181,10 @@ class _UserHomePageState extends State<UserHomePage> {
                   ],
                 ),
               ),
-              // 두 번째 박스
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 19.0),
+
+                // 검색 창
                 child: Container(
                   padding: const EdgeInsets.only(left: 14),
                   width: 400,
@@ -216,43 +204,39 @@ class _UserHomePageState extends State<UserHomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(left: 4.0),
-                            child: Icon(
-                              Icons.search,
-                              color: Color(0xFFC6C2C2),
-                              size: 14,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            child: TextField(
-                              onChanged: (value) {
-                                filterSearchResults(value);
-                              },
-                              controller: searchController,
-                              decoration: const InputDecoration(
-                                hintText: '뭐든 다 좋아 다 나와라!!!',
-                                hintStyle: TextStyle(
+                      TextButton(
+                          onPressed: () {
+                            // 검색 화면으로 이동
+                            showSearch(
+                              context: context,
+                              delegate: MenuSearchDelegate(futureStores),
+                            );
+                          },
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.search,
+                                color: Color(0xFFC6C2C2),
+                                size: 20,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                '뭐든 다 좋아 다 나와라!!!',
+                                style: TextStyle(
                                   color: Color(0xFFC6C2C2),
-                                  fontSize: 11,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
-                                border: InputBorder.none,
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
+                            ],
+                          ))
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 13),
+
+              // 광고
               Container(
                 // 세 번째 박스
                 height: 127,
@@ -333,39 +317,50 @@ class _UserHomePageState extends State<UserHomePage> {
                     children: List.generate(menuItems.length, (index) {
                       bool isDeliveryLogo = menuItems[index]['image'] ==
                           'assets/images/deliverylogo.png';
-                      return Container(
-                        padding: const EdgeInsets.all(8.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF374AA3).withOpacity(0.5),
-                              blurRadius: 4,
-                              offset: const Offset(0, 4),
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  UserMenuSelectPage(widget.accessToken),
                             ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              menuItems[index]['image']!,
-                              height: isDeliveryLogo ? 108 : 50,
-                              width: isDeliveryLogo ? 108 : 50,
-                            ),
-                            if (!isDeliveryLogo) ...[
-                              const SizedBox(height: 10),
-                              Text(
-                                menuItems[index]['name']!,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF374AA3).withOpacity(0.5),
+                                blurRadius: 4,
+                                offset: const Offset(0, 4),
                               ),
                             ],
-                          ],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                menuItems[index]['image']!,
+                                height: isDeliveryLogo ? 108 : 50,
+                                width: isDeliveryLogo ? 108 : 50,
+                              ),
+                              if (!isDeliveryLogo) ...[
+                                const SizedBox(height: 10),
+                                Text(
+                                  menuItems[index]['name']!,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                       );
                     }),
