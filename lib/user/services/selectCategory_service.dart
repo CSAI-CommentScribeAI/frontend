@@ -2,21 +2,19 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:frontend/user/models/selectCategory_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SelectCategoryService {
   late String serverAddress;
 
   // 카테고리 가져오기 API
-  Future<List<SelectCategoryModel>> getCategory(
-      int selectedCategoryIndex) async {
+  Future<List<StoreModel>> getCategory(int selectedCategoryIndex) async {
     // SharedPreferences에서 액세스 토큰을 가져옴
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
 
     // 카테고리 인스턴스를 저장할 리스트를 생성
-    List<SelectCategoryModel> categoryInstance = [];
+    List<StoreModel> categoryInstance = [];
 
     // 현재 플랫폼에 따라 서버 주소 설정
     if (Platform.isAndroid) {
@@ -49,7 +47,7 @@ class SelectCategoryService {
 
           // 각 카테고리를 SelectCategoryModel 인스턴스로 변환하여 리스트에 추가
           for (var category in categories) {
-            categoryInstance.add(SelectCategoryModel.fromJson(category));
+            categoryInstance.add(StoreModel.fromJson(category));
           }
 
           print('조회 성공 $categoryInstance');
@@ -73,9 +71,9 @@ class SelectCategoryService {
   }
 
   // 카테고리별 가게 조회 API
-  Future<List<SelectCategoryModel>> getSelectCategory(String category) async {
+  Future<List<StoreModel>> getSelectCategory(String category) async {
     // 가게 인스턴스를 저장할 리스트 생성
-    List<SelectCategoryModel> categorySelectInstance = [];
+    List<StoreModel> categorySelectInstance = [];
 
     // 현재 플랫폼에 따라 서버 주소 설정.
     if (Platform.isAndroid) {
@@ -110,7 +108,7 @@ class SelectCategoryService {
 
           // 각 가게를 SelectCategoryModel 인스턴스로 변환하여 리스트에 추가
           for (var store in stores) {
-            categorySelectInstance.add(SelectCategoryModel.fromJson(store));
+            categorySelectInstance.add(StoreModel.fromJson(store));
           }
 
           print('조회 성공 $categorySelectInstance');
@@ -122,7 +120,7 @@ class SelectCategoryService {
 
           // 각 가게를 SelectCategoryModel 인스턴스로 변환하여 리스트에 추가
           for (var store in stores) {
-            categorySelectInstance.add(SelectCategoryModel.fromJson(store));
+            categorySelectInstance.add(StoreModel.fromJson(store));
           }
 
           print('조회 성공 $categorySelectInstance');

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_pannable_rating_bar/flutter_pannable_rating_bar.dart';
+import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/screens/userHome_screen.dart';
@@ -8,9 +9,9 @@ import 'package:image_picker/image_picker.dart';
 
 class writeReviewPage extends StatefulWidget {
   final String store;
-  final Map<String, dynamic>? menu;
+  final AddMenuModel? userMenu;
 
-  const writeReviewPage(this.store, this.menu, {super.key});
+  const writeReviewPage(this.store, this.userMenu, {super.key});
 
   @override
   State<writeReviewPage> createState() => _writeReviewPageState();
@@ -154,7 +155,7 @@ class _writeReviewPageState extends State<writeReviewPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CartPage(widget.menu!),
+                        builder: (context) => CartPage(widget.userMenu!),
                       ),
                     );
                   },

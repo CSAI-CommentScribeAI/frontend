@@ -1,12 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:frontend/user/screens/cart_screen.dart';
+import 'package:frontend/owner/models/menu_model.dart';
+import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/services/userMenu_service.dart';
 import 'package:intl/intl.dart';
 
 class UserMenuSelectPage extends StatefulWidget {
-  final String accessToken;
-  const UserMenuSelectPage(this.accessToken, {super.key});
+  final StoreModel store;
+  const UserMenuSelectPage({required this.store, super.key});
 
   @override
   State<UserMenuSelectPage> createState() => _UserMenuSelectPageState();
@@ -100,33 +100,6 @@ void showReviewsBottomSheet(BuildContext context) {
 class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
   var f = NumberFormat('###,###,###,###'); // 숫자 세자리마다 콤마 넣는 코드
 
-  List<Map<String, dynamic>> menuList = [
-    {
-      'store': '피자에 미치다 교대역점',
-      'title': '페퍼로니 알리오올리오',
-      'price': 20000,
-      'detailMenu': '토마토 소스 위에 페퍼로니를 크리스피하게 굽고, 버진 올리브유와 편마늘, 페퍼론치노의 조화',
-      'goodNum': 211,
-      'menuImg': 'assets/images/menupizza.png',
-    },
-    {
-      'store': '피자에 미치다 교대역점',
-      'title': '시칠리안 갈릭쉬림프',
-      'price': 19900,
-      'detailMenu': '매콤한 살사 소스와 도톰한 새우와 베이컨, 마늘을 곁들인 뒤 루꼴라와 샤워크림으로 마무리',
-      'goodNum': 189,
-      'menuImg': 'assets/images/menushrimp.png',
-    },
-    {
-      'store': '피자에 미치다 교대역점',
-      'title': '시칠리안 갈릭쉬림프',
-      'price': 19900,
-      'detailMenu': '매콤한 살사 소스와 도톰한 새우와 베이컨, 마늘을 곁들인 뒤 루꼴라와 샤워크림으로 마무리',
-      'goodNum': 189,
-      'menuImg': 'assets/images/menushrimp.png',
-    }
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -165,7 +138,7 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
         child: Column(
           children: [
             Hero(
-              tag: 'selectMenu',
+              tag: widget.store.id,
               child: Container(
                 width: double.infinity,
                 height: 132,
@@ -188,44 +161,44 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width / 3,
                         height: 132,
-                        child: Image.asset(
-                          'assets/images/pizzalogo.png',
+                        child: Image.network(
+                          widget.store.storeImageUrl,
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
-                    const Expanded(
+                    Expanded(
                       child: Padding(
-                        padding: EdgeInsets.only(left: 16.0),
+                        padding: const EdgeInsets.only(left: 16.0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '피자에 미치다 교대역점',
-                              style: TextStyle(
+                              widget.store.name,
+                              style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
-                              '최소 주문 16,000원',
-                              style: TextStyle(
+                              '최소 주문 ${f.format(widget.store.minOrderPrice)}원',
+                              style: const TextStyle(
                                 fontSize: 12,
                                 color: Color(0xFF808080),
                               ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Row(
                               children: [
-                                Icon(Icons.star,
+                                const Icon(Icons.star,
                                     color: Color(0xFFDFB300), size: 15),
-                                SizedBox(width: 4),
+                                const SizedBox(width: 4),
                                 Text(
-                                  '4.75',
-                                  style: TextStyle(
+                                  '${widget.store.rating}',
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.black,
                                   ),
@@ -280,21 +253,21 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Row(
+                  Row(
                     children: [
-                      Text(
+                      const Text(
                         '최소주문',
                         style: TextStyle(
                           fontSize: 14,
                           color: Color(0xFF808080),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 42,
                       ),
                       Text(
-                        '17,000원',
-                        style: TextStyle(
+                        '${f.format(widget.store.minOrderPrice)}원',
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
@@ -303,47 +276,49 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const Row(
+                  Row(
                     children: [
-                      Text(
+                      const Text(
                         '가게설명',
                         style: TextStyle(
                           fontSize: 14,
                           color: Color(0xFF808080),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 42,
                       ),
-                      Text(
-                        '피자에 미쳐버린 당신을 위해~~',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                      Expanded(
+                        child: Text(
+                          widget.store.info,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const Row(
+                  Row(
                     children: [
-                      Text(
+                      const Text(
                         '가게주소',
                         style: TextStyle(
                           fontSize: 14,
                           color: Color(0xFF808080),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 42,
                       ),
 
                       // overflow 방지로 Row 위젯의 경계를 벗어나지 않기 위해 줄바꿈 사용
                       Expanded(
                         child: Text(
-                          '서울특별시 서초구 서초대로50길 63 2층 202호',
-                          style: TextStyle(
+                          widget.store.fullAddress,
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -372,7 +347,7 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
               ),
             ),
             const Divider(), // 구분선
-            allMenuSection(), // 전체 메뉴 위젯 호출
+            Expanded(child: allMenuSection()), // 전체 메뉴 위젯 호출
           ],
         ),
       ),
@@ -380,109 +355,127 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
   }
 
   Widget allMenuSection() {
-    return Expanded(
-      child: SingleChildScrollView(
-        // 전체 메뉴 스크롤
-        child: Column(
-          children: menuList.map((menu) {
-            return Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CartPage(menu),
-                    ),
-                  );
-                },
-                child: Card(
-                  color: const Color(0xFFF3F3FF),
-                  elevation: 0,
-                  child: Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            flex: 2,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  menu['title'],
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  '${f.format(menu['price'])}원',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  menu['detailMenu'],
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF808080),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {},
-                                      child: Image.asset(
-                                        'assets/images/goodjob.png',
-                                        width: 24,
-                                        height: 24,
-                                      ),
+    return FutureBuilder<List<AddMenuModel>>(
+      future: userMenuService().fetchMenus('${widget.store.id}'),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(
+            child: Text('등록된 메뉴가 없습니다.'),
+          );
+        } else {
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            itemBuilder: (BuildContext context, int index) {
+              final userMenu = snapshot.data![index];
+              return Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: GestureDetector(
+                  onTap: () {
+                    // CartService()
+                    //     .putCart(2, userMenu, 1, '부산 가야밀면', widget.accessToken);
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => CartPage(userMenu),
+                    //   ),
+                    // );
+                  },
+                  child: Card(
+                    color: const Color(0xFFF3F3FF),
+                    elevation: 0,
+                    child: Column(
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              flex: 2,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    userMenu.name,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
                                     ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '${menu['goodNum']}명',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    '${f.format(userMenu.price)}원',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(5.0),
-                            child: SizedBox(
-                              width: 100,
-                              height: 100,
-                              child: Image.asset(
-                                menu['menuImg'],
-                                fit: BoxFit.fill,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    userMenu.menuDetail,
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF808080),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {},
+                                        child: Image.asset(
+                                          'assets/images/goodjob.png',
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      // Text(
+                                      //   '${menu['goodNum']}명',
+                                      //   style: const TextStyle(
+                                      //     fontSize: 14,
+                                      //     fontWeight: FontWeight.bold,
+                                      //     color: Colors.black,
+                                      //   ),
+                                      // ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      const Divider(),
-                    ],
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(5.0),
+                              child: SizedBox(
+                                width: 100,
+                                height: 100,
+                                child: Image.network(
+                                  userMenu.imageUrl,
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        const Divider(),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
+              );
+            },
+          );
+        }
+      },
     );
   }
 }

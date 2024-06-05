@@ -14,6 +14,7 @@ class StoreModel {
   final String openTime;
   final String closeTime;
   final String storeImageUrl;
+  final double? rating;
 
   StoreModel({
     required this.id,
@@ -31,6 +32,7 @@ class StoreModel {
     required this.openTime,
     required this.closeTime,
     required this.storeImageUrl,
+    this.rating,
   });
 
   factory StoreModel.fromJson(Map<String, dynamic> json) {
@@ -53,6 +55,10 @@ class StoreModel {
       openTime: json['openTime'] ?? '',
       closeTime: json['closeTime'] ?? '',
       storeImageUrl: json['storeImageUrl'] ?? '',
+      rating: (json['rating'] is double
+              ? json['rating']
+              : double.tryParse(json['rating']?.toString() ?? '0.0')) ??
+          0.0,
     );
   }
 }

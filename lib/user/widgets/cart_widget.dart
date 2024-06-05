@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cart_stepper/cart_stepper.dart';
+import 'package:frontend/owner/models/menu_model.dart';
 import 'package:intl/intl.dart';
 
 class CartWidget extends StatefulWidget {
-  final Map<String, dynamic> menu;
-  const CartWidget(this.menu, {super.key});
+  final AddMenuModel userMenu;
+  const CartWidget(this.userMenu, {super.key});
 
   @override
   State<CartWidget> createState() => _CartWidgetState();
@@ -35,9 +36,9 @@ class _CartWidgetState extends State<CartWidget> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     // 주문 가게 이름
                     children: [
-                      Text(
-                        widget.menu['store'],
-                        style: const TextStyle(
+                      const Text(
+                        '가게 이름',
+                        style: TextStyle(
                           fontSize: 16,
                           color: Color(0xFF808080),
                         ),
@@ -57,7 +58,7 @@ class _CartWidgetState extends State<CartWidget> {
 
                   // 주문 메뉴 이름
                   Text(
-                    widget.menu['title'],
+                    widget.userMenu.name,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -71,7 +72,7 @@ class _CartWidgetState extends State<CartWidget> {
                       Column(
                         children: [
                           Text(
-                            '⋅ 가격: ${f.format(widget.menu['price'])}원\n⋅ 주문날짜: 2024.04.25 11:43',
+                            '⋅ 가격: ${f.format(widget.userMenu.price)}원\n⋅ 주문날짜: 2024.04.25 11:43',
                             style: const TextStyle(
                               fontSize: 13,
                               color: Color(0xFF808080),
@@ -80,7 +81,7 @@ class _CartWidgetState extends State<CartWidget> {
                           const SizedBox(height: 47),
                           Row(
                             children: [
-                              Text('${f.format(widget.menu['price'])}원'),
+                              Text('${f.format(widget.userMenu.price)}원'),
                               const SizedBox(width: 10),
 
                               // 수량 증가/감소 버튼
@@ -108,7 +109,12 @@ class _CartWidgetState extends State<CartWidget> {
                         ],
                       ),
                       // 주문 메뉴 사진
-                      Image.asset(widget.menu['menuImg']),
+                      Image.network(
+                        widget.userMenu.imageUrl,
+                        width: 120,
+                        height: 120,
+                        alignment: Alignment.topRight,
+                      ),
                     ],
                   ),
                 ],

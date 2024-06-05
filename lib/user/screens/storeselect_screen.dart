@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
-import 'package:frontend/user/screens/menuSelect_screen.dart';
-import 'package:frontend/user/models/selectCategory_model.dart';
+import 'package:frontend/user/screens/menuselect_screen.dart';
 import 'package:frontend/user/services/selectCategory_service.dart';
 
 class UserMenuPage extends StatefulWidget {
@@ -9,16 +8,16 @@ class UserMenuPage extends StatefulWidget {
   const UserMenuPage({required this.category, super.key});
 
   @override
-  State<UserMenuPage> createState() => _UserStoreSelectPageState();
+  State<UserMenuPage> createState() => _UserMenuPageState();
 }
 
-class _UserStoreSelectPageState extends State<UserMenuPage> {
+class _UserMenuPageState extends State<UserMenuPage> {
   int selectedButtonIndex = -1;
-  double _rating = 1.0; // 별점
-  double _deliveryFee = 0; // 배달비
-  double _minOrder = 3000; // 최소주문
-  List<SelectCategoryModel> stores = [];
-  final SelectCategoryService _selectCategoryService = SelectCategoryService();
+  double rating = 1.0; // 별점
+  double deliveryFee = 0; // 배달비
+  double minOrder = 3000; // 최소주문
+  List<StoreModel> stores = [];
+  final SelectCategoryService selectCategoryService = SelectCategoryService();
 
   @override
   void initState() {
@@ -45,8 +44,8 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
   Future<void> fetchStoresByCategory(String category) async {
     try {
       // SelectCategoryService 인스턴스를 통해 카테고리에 해당하는 가게 정보를 가져옴
-      List<SelectCategoryModel> fetchedStores =
-          await _selectCategoryService.getSelectCategory(category);
+      List<StoreModel> fetchedStores =
+          await selectCategoryService.getSelectCategory(category);
 
       // 상태를 업데이트하여 가져온 가게 정보를 stores 리스트에 저장
       setState(() {
@@ -94,15 +93,15 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                 ),
                 Slider(
                   // 별점 범위 필터링
-                  value: _rating,
+                  value: rating,
                   min: 1,
                   max: 5,
                   divisions: 4,
-                  label: '${_rating.toStringAsFixed(1)}점 이상',
+                  label: '${rating.toStringAsFixed(1)}점 이상',
                   activeColor: const Color(0xFF7E7EB2), // 채워진 부분의 색상
                   onChanged: (value) {
                     setState(() {
-                      _rating = value;
+                      rating = value;
                     });
                   },
                 ),
@@ -112,7 +111,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _rating = 1;
+                          rating = 1;
                         });
                       },
                       child: const Text(
@@ -127,7 +126,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _rating = 2;
+                          rating = 2;
                         });
                       },
                       child: const Text(
@@ -142,7 +141,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _rating = 3;
+                          rating = 3;
                         });
                       },
                       child: const Text(
@@ -157,7 +156,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _rating = 4;
+                          rating = 4;
                         });
                       },
                       child: const Text(
@@ -172,7 +171,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _rating = 5;
+                          rating = 5;
                         });
                       },
                       child: const Text(
@@ -199,16 +198,15 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                 ),
                 Slider(
                   // 배달비 범위 필터링
-                  value: _deliveryFee,
+                  value: deliveryFee,
                   min: 0,
                   max: 4000,
                   divisions: 4,
-                  label:
-                      _deliveryFee == 0 ? '무료배달' : '${_deliveryFee.toInt()}원',
+                  label: deliveryFee == 0 ? '무료배달' : '${deliveryFee.toInt()}원',
                   activeColor: const Color(0xFF7E7EB2), // 채워진 부분의 색상
                   onChanged: (value) {
                     setState(() {
-                      _deliveryFee = value;
+                      deliveryFee = value;
                     });
                   },
                 ),
@@ -218,7 +216,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _deliveryFee = 0;
+                          deliveryFee = 0;
                         });
                       },
                       child: const Text(
@@ -233,7 +231,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _deliveryFee = 1000;
+                          deliveryFee = 1000;
                         });
                       },
                       child: const Text(
@@ -248,7 +246,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _deliveryFee = 2000;
+                          deliveryFee = 2000;
                         });
                       },
                       child: const Text(
@@ -263,7 +261,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _deliveryFee = 3000;
+                          deliveryFee = 3000;
                         });
                       },
                       child: const Text(
@@ -278,7 +276,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _deliveryFee = 4000;
+                          deliveryFee = 4000;
                         });
                       },
                       child: const Text(
@@ -305,15 +303,15 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                 ),
                 Slider(
                   // 최소주문 범위 필터링
-                  value: _minOrder,
+                  value: minOrder,
                   min: 3000,
                   max: 15000,
                   divisions: 4,
-                  label: '${_minOrder.toInt()}원',
+                  label: '${minOrder.toInt()}원',
                   activeColor: const Color(0xFF7E7EB2), // 채워진 부분의 색상
                   onChanged: (value) {
                     setState(() {
-                      _minOrder = value;
+                      minOrder = value;
                     });
                   },
                 ),
@@ -323,7 +321,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _minOrder = 3000;
+                          minOrder = 3000;
                         });
                       },
                       child: const Text(
@@ -338,7 +336,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _minOrder = 6000;
+                          minOrder = 6000;
                         });
                       },
                       child: const Text(
@@ -353,7 +351,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _minOrder = 9000;
+                          minOrder = 9000;
                         });
                       },
                       child: const Text(
@@ -368,7 +366,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _minOrder = 12000;
+                          minOrder = 12000;
                         });
                       },
                       child: const Text(
@@ -383,7 +381,7 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _minOrder = 15000;
+                          minOrder = 15000;
                         });
                       },
                       child: const Text(
@@ -669,6 +667,8 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                 ),
               ),
               const SizedBox(height: 18),
+
+              // 가게 리스트
               Expanded(
                 child: ListView.builder(
                   itemCount: stores.length,
@@ -679,12 +679,14 @@ class _UserStoreSelectPageState extends State<UserMenuPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const UserMenuSelectPage(),
+                            builder: (context) => UserMenuSelectPage(
+                              store: store,
+                            ),
                           ),
                         );
                       },
                       child: Hero(
-                        tag: "selectMenu_$index",
+                        tag: store.id, // 가게 아이디로 태그 설정
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 18),
                           width: double.infinity,
