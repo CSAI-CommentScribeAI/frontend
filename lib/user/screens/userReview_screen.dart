@@ -79,8 +79,7 @@ class _UserReviewPageState extends State<UserReviewPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            CartPage(widget.store!, widget.userMenu!),
+                        builder: (context) => const CartItemPage(),
                       ),
                     );
                   },

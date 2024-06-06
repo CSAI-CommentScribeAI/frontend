@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:frontend/owner/models/menu_model.dart';
+import 'package:frontend/user/models/cartMenu_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,9 +9,8 @@ class CartService {
   String serverAddress = '';
   int? currentStoreId; // 현재 장바구니에 담긴 가게 ID를 저장
 
-  Future<void> putCart(
-    AddMenuModel userMenu,
-  ) async {
+  // 장바구니 담기 api
+  Future<void> putCart(AddMenuModel userMenu) async {
     // SharedPreferences에서 액세스 토큰을 가져옴
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
@@ -40,12 +40,65 @@ class CartService {
       );
 
       if (response.statusCode == 200) {
-        print('담기 성공');
+        final utf8Response = utf8.decode(response.bodyBytes);
+        final jsonResponse = jsonDecode(utf8Response);
+        print('담기 성공: $jsonResponse');
       } else {
-        throw Exception('담기 실패');
+        throw Exception('담기 실패: ${response.body}');
       }
     } catch (e) {
-      throw Exception(e.toString());
+      print('Error: $e');
+      throw Exception('예외 발생: ${e.toString()}');
+    }
+  }
+
+  // 장바구니 조회 api
+  Future<List<CartMenuModel>> getCart() async {
+    List<CartMenuModel> cartInstance = [];
+
+    // SharedPreferences에서 액세스 토큰을 가져옴
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
+
+    if (Platform.isAndroid) {
+      serverAddress = 'http://10.0.2.2:9000/api/v1/cart';
+    } else if (Platform.isIOS) {
+      serverAddress = 'http://127.0.0.1:9000/api/v1/cart';
+    }
+
+    try {
+      final url = Uri.parse(serverAddress);
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final utf8Response = utf8.decode(response.bodyBytes);
+        final dynamic jsonResponse = jsonDecode(utf8Response);
+
+        if (jsonResponse is Map<String, dynamic> &&
+            jsonResponse['data']['cartItems'] is List) {
+          final List<dynamic> carts = jsonResponse['data']['cartItems'];
+          print('JSON 데이터: ${jsonResponse['data']}');
+
+          for (var cart in carts) {
+            cartInstance.add(CartMenuModel.fromJson(cart));
+          }
+        }
+        print('조회 성공: $cartInstance');
+
+        return cartInstance;
+      } else {
+        print('조회 실패');
+        return [];
+      }
+    } catch (e) {
+      print(e.toString());
+      return [];
     }
   }
 }

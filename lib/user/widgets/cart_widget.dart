@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
-import 'package:frontend/user/screens/menuselect_screen.dart';
-import 'package:frontend/user/screens/storeselect_screen.dart';
 import 'package:intl/intl.dart';
 
 class CartWidget extends StatefulWidget {

@@ -388,8 +388,7 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              CartPage(widget.store, userMenu),
+                          builder: (context) => const CartItemPage(),
                         ),
                       );
                     } catch (e) {

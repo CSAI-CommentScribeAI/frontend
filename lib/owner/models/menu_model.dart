@@ -18,10 +18,10 @@ class AddMenuModel {
   });
 
   AddMenuModel.fromJson(Map<String, dynamic> json)
-      : id = json['id'] ?? '',
-        storeId = json['storeId'] ?? '',
+      : id = json['id'] ?? 0,
+        storeId = json['storeId'] ?? 0,
         name = json['name'] ?? '',
-        price = json['price'] ?? '',
+        price = json['price'] ?? 0,
         menuDetail = json['menuDetail'] ?? '',
         imageUrl = json['imageUrl'] ?? '',
         status = json['status'] ?? '';
