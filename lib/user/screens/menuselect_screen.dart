@@ -380,8 +380,7 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                 padding: const EdgeInsets.all(10.0),
                 child: GestureDetector(
                   onTap: () {
-                    CartService()
-                        .putCart(userMenu, 3, widget.store.fullAddress);
+                    CartService().putCart(userMenu);
                   },
                   child: Card(
                     color: const Color(0xFFF3F3FF),

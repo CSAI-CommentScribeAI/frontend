@@ -9,8 +9,6 @@ class CartService {
 
   Future<void> putCart(
     AddMenuModel userMenu,
-    int userId,
-    String storeAddress,
   ) async {
     // SharedPreferences에서 액세스 토큰을 가져옴
     final prefs = await SharedPreferences.getInstance();
@@ -24,25 +22,17 @@ class CartService {
     try {
       final url = Uri.parse(serverAddress);
 
-      // 먼저 CartItem을 데이터베이스에 저장
-      final addCartItemResponse = await http.post(url,
-          headers: {
-            'Authorization': 'Bearer $accessToken',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
-            'menuId': userMenu.id,
-            'menuName': userMenu.name,
-            'imageUrl': userMenu.imageUrl,
-          }));
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(userMenu),
+      );
 
-      if (addCartItemResponse.statusCode == 200) {
-        final addToCartResponse = await http.post(url,
-            headers: {
-              'Authorization': 'Bearer $accessToken',
-              'Content-Type': 'application/json',
-            },
-            body: jsonEncode({}));
+      if (response.statusCode == 200) {
+        print('담기 성공');
       } else {
         print('담기 실패');
       }
