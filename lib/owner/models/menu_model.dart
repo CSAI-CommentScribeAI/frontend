@@ -1,4 +1,6 @@
 class AddMenuModel {
+  final int id;
+  final int storeId;
   final String name;
   final int price;
   final String menuDetail;
@@ -6,6 +8,8 @@ class AddMenuModel {
   final String status;
 
   AddMenuModel({
+    required this.id,
+    required this.storeId,
     required this.name,
     required this.price,
     required this.menuDetail,
@@ -14,7 +18,9 @@ class AddMenuModel {
   });
 
   AddMenuModel.fromJson(Map<String, dynamic> json)
-      : name = json['name'] ?? '',
+      : id = json['id'] ?? '',
+        storeId = json['storeId'] ?? '',
+        name = json['name'] ?? '',
         price = json['price'] ?? '',
         menuDetail = json['menuDetail'] ?? '',
         imageUrl = json['imageUrl'] ?? '',
@@ -22,6 +28,8 @@ class AddMenuModel {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
+      'storeId': storeId,
       'name': name,
       'price': price,
       'menuDetail': menuDetail,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/screens/userOrder_screen.dart';
 
@@ -7,9 +8,11 @@ import 'package:frontend/user/screens/userOrder_screen.dart';
 class OrderAndPayBtn extends StatelessWidget {
   final String title;
   final bool cart;
+  final StoreModel store;
   final AddMenuModel userMenu;
 
-  const OrderAndPayBtn(this.title, this.cart, this.userMenu, {super.key});
+  const OrderAndPayBtn(this.title, this.cart, this.store, this.userMenu,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +21,7 @@ class OrderAndPayBtn extends StatelessWidget {
         Navigator.push(
             context,
             cart
-                ? MaterialPageRoute(builder: (context) => const CompletePage())
+                ? MaterialPageRoute(builder: (context) => CompletePage(store))
                 : downToUpRoute());
       }, // 결제 화면으로 이동
       style: ElevatedButton.styleFrom(
@@ -42,7 +45,7 @@ class OrderAndPayBtn extends StatelessWidget {
   Route downToUpRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
-          UserOrderPage(userMenu),
+          UserOrderPage(store, userMenu),
 
       // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
       transitionsBuilder: (context, animation, secondaryAnimation, child) {

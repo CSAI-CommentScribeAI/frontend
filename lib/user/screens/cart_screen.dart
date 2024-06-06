@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:frontend/user/widgets/orderAndPay_widget.dart';
 
 class CartPage extends StatefulWidget {
+  final StoreModel store;
   final AddMenuModel userMenu;
-  const CartPage(this.userMenu, {super.key});
+  const CartPage(this.store, this.userMenu, {super.key});
 
   @override
   State<CartPage> createState() => _CartPageState();
@@ -41,11 +43,12 @@ class _CartPageState extends State<CartPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 24.0),
-        child: CartWidget(widget.userMenu),
+        child: CartWidget(widget.store.name, widget.store, widget.userMenu),
       ),
       bottomNavigationBar: OrderAndPayBtn(
         '주문하기',
         false,
+        widget.store,
         widget.userMenu,
       ),
     );
