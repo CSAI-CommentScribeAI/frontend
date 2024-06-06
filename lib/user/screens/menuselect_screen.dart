@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/screens/cart_screen.dart';
+import 'package:frontend/user/services/cart_service.dart';
 import 'package:frontend/user/services/userMenu_service.dart';
 import 'package:intl/intl.dart';
 
@@ -378,15 +380,37 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
               return Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: GestureDetector(
-                  onTap: () {
-                    // CartService()
-                    //     .putCart(2, userMenu, 1, '부산 가야밀면', widget.accessToken);
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => CartPage(userMenu),
-                    //   ),
-                    // );
+                  onTap: () async {
+                    try {
+                      await CartService().putCart(userMenu);
+
+                      // 장바구니 담기에 성공하면 장바구니에 페이지로 이동
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CartItemPage(),
+                        ),
+                      );
+                    } catch (e) {
+                      // 장바구니에 담은 경우 다른 가게의 메뉴를 담을려고 할 때 경고창 구현
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('경고'),
+                            content: const Text('다른 가게의 메뉴를 추가할 수 없습니다.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('확인'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
                   },
                   child: Card(
                     color: const Color(0xFFF3F3FF),
@@ -439,14 +463,14 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                                         ),
                                       ),
                                       const SizedBox(width: 6),
-                                      // Text(
-                                      //   '${menu['goodNum']}명',
-                                      //   style: const TextStyle(
-                                      //     fontSize: 14,
-                                      //     fontWeight: FontWeight.bold,
-                                      //     color: Colors.black,
-                                      //   ),
-                                      // ),
+                                      const Text(
+                                        '45명',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],

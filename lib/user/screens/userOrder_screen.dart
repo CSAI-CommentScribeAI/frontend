@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:frontend/user/widgets/orderAndPay_widget.dart';
 
 class UserOrderPage extends StatefulWidget {
+  final StoreModel store;
   final AddMenuModel menu;
-  const UserOrderPage(this.menu, {super.key});
+  const UserOrderPage(this.store, this.menu, {super.key});
 
   @override
   State<UserOrderPage> createState() => _UserOrderPageState();
@@ -141,7 +143,7 @@ class _UserOrderPageState extends State<UserOrderPage> {
               const SizedBox(height: 17),
 
               // 주문 내용
-              CartWidget(widget.menu),
+              CartWidget(widget.store.name, widget.store, widget.menu),
               const SizedBox(height: 17),
 
               // 요청사항
@@ -262,6 +264,7 @@ class _UserOrderPageState extends State<UserOrderPage> {
       bottomNavigationBar: OrderAndPayBtn(
         '20000원 결제하기',
         true,
+        widget.store,
         widget.menu,
       ), // '20000'에 totalPrice 변수 넣을 예정
     );

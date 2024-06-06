@@ -2,13 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_pannable_rating_bar/flutter_pannable_rating_bar.dart';
 import 'package:frontend/owner/models/menu_model.dart';
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/screens/userHome_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
 class writeReviewPage extends StatefulWidget {
-  final String store;
+  final StoreModel store;
   final AddMenuModel? userMenu;
 
   const writeReviewPage(this.store, this.userMenu, {super.key});
@@ -155,7 +156,7 @@ class _writeReviewPageState extends State<writeReviewPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CartPage(widget.userMenu!),
+                        builder: (context) => const CartItemPage(),
                       ),
                     );
                   },
@@ -176,7 +177,7 @@ class _writeReviewPageState extends State<writeReviewPage> {
             children: [
               // 가게 이름
               Text(
-                widget.store,
+                widget.store.name,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -357,8 +358,8 @@ class _writeReviewPageState extends State<writeReviewPage> {
   // 아래에서 위로 페이지 이동하는 애니메이션 함수
   Route downToUpRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => CompletePage(
-          isWritten: isWritten), // 오른쪽에 있는 isWritten : 위의 isWritte의 값
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          CompletePage(widget.store), // 오른쪽에 있는 isWritten : 위의 isWritte의 값
 
       // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
