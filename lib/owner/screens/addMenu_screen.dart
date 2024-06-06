@@ -544,7 +544,8 @@ class _AddMenuPageState extends State<AddMenuPage> {
                         '${widget.storeId}',
                       );
 
-                      Navigator.pop(context, true);
+                      Navigator.pop(
+                          context, true); // true -> 메뉴 등록 시 바로 페이지 이동해서 보이도록
                     } catch (e) {
                       print('Error registering menu: $e');
                     }

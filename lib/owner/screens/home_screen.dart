@@ -43,8 +43,9 @@ class _HomePageState extends State<HomePage> {
     return 0;
   }
 
-  void chooseStore(BuildContext context) async {
-    await showModalBottomSheet(
+  Future<void> chooseStore(BuildContext context) async {
+    // showModalBottomSheet가 반환하는 Future<bool>을 받아옴
+    final refresh = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -82,10 +83,6 @@ class _HomePageState extends State<HomePage> {
                         IconButton(
                           onPressed: () {
                             Navigator.pop(context);
-                            setState(() {
-                              isExpanded =
-                                  true; // 닫기 버튼 눌렀을 때 isExpanded를 true로 변경
-                            });
                           },
                           icon: const Icon(Icons.close),
                         ),
@@ -173,13 +170,14 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.symmetric(vertical: 40.0),
                     alignment: Alignment.center,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        final refreshResult = await Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => RegisterStorePage(
                                   selectedStore, widget.accessToken)),
                         );
+                        Navigator.pop(context, refreshResult);
                       },
                       icon: const Icon(Icons.add),
                       label: const Text(
@@ -207,11 +205,10 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
-    setState(() {
-      // 보유 가게 목록이 확장되었는지를 나타내는 상태를 저장
-      // 작성해야만 expand_less,more 변경
-      isExpanded = !isExpanded;
-    });
+    // refresh가 true일 경우 상태를 갱신하여 새로고침
+    if (refresh == true) {
+      setState(() {});
+    }
   }
 
   @override
