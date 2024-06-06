@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/screens/write_screen.dart';
 import 'package:intl/intl.dart';
 
 // 결제 완료 후 이 페이지로 넘어가는 동시에 스낵바로 '주문 완료되었습니다'라고 뜨게 구현(API 할 때 구현할 예정)
 class CompletePage extends StatelessWidget {
+  final StoreModel store;
   final bool? isWritten;
   final Map<String, dynamic>? menu;
 
-  const CompletePage(
+  const CompletePage(this.store,
       {this.isWritten = false, this.menu, super.key}); // null일 경우를 대비하여 기본값을 설정
 
   @override
@@ -113,10 +115,9 @@ class CompletePage extends StatelessWidget {
                               : Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const writeReviewPage(
-                                        '피자에 미치다 교대역점',
-                                        null), // 나중에 변수로 집어넣을 계획
-                                  ),
+                                      builder: (context) => writeReviewPage(
+                                          store, null) // 나중에 변수로 집어넣을 계획
+                                      ),
                                 );
                         }, // 리뷰 페이지로 이동
                         style: ElevatedButton.styleFrom(

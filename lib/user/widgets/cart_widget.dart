@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:frontend/owner/models/menu_model.dart';
+import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/screens/menuselect_screen.dart';
+import 'package:frontend/user/screens/storeselect_screen.dart';
 import 'package:intl/intl.dart';
 
 class CartWidget extends StatefulWidget {
+  final String storeName;
+  final StoreModel store;
   final AddMenuModel userMenu;
-  const CartWidget(this.userMenu, {super.key});
+  const CartWidget(this.storeName, this.store, this.userMenu, {super.key});
 
   @override
   State<CartWidget> createState() => _CartWidgetState();
@@ -36,9 +41,9 @@ class _CartWidgetState extends State<CartWidget> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     // 주문 가게 이름
                     children: [
-                      const Text(
-                        '가게 이름',
-                        style: TextStyle(
+                      Text(
+                        widget.storeName,
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Color(0xFF808080),
                         ),
@@ -54,7 +59,6 @@ class _CartWidgetState extends State<CartWidget> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
 
                   // 주문 메뉴 이름
                   Text(
@@ -64,56 +68,47 @@ class _CartWidgetState extends State<CartWidget> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(height: 20),
 
-                  // 주문 내용
+                  // 주문 가격과 수량
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Column(
-                        children: [
-                          Text(
-                            '⋅ 가격: ${f.format(widget.userMenu.price)}원\n⋅ 주문날짜: 2024.04.25 11:43',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF808080),
-                            ),
-                          ),
-                          const SizedBox(height: 47),
-                          Row(
-                            children: [
-                              Text('${f.format(widget.userMenu.price)}원'),
-                              const SizedBox(width: 10),
-
-                              // 수량 증가/감소 버튼
-                              CartStepperInt(
-                                value: counterLimit,
-                                style: const CartStepperStyle(
-                                  activeBackgroundColor: Color(0xFF7E7EB2),
-                                  radius: Radius.circular(5.0),
-                                ),
-                                size: 25,
-                                didChangeCount: (count) {
-                                  // 수량이 0으로 감소하지 못하게하고 버튼도 사라지지 않게 구현
-                                  if (count < 1) {
-                                    ScaffoldMessenger.of(context)
-                                        .hideCurrentSnackBar();
-                                    return;
-                                  }
-                                  setState(() {
-                                    counterLimit = count;
-                                  });
-                                },
-                              ),
-                            ],
-                          )
-                        ],
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: Image.network(
+                          widget.userMenu.imageUrl,
+                          width: 120,
+                          alignment: Alignment.topLeft,
+                        ),
                       ),
-                      // 주문 메뉴 사진
-                      Image.network(
-                        widget.userMenu.imageUrl,
-                        width: 120,
-                        height: 120,
-                        alignment: Alignment.topRight,
+                      Row(
+                        children: [
+                          Text('${f.format(widget.userMenu.price)}원'),
+                          const SizedBox(width: 10),
+
+                          // 수량 증가/감소 버튼
+                          CartStepperInt(
+                            value: counterLimit,
+                            style: const CartStepperStyle(
+                              activeBackgroundColor: Color(0xFF7E7EB2),
+                              radius: Radius.circular(5.0),
+                            ),
+                            size: 25,
+                            didChangeCount: (count) {
+                              // 수량이 0으로 감소하지 못하게하고 버튼도 사라지지 않게 구현
+                              if (count < 1) {
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
+                                return;
+                              }
+                              setState(() {
+                                counterLimit = count;
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -142,7 +137,14 @@ class _CartWidgetState extends State<CartWidget> {
               ),
               // elevation: 4.0,
             ),
-            onPressed: () {},
+            onPressed: () {
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => UserMenuPage(category: category),
+              //   ),
+              // );
+            },
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CartService {
   String serverAddress = '';
+  int? currentStoreId; // 현재 장바구니에 담긴 가게 ID를 저장
 
   Future<void> putCart(
     AddMenuModel userMenu,
@@ -19,6 +20,13 @@ class CartService {
     } else if (Platform.isIOS) {
       serverAddress = 'http://127.0.0.1:9000/api/v1/cart/add';
     }
+
+    if (currentStoreId == null) {
+      currentStoreId = userMenu.storeId; // 장바구니가 비어있으면 현재 가게 ID를 설정
+    } else if (currentStoreId != userMenu.storeId) {
+      throw Exception('다른 가게의 메뉴를 추가할 수 없습니다.'); // 다른 가게의 메뉴를 추가하려고 하면 예외 발생
+    }
+
     try {
       final url = Uri.parse(serverAddress);
 
@@ -34,10 +42,10 @@ class CartService {
       if (response.statusCode == 200) {
         print('담기 성공');
       } else {
-        print('담기 실패');
+        throw Exception('담기 실패');
       }
     } catch (e) {
-      print(e.toString());
+      throw Exception(e.toString());
     }
   }
 }
