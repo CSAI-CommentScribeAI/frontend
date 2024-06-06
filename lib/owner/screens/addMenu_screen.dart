@@ -528,19 +528,27 @@ class _AddMenuPageState extends State<AddMenuPage> {
         ),
         bottomNavigationBar: saveColor
             ? ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (formKey.currentState!.validate()) {
                     formKey.currentState!.save();
                     printFormValues();
-                    MenuService().registerMenu(
-                      name,
-                      price,
-                      menuDetail,
-                      _menuImage!,
-                      status!,
-                      widget.accessToken,
-                      '${widget.storeId}',
-                    );
+
+                    try {
+                      await MenuService().registerMenu(
+                        name,
+                        price,
+                        menuDetail,
+                        _menuImage!,
+                        status!,
+                        widget.accessToken,
+                        '${widget.storeId}',
+                      );
+
+                      Navigator.pop(
+                          context, true); // true -> 메뉴 등록 시 바로 페이지 이동해서 보이도록
+                    } catch (e) {
+                      print('Error registering menu: $e');
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(

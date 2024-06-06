@@ -77,7 +77,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
-  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_inappwebview: 3d32228f1304635e7c028b0d4252937730bbc6cf
   geocoding_ios: a389ea40f6f548de6e63006a2e31bf66ff80769a
   image_picker_ios: 99dfe1854b4fa34d0364e74a78448a0151025425
