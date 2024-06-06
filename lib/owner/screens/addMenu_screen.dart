@@ -528,19 +528,26 @@ class _AddMenuPageState extends State<AddMenuPage> {
         ),
         bottomNavigationBar: saveColor
             ? ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (formKey.currentState!.validate()) {
                     formKey.currentState!.save();
                     printFormValues();
-                    MenuService().registerMenu(
-                      name,
-                      price,
-                      menuDetail,
-                      _menuImage!,
-                      status!,
-                      widget.accessToken,
-                      '${widget.storeId}',
-                    );
+
+                    try {
+                      await MenuService().registerMenu(
+                        name,
+                        price,
+                        menuDetail,
+                        _menuImage!,
+                        status!,
+                        widget.accessToken,
+                        '${widget.storeId}',
+                      );
+
+                      Navigator.pop(context, true);
+                    } catch (e) {
+                      print('Error registering menu: $e');
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(
