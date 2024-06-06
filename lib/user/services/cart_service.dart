@@ -52,14 +52,12 @@ class CartService {
     }
   }
 
-  // 장바구니 조회 api
-  Future<List<CartMenuModel>> getCart() async {
-    List<CartMenuModel> cartInstance = [];
-
+  Future<Map<String, dynamic>> getCart() async {
     // SharedPreferences에서 액세스 토큰을 가져옴
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
 
+    String serverAddress = '';
     if (Platform.isAndroid) {
       serverAddress = 'http://10.0.2.2:9000/api/v1/cart';
     } else if (Platform.isIOS) {
@@ -81,24 +79,21 @@ class CartService {
         final dynamic jsonResponse = jsonDecode(utf8Response);
 
         if (jsonResponse is Map<String, dynamic> &&
-            jsonResponse['data']['cartItems'] is List) {
-          final List<dynamic> carts = jsonResponse['data']['cartItems'];
+            jsonResponse['data'] is Map<String, dynamic>) {
+          final Map<String, dynamic> carts = jsonResponse['data'];
           print('JSON 데이터: ${jsonResponse['data']}');
-
-          for (var cart in carts) {
-            cartInstance.add(CartMenuModel.fromJson(cart));
-          }
+          return carts;
+        } else {
+          print('잘못된 응답 형식');
+          return {};
         }
-        print('조회 성공: $cartInstance');
-
-        return cartInstance;
       } else {
-        print('조회 실패');
-        return [];
+        print('조회 실패: ${response.statusCode}');
+        return {};
       }
     } catch (e) {
       print(e.toString());
-      return [];
+      return {};
     }
   }
 }
