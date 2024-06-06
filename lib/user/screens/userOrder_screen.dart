@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
+import 'package:frontend/user/models/cartMenu_model.dart';
+import 'package:frontend/user/services/cart_service.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:frontend/user/widgets/orderAndPay_widget.dart';
 
@@ -18,6 +20,18 @@ class _UserOrderPageState extends State<UserOrderPage> {
   bool isChecked = false;
   bool ownerChecked = false;
   bool riderChecked = false;
+  String userAddress = '';
+  List<CartMenuModel> cartItems = [];
+
+  // Future<void> fetchUserAddress() async {
+  //   List<CartMenuModel> cartInstance = await CartService().getCart();
+  //   setState(() {
+  //     cartItems = cartInstance;
+  //     if (cartItems.isNotEmpty) {
+  //       userAddress = cartItems[0].imageUrl;
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +157,33 @@ class _UserOrderPageState extends State<UserOrderPage> {
               const SizedBox(height: 17),
 
               // 주문 내용
-              CartWidget(widget.store.name, widget.store, widget.menu),
+              FutureBuilder(
+                future: CartService().getCart(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('등록된 장바구니가 없습니다.');
+                  } else {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const ScrollPhysics(),
+                      itemCount: snapshot.data!['cartItems'].length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final carts = snapshot.data!['cartItems'][index];
+                        return Column(
+                          children: [
+                            CartWidget(carts),
+                            const SizedBox(height: 10),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
               const SizedBox(height: 17),
 
               // 요청사항
