@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/services/cart_service.dart';
 import 'package:frontend/user/services/userMenu_service.dart';
 import 'package:intl/intl.dart';
 
@@ -379,14 +380,8 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                 padding: const EdgeInsets.all(10.0),
                 child: GestureDetector(
                   onTap: () {
-                    // CartService()
-                    //     .putCart(2, userMenu, 1, '부산 가야밀면', widget.accessToken);
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => CartPage(userMenu),
-                    //   ),
-                    // );
+                    CartService()
+                        .putCart(userMenu, 3, widget.store.fullAddress);
                   },
                   child: Card(
                     color: const Color(0xFFF3F3FF),
