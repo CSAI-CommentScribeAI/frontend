@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 class CartWidget extends StatefulWidget {
   final Map<String, dynamic> cart;
   const CartWidget(this.cart, {super.key});
-
   @override
   State<CartWidget> createState() => _CartWidgetState();
 }
@@ -13,7 +12,6 @@ class CartWidget extends StatefulWidget {
 class _CartWidgetState extends State<CartWidget> {
   int counterLimit = 1;
   var f = NumberFormat('###,###,###,###'); // 숫자 세자리마다 콤마 넣는 코드
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -43,7 +41,6 @@ class _CartWidgetState extends State<CartWidget> {
                       //     color: Color(0xFF808080),
                       //   ),
                       // ),
-
                       // 삭제 버튼
                       // IconButton(
                       //   onPressed: () {},
@@ -54,7 +51,6 @@ class _CartWidgetState extends State<CartWidget> {
                       // ),
                     ],
                   ),
-
                   // 주문 메뉴 이름
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -76,7 +72,6 @@ class _CartWidgetState extends State<CartWidget> {
                     ],
                   ),
                   const SizedBox(height: 20),
-
                   // 주문 가격과 수량
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -94,7 +89,6 @@ class _CartWidgetState extends State<CartWidget> {
                         children: [
                           Text('${widget.cart['price']}원'),
                           const SizedBox(width: 10),
-
                           // 수량 증가/감소 버튼
                           CartStepperInt(
                             value: counterLimit,
@@ -124,7 +118,6 @@ class _CartWidgetState extends State<CartWidget> {
             ),
           ),
         ),
-
         // 더 담기 버튼
         Padding(
           padding: const EdgeInsets.symmetric(

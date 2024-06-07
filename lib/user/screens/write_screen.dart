@@ -11,9 +11,7 @@ import 'package:image_picker/image_picker.dart';
 class writeReviewPage extends StatefulWidget {
   final StoreModel store;
   final AddMenuModel? userMenu;
-
   const writeReviewPage(this.store, this.userMenu, {super.key});
-
   @override
   State<writeReviewPage> createState() => _writeReviewPageState();
 }
@@ -21,12 +19,10 @@ class writeReviewPage extends StatefulWidget {
 class _writeReviewPageState extends State<writeReviewPage> {
   double rating = 0.0;
   TextEditingController reviewController = TextEditingController();
-
   File? _menuImage; // 이미지 선택
   XFile? _image; //이미지를 담을 변수 선언
   final ImagePicker picker = ImagePicker(); //ImagePicker 초기화
   bool isImagePicked = false;
-
   // 별점을 설정하고 리뷰를 작성하면 등록버튼 활성화 위해 isWritten이 true로 반환
   bool get isWritten {
     return rating > 0 && reviewController.text.isNotEmpty;
@@ -47,7 +43,6 @@ class _writeReviewPageState extends State<writeReviewPage> {
         _menuImage = File(pickedFile.path); // 가져온 이미지를 _menuImage에 저장
       });
     }
-
     // 선택이 완료되면 다이얼로그 닫음으로 변경
     setState(() {
       isImagePicked = false;
@@ -185,7 +180,6 @@ class _writeReviewPageState extends State<writeReviewPage> {
                 ),
               ),
               const SizedBox(height: 12),
-
               // 별점
               PannableRatingBar(
                 rate: rating,
@@ -206,7 +200,6 @@ class _writeReviewPageState extends State<writeReviewPage> {
                 },
               ),
               const SizedBox(height: 30),
-
               // 리뷰 작성 필드
               SizedBox(
                 width: double.infinity,
@@ -226,7 +219,6 @@ class _writeReviewPageState extends State<writeReviewPage> {
                         color: Color(0xFFD3D3D3), // 테두리 색상
                       ),
                     ),
-
                     // 입력했을 때 색상
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0), // 포커스된 테두리 둥글게
@@ -234,7 +226,6 @@ class _writeReviewPageState extends State<writeReviewPage> {
                         color: Color(0xFFD3D3D3), // 포커스된 테두리 색상
                       ),
                     ),
-
                     // 입력하기 전 테두리
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0), // 활성화된 테두리 둥글게
@@ -258,7 +249,6 @@ class _writeReviewPageState extends State<writeReviewPage> {
                 ),
               ),
               const SizedBox(height: 18),
-
               // 사진 추가 버튼
               ElevatedButton(
                 onPressed: () {
@@ -321,7 +311,6 @@ class _writeReviewPageState extends State<writeReviewPage> {
           ),
         ),
       ),
-
       // 등록하기 버튼
       bottomNavigationBar: ElevatedButton(
         onPressed: () {
@@ -361,18 +350,15 @@ class _writeReviewPageState extends State<writeReviewPage> {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
           CompletePage(widget.store), // 오른쪽에 있는 isWritten : 위의 isWritte의 값
-
       // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 1.0); // 시작점 지정(화면의 아래쪽 의미)
         const end = Offset.zero; // 원래 위치(화면의 제자리) 지정
         const curve = Curves.ease; // 부드러운 속도 변화
-
         // 시작과 끝을 정의(부드럽게 페이지 이동)
         var tween = Tween(begin: begin, end: end).chain(
           CurveTween(curve: curve),
         );
-
         // 위에서 지정했던 애니메이션을 적용하는 위젯
         return SlideTransition(
           position: animation.drive(tween),

@@ -9,7 +9,6 @@ import 'package:intl/intl.dart';
 class UserMenuSelectPage extends StatefulWidget {
   final StoreModel store;
   const UserMenuSelectPage({required this.store, super.key});
-
   @override
   State<UserMenuSelectPage> createState() => _UserMenuSelectPageState();
 }
@@ -101,7 +100,6 @@ void showReviewsBottomSheet(BuildContext context) {
 
 class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
   var f = NumberFormat('###,###,###,###'); // 숫자 세자리마다 콤마 넣는 코드
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -315,7 +313,6 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                       const SizedBox(
                         width: 42,
                       ),
-
                       // overflow 방지로 Row 위젯의 경계를 벗어나지 않기 위해 줄바꿈 사용
                       Expanded(
                         child: Text(
@@ -383,7 +380,6 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                   onTap: () async {
                     try {
                       await CartService().putCart(userMenu);
-
                       // 장바구니 담기에 성공하면 장바구니에 페이지로 이동
                       Navigator.push(
                         context,
