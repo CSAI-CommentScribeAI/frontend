@@ -492,7 +492,9 @@ class _HomePageState extends State<HomePage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const ReceiptPage(),
+                                    builder: (context) => ReceiptPage(
+                                      accessToken: widget.accessToken,
+                                    ),
                                   ),
                                 );
                               },
