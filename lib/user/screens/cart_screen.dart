@@ -17,19 +17,11 @@ class CartItemPage extends StatefulWidget {
 
 class _CartItemPageState extends State<CartItemPage> {
   int counterLimit = 1;
-  int totalPrice = 0;
   var f = NumberFormat('###,###,###,###');
 
   @override
   void initState() {
     super.initState();
-    calculateTotalPrice();
-  }
-
-  void calculateTotalPrice() {
-    setState(() {
-      totalPrice = counterLimit * widget.userMenu.price;
-    });
   }
 
   @override

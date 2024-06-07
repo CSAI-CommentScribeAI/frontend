@@ -1,8 +1,8 @@
+import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
-import 'package:frontend/user/models/cartMenu_model.dart';
 import 'package:frontend/user/services/cart_service.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:frontend/user/widgets/orderAndPay_widget.dart';
@@ -21,17 +21,53 @@ class _UserOrderPageState extends State<UserOrderPage> {
   bool ownerChecked = false;
   bool riderChecked = false;
   String userAddress = '';
-  List<CartMenuModel> cartItems = [];
+  int totalPrice = 0;
+  Map<int, int> itemCounts = {}; // // 각 장바구니의 수량을 저장
 
-  // Future<void> fetchUserAddress() async {
-  //   List<CartMenuModel> cartInstance = await CartService().getCart();
-  //   setState(() {
-  //     cartItems = cartInstance;
-  //     if (cartItems.isNotEmpty) {
-  //       userAddress = cartItems[0].imageUrl;
-  //     }
-  //   });
-  // }
+  // initState에서 fetchUserAddress를 호출해야 userAddress 변경 값 출력 가능
+  @override
+  void initState() {
+    super.initState();
+    fetchUserAddress();
+    calculateTotalPrice();
+  }
+
+  // 주소 가져오기 메서드
+  Future<void> fetchUserAddress() async {
+    Map<String, dynamic> cartInstance = await CartService().getCart();
+    setState(() {
+      if (cartInstance.isNotEmpty) {
+        userAddress = cartInstance['userAddress'];
+      }
+    });
+  }
+
+  // 가격 합 계산 함수
+  void calculateTotalPrice() async {
+    Map<String, dynamic> cartInstance = await CartService().getCart();
+
+    int tempTotalPrice = 0;
+    if (cartInstance.isNotEmpty) {
+      List<dynamic> cartItems = cartInstance['cartItems'];
+      for (var item in cartItems) {
+        int itemId = item['menuId']; // 해당 메뉴 아이디 저장
+        int itemCount = itemCounts[itemId] ?? 1; // 수량 업데이트 함수에서 수량 값 들어있음
+        tempTotalPrice += (item['price'] as int) * itemCount;
+      }
+
+      setState(() {
+        totalPrice = tempTotalPrice;
+      });
+    }
+  }
+
+  // 수량 업데이트 함수
+  void updateItemCount(int itemId, int count) {
+    setState(() {
+      itemCounts[itemId] = count; // 해당 수량 카운트를 itemCounts의 itemId에 저장
+      calculateTotalPrice(); // 가격 합 계산 함수 호출
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,9 +155,9 @@ class _UserOrderPageState extends State<UserOrderPage> {
                             ],
                           ),
                           const SizedBox(height: 15),
-                          const Text(
-                            '서울특별시 서초구 강남대로 583\n성결아파트 109동 807호',
-                            style: TextStyle(
+                          Text(
+                            userAddress,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -167,15 +203,185 @@ class _UserOrderPageState extends State<UserOrderPage> {
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Text('등록된 장바구니가 없습니다.');
                   } else {
+                    final List<dynamic> cartItems = snapshot.data!['cartItems'];
                     return ListView.builder(
                       shrinkWrap: true,
                       physics: const ScrollPhysics(),
-                      itemCount: snapshot.data!['cartItems'].length,
+                      itemCount: cartItems.length,
                       itemBuilder: (BuildContext context, int index) {
-                        final carts = snapshot.data!['cartItems'][index];
+                        final Map<String, dynamic> cart = cartItems[index];
+                        int itemId = cart['menuId']; // 해당 메뉴 아이디 저장
+                        int itemCount = itemCounts[itemId] ??
+                            1; // 수량 값(itemId와 키,값 쌍을 이룸)을 itemCount에 저장(1 초기값)
                         return Column(
                           children: [
-                            CartWidget(carts),
+                            Stack(
+                              // Stack 위젯을 사용해 위에 덮어있는 위젯을 중앙하단으로 조정
+                              alignment: AlignmentDirectional.bottomCenter,
+                              children: [
+                                SizedBox(
+                                  height: 230, // 275,
+                                  child: Card(
+                                    color: Colors.white,
+                                    shadowColor: const Color(0xFF374AA3),
+                                    elevation: 3.0, // 그림자 설정
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(15.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            // 주문 가게 이름
+                                            children: [
+                                              // 추후에 구현 예정
+                                              // Text(
+                                              //   carts.menuName,
+                                              //   style: const TextStyle(
+                                              //     fontSize: 16,
+                                              //     color: Color(0xFF808080),
+                                              //   ),
+                                              // ),
+
+                                              // 삭제 버튼
+                                              // IconButton(
+                                              //   onPressed: () {},
+                                              //   icon: const Icon(
+                                              //     Icons.delete,
+                                              //     color: Color(0xFF7E7EB2),
+                                              //   ),
+                                              // ),
+                                            ],
+                                          ),
+
+                                          // 주문 메뉴 이름
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                cart['menuName'],
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                onPressed: () {},
+                                                icon: const Icon(
+                                                  Icons.delete,
+                                                  color: Color(0xFF7E7EB2),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 20),
+
+                                          // 주문 가격과 수량
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                                child: Image.network(
+                                                  cart['imageUrl'],
+                                                  width: 120,
+                                                  alignment: Alignment.topLeft,
+                                                ),
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Text('${cart['price']}원'),
+                                                  const SizedBox(width: 10),
+
+                                                  // 수량 증가/감소 버튼
+                                                  CartStepperInt(
+                                                    value: itemCount,
+                                                    style:
+                                                        const CartStepperStyle(
+                                                      activeBackgroundColor:
+                                                          Color(0xFF7E7EB2),
+                                                      radius:
+                                                          Radius.circular(5.0),
+                                                    ),
+                                                    size: 25,
+                                                    didChangeCount: (count) {
+                                                      // 수량이 0으로 감소하지 못하게하고 버튼도 사라지지 않게 구현
+                                                      if (count < 1) {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .hideCurrentSnackBar();
+                                                        return;
+                                                      }
+                                                      // 수량 업데이트 함수 호출
+                                                      updateItemCount(
+                                                          itemId, count);
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                // 더 담기 버튼
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 5.0,
+                                    vertical: 1.0,
+                                  ),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFFF3F3FF),
+                                      shape: const BeveledRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.zero,
+                                          topRight: Radius.zero,
+                                          bottomLeft: Radius.circular(5.0),
+                                          bottomRight: Radius.circular(5.0),
+                                        ),
+                                      ),
+                                      // elevation: 4.0,
+                                    ),
+                                    onPressed: () {
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (context) => UserMenuPage(category: category),
+                                      //   ),
+                                      // );
+                                    },
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.add,
+                                          color: Colors.black,
+                                        ),
+                                        SizedBox(width: 5),
+                                        Text(
+                                          '더 담으러 가기',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                             const SizedBox(height: 10),
                           ],
                         );
@@ -302,7 +508,7 @@ class _UserOrderPageState extends State<UserOrderPage> {
         ),
       ),
       bottomNavigationBar: OrderAndPayBtn(
-        '20000원 결제하기',
+        '$totalPrice원 결제하기',
         true,
         widget.store,
         widget.menu,
