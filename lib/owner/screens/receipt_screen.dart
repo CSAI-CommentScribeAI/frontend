@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/letter_screen.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
+import 'package:frontend/owner/services/letter_service.dart';
 
 class ReceiptPage extends StatefulWidget {
   const ReceiptPage({super.key});
@@ -38,18 +39,25 @@ class _ReceiptPageState extends State<ReceiptPage> {
   }
 
   // 주문을 수락하는 메서드
-  void acceptOrder(int index) {
+  void acceptOrder(int index) async {
     setState(() {
-      orderList[index]['isAccepted'] =
-          true; // isOrderAccepted 변수를 true로 설정하여 주문이 수락되었음을 나타냄
+      orderList[index]['isAccepted'] = true;
     });
 
-    // 3초 후에 상태를 배차 / 출력 버튼으로 변경
-    Future.delayed(const Duration(seconds: 3), () {
-      setState(() {
-        orderList[index]['isPrinted'] = true; // 배차 혹은 출력 상태로 활성화
+    bool isSaved = await LetterService().saveLetter();
+
+    if (isSaved) {
+      // 3초 후에 상태를 배차 / 출력 버튼으로 변경
+      Future.delayed(const Duration(seconds: 3), () {
+        setState(() {
+          orderList[index]['isPrinted'] = true; // 배차 혹은 출력 상태로 활성화
+        });
       });
-    });
+    } else {
+      setState(() {
+        orderList[index]['isAccepted'] = false;
+      });
+    }
   }
 
   // 배차 혹은 출력시키는 메서드
