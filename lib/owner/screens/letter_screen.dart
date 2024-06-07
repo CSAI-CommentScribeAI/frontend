@@ -67,16 +67,16 @@ class _LetterPageState extends State<LetterPage> {
     fetchLetters(); // 위젯이 처음 생성될 때 서버에서 편지들을 불러오는 메서드 호출
   }
 
-// 서버에서 편지를 불러오는 메서드
-  Future<String> fetchLetters() async {
+  // 서버에서 편지를 불러오는 메서드
+  Future<void> fetchLetters() async {
     // LetterService 클래스의 getLetter 메서드를 호출하여 편지들을 불러오고, 그 결과를 기다림
     String fetchedLetters = await LetterService().getLetter();
 
     // 불러온 편지들로 상태를 업데이트하여, 위젯 트리를 다시 빌드
     setState(() {
-      letters = fetchedLetters; // 불러온 편지들을 letters 리스트에 할당
+      letters = fetchedLetters; // 불러온 편지들을 letters에 할당
+      letterController.text = letters; // letterController에 불러온 편지 내용 설정
     });
-    return letters;
   }
 
   void loadNextIcons() {
