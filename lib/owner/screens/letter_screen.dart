@@ -63,19 +63,19 @@ class _LetterPageState extends State<LetterPage> {
 
   @override
   void initState() {
-    super.initState(); // 부모 클래스의 initState 메서드를 호출하여 초기화를 올바르게 수행합니다.
-    fetchLetters(); // 위젯이 처음 생성될 때 서버에서 편지들을 불러오는 메서드를 호출합니다.
+    super.initState(); // 부모 클래스의 initState 메서드를 호출하여 초기화 수행
+    fetchLetters(); // 위젯이 처음 생성될 때 서버에서 편지들을 불러오는 메서드 호출
   }
 
 // 서버에서 편지를 불러오는 메서드
   Future<void> fetchLetters() async {
-    // LetterService 클래스의 getLetter 메서드를 호출하여 편지들을 불러오고, 그 결과를 기다립니다.
+    // LetterService 클래스의 getLetter 메서드를 호출하여 편지들을 불러오고, 그 결과를 기다림
     List<Map<String, dynamic>> fetchedLetters =
         await LetterService().getLetter();
 
-    // 불러온 편지들로 상태를 업데이트하여, 위젯 트리를 다시 빌드하게 합니다.
+    // 불러온 편지들로 상태를 업데이트하여, 위젯 트리를 다시 빌드
     setState(() {
-      letters = fetchedLetters; // 불러온 편지들을 letters 리스트에 할당합니다.
+      letters = fetchedLetters; // 불러온 편지들을 letters 리스트에 할당
     });
   }
 
