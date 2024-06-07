@@ -3,7 +3,6 @@ import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/screens/userOrder_screen.dart';
 import 'package:frontend/user/services/cart_service.dart';
-import 'package:frontend/user/services/order_service.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:intl/intl.dart';
 
