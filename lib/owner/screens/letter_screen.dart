@@ -413,7 +413,9 @@ class _LetterPageState extends State<LetterPage> {
       // 하단바
       bottomNavigationBar: isCompleted
           ? ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pop(context);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF374AA3),
                 minimumSize: const Size(

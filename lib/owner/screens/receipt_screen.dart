@@ -58,7 +58,17 @@ class _ReceiptPageState extends State<ReceiptPage> {
       orderList[index]['isDelivered'] = true; // 배달 중 상태로 활성화
     });
 
-    Future.delayed(const Duration(seconds: 3), () {
+    // 주문을 완료 상태로 설정하는 메서드
+    void completeOrder(int index) {
+      setState(() {
+        orderList[index]['isAccepted'] = true;
+        orderList[index]['isPrinted'] = false;
+        orderList[index]['isDelivered'] = false;
+        orderList[index]['isCompleted'] = true; // 주문을 완료 상태로 설정
+      });
+    }
+
+    Future.delayed(const Duration(seconds: 1), () {
       setState(() {
         // 배차 혹은 출력 상태는 비활성화, 완료 중 상태로 활성화
         orderList[index]['isPrinted'] = false;
