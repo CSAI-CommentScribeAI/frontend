@@ -7,6 +7,8 @@ import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/screens/userHome_screen.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:frontend/user/services/review_service.dart';
+import 'package:get/get.dart';
 
 class writeReviewPage extends StatefulWidget {
   final StoreModel store;
@@ -23,6 +25,9 @@ class _writeReviewPageState extends State<writeReviewPage> {
   XFile? _image; //이미지를 담을 변수 선언
   final ImagePicker picker = ImagePicker(); //ImagePicker 초기화
   bool isImagePicked = false;
+  final ReviewService _reviewService = ReviewService(); // ReviewService 인스턴스 생성
+  bool isReviewSubmitted = false; // 리뷰 제출 여부 추적
+
   // 별점을 설정하고 리뷰를 작성하면 등록버튼 활성화 위해 isWritten이 true로 반환
   bool get isWritten {
     return rating > 0 && reviewController.text.isNotEmpty;
@@ -250,37 +255,37 @@ class _writeReviewPageState extends State<writeReviewPage> {
               ),
               const SizedBox(height: 18),
               // 사진 추가 버튼
-              ElevatedButton(
-                onPressed: () {
-                  _showImageSelectionDialog();
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  side: const BorderSide(
-                    color: Color(0xFF7E7EB2),
-                  ),
-                  backgroundColor: Colors.white,
-                  elevation: 0,
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.camera_alt,
-                      color: Colors.black,
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      '사진 추가',
-                      style: TextStyle(
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // ElevatedButton(
+              //   onPressed: () {
+              //     _showImageSelectionDialog();
+              //   },
+              //   style: ElevatedButton.styleFrom(
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(5.0),
+              //     ),
+              //     side: const BorderSide(
+              //       color: Color(0xFF7E7EB2),
+              //     ),
+              //     backgroundColor: Colors.white,
+              //     elevation: 0,
+              //   ),
+              //   child: const Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       Icon(
+              //         Icons.camera_alt,
+              //         color: Colors.black,
+              //       ),
+              //       SizedBox(width: 10),
+              //       Text(
+              //         '사진 추가',
+              //         style: TextStyle(
+              //           color: Colors.black,
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
               const SizedBox(height: 5),
               // null값이면 이미지 삭제
               if (_menuImage != null)
@@ -313,19 +318,30 @@ class _writeReviewPageState extends State<writeReviewPage> {
       ),
       // 등록하기 버튼
       bottomNavigationBar: ElevatedButton(
-        onPressed: () {
-          // 주문 내역 페이지로 넘어간 뒤에 다시 리뷰작성 페이지로 못 넘어가게 해야됨
-          // 리뷰쓰기 버튼 비활성화(작성한 리뷰)
-          // 별점과 리뷰 작성해야만 버튼 활성화
-          isWritten
-              // 특정 화면으로 이동하고 기존 화면은 모두 제거
-              ? Navigator.pushAndRemoveUntil(
-                  context,
-                  downToUpRoute(),
-                  (route) => false,
-                )
-              : null;
-        }, // 결제 화면으로 이동
+        onPressed: () async {
+          if (isWritten) {
+            // 리뷰 데이터 작성
+            final reviewData = {
+              'rating': rating,
+              'comment': reviewController.text,
+            };
+
+            // 리뷰 작성 API 호출
+            final success = await _reviewService.writeReview(reviewData);
+
+            if (success) {
+              // 리뷰 작성 성공 시
+              setState(() {
+                isReviewSubmitted = true; // 리뷰 제출 상태 업데이트
+              });
+              Navigator.pushAndRemoveUntil(
+                context,
+                downToUpRoute(),
+                (route) => false,
+              );
+            }
+          }
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor:
               isWritten ? const Color(0xFF274AA3) : const Color(0xFFD9D9D9),
