@@ -368,7 +368,7 @@ class _UserOrderPageState extends State<UserOrderPage> {
                                         final cartInfo =
                                             await CartService().getCart();
                                         OrderService().order(
-                                          orderStatus[2],
+                                          orderStatus[0],
                                           widget.menu.storeId,
                                           totalPrice,
                                           cartInfo,
