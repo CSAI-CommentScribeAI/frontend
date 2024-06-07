@@ -11,7 +11,6 @@ class UserReviewPage extends StatefulWidget {
   final StoreModel? store;
   final AddMenuModel? userMenu;
   const UserReviewPage(this.store, this.userMenu, {super.key});
-
   @override
   State<UserReviewPage> createState() => _UserReviewPageState();
 }
@@ -20,7 +19,6 @@ class _UserReviewPageState extends State<UserReviewPage> {
   double rate = 0.0; // 선택된 날짜에 해당하는 리뷰들의 평균 별점
   bool isReplied = false; // 답글 유무
   bool isExpanded = false;
-
   List<Map<String, dynamic>> userReviewList = [
     {
       // 실제 위젯을 렌더링할 때 이미지가 준비되었는지 확인한 후에 위젯을 생성을 위해
@@ -50,7 +48,6 @@ class _UserReviewPageState extends State<UserReviewPage> {
       "hide": false
     },
   ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,7 +76,8 @@ class _UserReviewPageState extends State<UserReviewPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const CartItemPage(),
+                        builder: (context) =>
+                            CartItemPage(widget.store!, widget.userMenu!),
                       ),
                     );
                   },
@@ -130,9 +128,7 @@ class _UserReviewPageState extends State<UserReviewPage> {
                 ),
               ],
             ),
-
             const SizedBox(height: 35),
-
             // 리뷰 수와 미답글 리뷰 버튼
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -170,7 +166,6 @@ class _UserReviewPageState extends State<UserReviewPage> {
               ],
             ),
             const SizedBox(height: 10),
-
             // 경계선
             Container(
               width: double.infinity,
@@ -209,7 +204,6 @@ class _UserReviewPageState extends State<UserReviewPage> {
                                       visibleTrail: false,
                                     ),
                                     const SizedBox(height: 20),
-
                                     // 답글 달기 버튼
                                     // 아마도 작성 유형이나 답글 등록 버튼 누를 때 isReplied 값 상태 변경할 예정
                                     if (isReplied)
@@ -249,7 +243,6 @@ class _UserReviewPageState extends State<UserReviewPage> {
                                                 ),
                                               ),
                                             ),
-
                                             // 답글
                                             Text(userReview["reply"]),
                                             const SizedBox(height: 15),
