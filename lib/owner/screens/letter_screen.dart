@@ -59,7 +59,7 @@ class _LetterPageState extends State<LetterPage> {
 
   String letterContent = '';
   // 서버에서 불러온 편지들을 저장할 리스트
-  List<Map<String, dynamic>> letters = [];
+  String letters = '';
 
   @override
   void initState() {
@@ -68,15 +68,15 @@ class _LetterPageState extends State<LetterPage> {
   }
 
 // 서버에서 편지를 불러오는 메서드
-  Future<void> fetchLetters() async {
+  Future<String> fetchLetters() async {
     // LetterService 클래스의 getLetter 메서드를 호출하여 편지들을 불러오고, 그 결과를 기다림
-    List<Map<String, dynamic>> fetchedLetters =
-        await LetterService().getLetter();
+    String fetchedLetters = await LetterService().getLetter();
 
     // 불러온 편지들로 상태를 업데이트하여, 위젯 트리를 다시 빌드
     setState(() {
       letters = fetchedLetters; // 불러온 편지들을 letters 리스트에 할당
     });
+    return letters;
   }
 
   void loadNextIcons() {
