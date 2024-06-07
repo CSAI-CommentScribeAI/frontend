@@ -44,8 +44,16 @@ class _UserOrderPageState extends State<UserOrderPage> {
 
   // 장바구니 정보 가져오는 메서드
   Future<Map<String, dynamic>> getCartInfo() async {
-    Map<String, dynamic> cartInfo = await CartService().getCart();
-    return cartInfo;
+    try {
+      Map<String, dynamic> cartInfo = await CartService().getCart();
+      if (cartInfo.isEmpty || cartInfo['cartItems'] == null) {
+        throw Exception('장바구니가 비어 있습니다.');
+      }
+      return cartInfo;
+    } catch (e) {
+      print(e);
+      return {};
+    }
   }
 
   // 주소 가져오기 메서드
@@ -355,22 +363,33 @@ class _UserOrderPageState extends State<UserOrderPage> {
                                     onPressed: () {
                                       // Navigate to another screen
                                     },
-                                    child: const Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.add,
-                                          color: Colors.black,
-                                        ),
-                                        SizedBox(width: 5),
-                                        Text(
-                                          '더 담으러 가기',
-                                          style: TextStyle(
+                                    child: ElevatedButton(
+                                      onPressed: () async {
+                                        final cartInfo =
+                                            await CartService().getCart();
+                                        OrderService().order(
+                                          orderStatus[0],
+                                          widget.menu.storeId,
+                                          totalPrice,
+                                          cartInfo,
+                                          orderMenus, // orderMenus를 주문 API에 포함
+                                        );
+                                      },
+                                      child: const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.add,
                                             color: Colors.black,
                                           ),
-                                        ),
-                                      ],
+                                          SizedBox(width: 5),
+                                          Text('더 담으러 가기',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                              )),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -500,14 +519,7 @@ class _UserOrderPageState extends State<UserOrderPage> {
       ),
       bottomNavigationBar: ElevatedButton(
         onPressed: () async {
-          final cartInfo = await CartService().getCart();
-          OrderService().order(
-            orderStatus[0],
-            widget.menu.storeId,
-            totalPrice,
-            cartInfo,
-            orderMenus, // orderMenus를 주문 API에 포함
-          );
+          await OrderService().getOrder();
 
           Navigator.push(
               context,

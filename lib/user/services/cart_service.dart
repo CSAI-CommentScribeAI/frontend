@@ -80,7 +80,7 @@ class CartService {
 
         if (jsonResponse is Map<String, dynamic> &&
             jsonResponse['data'] is Map<String, dynamic>) {
-          final Map<String, dynamic> carts = jsonResponse['data'];
+          final carts = jsonResponse['data'];
           print('JSON 데이터: ${jsonResponse['data']}');
           return carts;
         } else {
