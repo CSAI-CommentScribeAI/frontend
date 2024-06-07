@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:frontend/owner/services/letter_service.dart';
 
 class LetterPage extends StatefulWidget {
   const LetterPage({super.key});
@@ -57,6 +58,26 @@ class _LetterPageState extends State<LetterPage> {
   ];
 
   String letterContent = '';
+  // 서버에서 불러온 편지들을 저장할 리스트
+  List<Map<String, dynamic>> letters = [];
+
+  @override
+  void initState() {
+    super.initState(); // 부모 클래스의 initState 메서드를 호출하여 초기화를 올바르게 수행합니다.
+    fetchLetters(); // 위젯이 처음 생성될 때 서버에서 편지들을 불러오는 메서드를 호출합니다.
+  }
+
+// 서버에서 편지를 불러오는 메서드
+  Future<void> fetchLetters() async {
+    // LetterService 클래스의 getLetter 메서드를 호출하여 편지들을 불러오고, 그 결과를 기다립니다.
+    List<Map<String, dynamic>> fetchedLetters =
+        await LetterService().getLetter();
+
+    // 불러온 편지들로 상태를 업데이트하여, 위젯 트리를 다시 빌드하게 합니다.
+    setState(() {
+      letters = fetchedLetters; // 불러온 편지들을 letters 리스트에 할당합니다.
+    });
+  }
 
   void loadNextIcons() {
     setState(() {
