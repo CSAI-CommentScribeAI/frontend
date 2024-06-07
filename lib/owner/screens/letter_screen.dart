@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:frontend/owner/services/letter_service.dart';
+import 'package:frontend/owner/services/delivery_service.dart';
 
 class LetterPage extends StatefulWidget {
   const LetterPage({super.key});
@@ -436,6 +437,7 @@ class _LetterPageState extends State<LetterPage> {
           ? ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
+                DeliveryService().completeDelivery(4);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF374AA3),
