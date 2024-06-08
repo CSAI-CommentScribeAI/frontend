@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/all/services/order_service.dart';
+import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/letter_screen.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
+import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
 import 'package:frontend/owner/services/letter_service.dart';
+import 'package:frontend/user/models/order_model.dart';
 
 class ReceiptPage extends StatefulWidget {
   const ReceiptPage({super.key});
@@ -39,12 +43,12 @@ class _ReceiptPageState extends State<ReceiptPage> {
   }
 
   // 주문을 수락하는 메서드
-  void acceptOrder(int index) async {
+  void acceptOrder(int index, int orderId) async {
     setState(() {
       orderList[index]['isAccepted'] = true;
     });
 
-    bool isSaved = await LetterService().saveLetter();
+    bool isSaved = await LetterService().saveLetter(orderId);
 
     if (isSaved) {
       // 3초 후에 상태를 배차 / 출력 버튼으로 변경
@@ -439,6 +443,22 @@ class _ReceiptPageState extends State<ReceiptPage> {
     );
   }
 
+  Future<int> getOrderId() async {
+    List<OrderModel> orders = await OrderService().getOrder();
+    int? orderId;
+
+    for (var order in orders) {
+      orderId = order.orderId;
+    }
+
+    // orderId가 null일 경우 예외 처리
+    if (orderId == null) {
+      throw Exception("No orders found");
+    }
+
+    return orderId;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -539,9 +559,9 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                       height: 20,
                                       width: 70,
                                       child: ElevatedButton(
-                                        onPressed: () {
-                                          acceptOrder(
-                                              index); // 주문 수락 시 acceptOrder() 함수가 호출되어 isOrderAccepted가 true
+                                        onPressed: () async {
+                                          acceptOrder(index,
+                                              await getOrderId()); // 주문 수락 시 acceptOrder() 함수가 호출되어 isOrderAccepted가 true
                                           // 주문을 수락할 때 추가적으로 해야 할 작업
                                         },
                                         style: ElevatedButton.styleFrom(
