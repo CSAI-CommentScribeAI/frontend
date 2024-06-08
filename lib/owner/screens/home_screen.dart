@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/owner/charts/feedback_chart.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/feedback_screen.dart';
@@ -11,6 +12,7 @@ import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/circle_widget.dart';
 import 'package:frontend/owner/widgets/current_widget.dart';
 import 'package:frontend/owner/widgets/menuItem_widget.dart';
+import 'package:frontend/user/services/userStore_service.dart';
 
 class HomePage extends StatefulWidget {
   final String accessToken;
@@ -21,16 +23,55 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int storeId = 0; // 메뉴 조회할 때 사용할 가게 아이디
+  late int storeIndex; // 가게 관리나 메뉴 관리 때 사용할 인덱스
   bool light = true;
   bool isExpanded = false; // 확장 유무(Expaned_less,more)
   String selectedStore = ''; // 선택한 가게의 이름을 저장할 변수
-  int storeIndex = 0; // 가게 리스트 인덱스
   bool titleOpacity = false; // 가게명 투명도
   bool thisColor = true; // 선택되었을 때 원 색깔
   bool lastColor = false;
 
-  void chooseStore(BuildContext context) async {
-    await showModalBottomSheet(
+  int storeNum = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getStoreId();
+  }
+
+  // 가게 이름 비교를 통한 가게 아이디 반환 함수
+  Future<int> getStoreIdByName(String storeName) async {
+    List<StoreModel> stores = await UserStoreService().getManyStores();
+
+    for (var store in stores) {
+      if (store.name == storeName) {
+        return store.id;
+      }
+    }
+
+    return 0;
+  }
+
+  Future<int> getStoreId() async {
+    List<StoreModel> storeList = await UserStoreService().getManyStores();
+    int? id;
+
+    for (var store in storeList) {
+      id = store.id;
+    }
+
+    // orderId가 null일 경우 예외 처리
+    if (id == null) {
+      throw Exception("No orders found");
+    }
+
+    return id;
+  }
+
+  Future<void> chooseStore(BuildContext context) async {
+    // showModalBottomSheet가 반환하는 Future<bool>을 받아옴
+    final refresh = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -68,16 +109,13 @@ class _HomePageState extends State<HomePage> {
                         IconButton(
                           onPressed: () {
                             Navigator.pop(context);
-                            setState(() {
-                              isExpanded =
-                                  true; // 닫기 버튼 눌렀을 때 isExpanded를 true로 변경
-                            });
                           },
                           icon: const Icon(Icons.close),
                         ),
                       ],
                     ),
                   ),
+
                   // 보유 가게 리스트
                   // Column 위젯의 높이가 자식 위젯들의 높이보다 작아서 발생을 막기 위해 사용(Expanded)
                   Expanded(
@@ -85,7 +123,7 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 18.0),
                       child: FutureBuilder<List<StoreModel>>(
                         // getStore() 메서드를 호출해서 데이터를 가져옴
-                        future: StoreService().getStore(widget.accessToken),
+                        future: StoreService().getStore(),
                         builder: (context, snapshot) {
                           // 데이터가 로드되는 동안 로딩 스피너 표시
                           if (snapshot.connectionState ==
@@ -119,14 +157,18 @@ class _HomePageState extends State<HomePage> {
                                 final store =
                                     snapshot.data![index]; // 현재 인덱스의 가게 데이터
                                 return ListTile(
-                                  onTap: () {
+                                  onTap: () async {
+                                    int? id =
+                                        await getStoreIdByName(store.name);
                                     setState(() {
-                                      selectedStore =
-                                          store.name; // 선택한 가게의 이름을 저장
+                                      selectedStore = store.name;
                                       storeIndex = index;
-                                      isExpanded = true; // 모달 닫기
-                                      storeIndex = index;
+                                      storeId = id;
+                                      isExpanded = true;
                                     });
+
+                                    print('선택된 가게 아이디: $id');
+                                    print('현재 인덱스: $storeIndex');
                                     Navigator.pop(context);
                                   },
                                   title: Text(
@@ -154,13 +196,14 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.symmetric(vertical: 40.0),
                     alignment: Alignment.center,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        final refreshResult = await Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => RegisterStorePage(
                                   selectedStore, widget.accessToken)),
                         );
+                        Navigator.pop(context, refreshResult);
                       },
                       icon: const Icon(Icons.add),
                       label: const Text(
@@ -188,11 +231,10 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
-    setState(() {
-      // 보유 가게 목록이 확장되었는지를 나타내는 상태를 저장
-      // 작성해야만 expand_less,more 변경
-      isExpanded = !isExpanded;
-    });
+    // refresh가 true일 경우 상태를 갱신하여 새로고침
+    if (refresh == true) {
+      setState(() {});
+    }
   }
 
   @override
@@ -339,8 +381,7 @@ class _HomePageState extends State<HomePage> {
                                             // expand_less,more
                                             GestureDetector(
                                               onTap: () {
-                                                StoreService().getStore(
-                                                    widget.accessToken);
+                                                StoreService().getStore();
                                                 setState(() {
                                                   isExpanded =
                                                       !isExpanded; // 확장되어 있을 때는 축소하고, 축소되어 있을 때는 확장
@@ -477,7 +518,7 @@ class _HomePageState extends State<HomePage> {
                                     MaterialPageRoute(
                                       builder: (context) => MenuPage(
                                           selectedStore,
-                                          storeIndex,
+                                          storeId,
                                           widget.accessToken),
                                     ),
                                   );
@@ -488,7 +529,9 @@ class _HomePageState extends State<HomePage> {
                                   title: '메뉴관리'),
                             ),
                             GestureDetector(
-                              onTap: () {
+                              onTap: () async {
+                                OrderService()
+                                    .getUserOrders(await getStoreId());
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

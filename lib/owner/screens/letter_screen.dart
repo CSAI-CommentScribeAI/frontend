@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:frontend/owner/services/letter_service.dart';
+import 'package:frontend/owner/services/delivery_service.dart';
 
 class LetterPage extends StatefulWidget {
   final String accessToken;
@@ -69,48 +70,16 @@ class _LetterPageState extends State<LetterPage> {
     fetchLetters(); // 위젯이 처음 생성될 때 서버에서 편지들을 불러오는 메서드 호출
   }
 
-// 서버에서 편지를 불러오는 메서드
-  Future<String> fetchLetters() async {
+  // 서버에서 편지를 불러오는 메서드
+  Future<void> fetchLetters() async {
     // LetterService 클래스의 getLetter 메서드를 호출하여 편지들을 불러오고, 그 결과를 기다림
     String fetchedLetters = await LetterService().getLetter();
 
     // 불러온 편지들로 상태를 업데이트하여, 위젯 트리를 다시 빌드
     setState(() {
-      letters = fetchedLetters; // 불러온 편지들을 letters 리스트에 할당
+      letters = fetchedLetters; // 불러온 편지들을 letters에 할당
+      letterController.text = letters; // letterController에 불러온 편지 내용 설정
     });
-    return letters;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchLetterContent(); // fetchLetterContent() 메서드를 호출하여 편지 내용을 가져옵니다.
-  }
-
-  void fetchLetterContent() async {
-    String content = await LetterService().getLetter(widget.accessToken, 3);
-    setState(() {
-      fullLetterContent = content;
-    });
-    startTyping();
-  }
-
-  void startTyping() async {
-    // 비동기 메서드로, async 키워드를 사용
-    for (int i = 0; i < fullLetterContent.length; i++) {
-      // fullLetterContent의 길이만큼 반복, 루프의 각 반복마다 한 글자씩 letterContent에 추가
-      await Future.delayed(const Duration(milliseconds: 100), () {
-        // 100밀리초씩 지연
-        // Future.delayed는 지정된 시간 동안 대기하는 Future를 반환
-        // 텍스트가 한 글자씩 천천히 추가되는 효과
-        setState(() {
-          letterContent += fullLetterContent[i];
-          // letterContent에 fullLetterContent의 한 글자씩 추가
-          letterController.text = letterContent;
-          // letterController.text에 업데이트된 letterContent를 설정 -> 텍스트 필드의 내용을 업데이트
-        });
-      });
-    }
   }
 
   void loadNextIcons() {
@@ -471,6 +440,7 @@ class _LetterPageState extends State<LetterPage> {
           ? ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
+                DeliveryService().completeDelivery(4);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF374AA3),

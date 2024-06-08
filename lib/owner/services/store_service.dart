@@ -77,7 +77,6 @@ class StoreService {
     final Map<String, String> categoryMapping = {
       '햄버거': 'HAMBURGER',
       '피자': 'PIZZA',
-      '커피': 'COFFEE',
       '디저트': 'DESSERT',
       '한식': 'KOREANFOOD',
       '중식': 'CHINESEFOOD',

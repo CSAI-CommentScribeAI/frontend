@@ -3,12 +3,13 @@ import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/screens/addMenu_screen.dart';
 import 'package:frontend/owner/services/menu_service.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
+import 'package:intl/intl.dart';
 
 class MenuPage extends StatefulWidget {
   final String selectedStore;
-  final int storeIndex;
+  final int storeId;
   final String accessToken;
-  const MenuPage(this.selectedStore, this.storeIndex, this.accessToken,
+  const MenuPage(this.selectedStore, this.storeId, this.accessToken,
       {super.key});
 
   @override
@@ -16,6 +17,8 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
+  var f = NumberFormat('###,###,###,###'); // 숫자 세자리마다 콤마 넣는 코드
+
   bool saveColor = false;
   bool isMenuOrderByName = true; // true: 가나다 순, false: 최신 등록 순
 
@@ -76,10 +79,12 @@ class _MenuPageState extends State<MenuPage> {
                   TextButton(
                     onPressed: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddMenuPage(
-                                  widget.storeIndex, widget.accessToken)));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              AddMenuPage(widget.storeId, widget.accessToken),
+                        ),
+                      );
                     },
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
@@ -194,7 +199,7 @@ class _MenuPageState extends State<MenuPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 18.0),
                 child: FutureBuilder<List<AddMenuModel>>(
                   // getMenu() 메서드를 호출해서 데이터를 가져옴
-                  future: MenuService().getMenu(widget.storeIndex),
+                  future: MenuService().getMenu(widget.storeId),
                   builder: (context, snapshot) {
                     // 데이터가 로드되는 동안 로딩 스피너 표시
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -275,7 +280,7 @@ class _MenuPageState extends State<MenuPage> {
                                           ),
                                           const SizedBox(height: 8.0),
                                           Text(
-                                            menu.price.toString(),
+                                            '${f.format(menu.price)}원',
                                             style: const TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,

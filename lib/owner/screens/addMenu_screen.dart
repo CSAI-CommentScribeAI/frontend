@@ -5,9 +5,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:frontend/owner/services/menu_service.dart';
 
 class AddMenuPage extends StatefulWidget {
-  final int storeIndex;
+  final int storeId;
   final String accessToken;
-  const AddMenuPage(this.storeIndex, this.accessToken, {super.key});
+  const AddMenuPage(this.storeId, this.accessToken, {super.key});
 
   @override
   State<AddMenuPage> createState() => _AddMenuPageState();
@@ -528,19 +528,27 @@ class _AddMenuPageState extends State<AddMenuPage> {
         ),
         bottomNavigationBar: saveColor
             ? ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (formKey.currentState!.validate()) {
                     formKey.currentState!.save();
                     printFormValues();
-                    MenuService().registerMenu(
-                      name,
-                      price,
-                      menuDetail,
-                      _menuImage!,
-                      status!,
-                      widget.accessToken,
-                      widget.storeIndex,
-                    );
+
+                    try {
+                      await MenuService().registerMenu(
+                        name,
+                        price,
+                        menuDetail,
+                        _menuImage!,
+                        status!,
+                        widget.accessToken,
+                        '${widget.storeId}',
+                      );
+
+                      Navigator.pop(
+                          context, true); // true -> 메뉴 등록 시 바로 페이지 이동해서 보이도록
+                    } catch (e) {
+                      print('Error registering menu: $e');
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(

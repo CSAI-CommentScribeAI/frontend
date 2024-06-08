@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
 import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/storeForm_widget.dart';
-import 'package:get/get.dart';
 import 'dart:io' show File;
 import 'package:image_picker/image_picker.dart';
 
@@ -355,9 +354,8 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => AddressPage(
-                                            onAddressSelected:
-                                                _onAddressSelected,
-                                            sendAddress: sendAddress,
+                                            _onAddressSelected,
+                                            sendAddress,
                                           ),
                                         ),
                                       )
@@ -593,30 +591,39 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
         ),
         bottomNavigationBar: saveColor
             ? ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  // 저장하기 버튼 클릭하고 홈페이지로 나갈 때 보유 가게 화살표 아이콘 수정해야 함!
                   if (formKey.currentState!.validate()) {
                     formKey.currentState!.save();
                     sendAddress(finalRoadAddress, finalJibunAddres,
                         finalPostalCode, finalLatitude, finalLongitude);
 
                     printFormValues();
-                    StoreService().registerStore(
-                      register,
-                      name,
-                      category!,
-                      explanation,
-                      minOrderPrice,
-                      fullAddress,
-                      finalRoadAddress,
-                      finalJibunAddres,
-                      finalPostalCode,
-                      finalLatitude,
-                      finalLongitude,
-                      openInitialTime,
-                      closeInitialTime,
-                      _menuImage!,
-                      widget.accessToken,
-                    );
+
+                    try {
+                      await StoreService().registerStore(
+                        register,
+                        name,
+                        category!,
+                        explanation,
+                        minOrderPrice,
+                        fullAddress,
+                        finalRoadAddress,
+                        finalJibunAddres,
+                        finalPostalCode,
+                        finalLatitude,
+                        finalLongitude,
+                        openInitialTime,
+                        closeInitialTime,
+                        _menuImage!,
+                        widget.accessToken,
+                      );
+
+                      Navigator.pop(
+                          context, true); // true -> 가게 등록 시 바로 페이지 이동해서 보이도록
+                    } catch (e) {
+                      print('Error registering menu: $e');
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(
