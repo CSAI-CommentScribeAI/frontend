@@ -67,7 +67,7 @@ class _StorePageState extends State<StorePage> {
                 ),
               ),
               FutureBuilder<List<StoreModel>>(
-                future: StoreService().getStore(widget.accessToken),
+                future: StoreService().getStore(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

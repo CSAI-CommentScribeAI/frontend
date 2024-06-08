@@ -544,14 +544,10 @@ class _HomePageState extends State<HomePage> {
                             ),
                             GestureDetector(
                               onTap: () async {
-                                OrderService()
-                                    .getUserOrders(await getStoreId());
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ReceiptPage(
-                                      accessToken: widget.accessToken,
-                                    ),
+                                    builder: (context) => ReceiptPage(storeId),
                                   ),
                                 );
                               },

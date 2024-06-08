@@ -4,15 +4,13 @@ import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/letter_screen.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
 import 'package:frontend/owner/services/letter_service.dart';
-import 'package:frontend/owner/services/order_service.dart';
-import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
 import 'package:frontend/user/models/order_model.dart';
 import 'package:frontend/user/services/userStore_service.dart';
 
 class ReceiptPage extends StatefulWidget {
-  final String accessToken;
-  const ReceiptPage({required this.accessToken, super.key});
+  final int storeId;
+  const ReceiptPage(this.storeId, {super.key});
 
   @override
   State<ReceiptPage> createState() => _ReceiptPageState();
@@ -440,22 +438,6 @@ class _ReceiptPageState extends State<ReceiptPage> {
     );
   }
 
-  Future<int> getOrderId() async {
-    List<OrderModel> orders = await OrderService().getOrder();
-    int? orderId;
-
-    for (var order in orders) {
-      orderId = order.orderId;
-    }
-
-    // orderId가 null일 경우 예외 처리
-    if (orderId == null) {
-      throw Exception("No orders found");
-    }
-
-    return orderId;
-  }
-
   Future<int> getStoreId() async {
     List<StoreModel> storeList = await UserStoreService().getManyStores();
     int? id;
@@ -472,12 +454,29 @@ class _ReceiptPageState extends State<ReceiptPage> {
     return id;
   }
 
+  Future<int> getOrderId() async {
+    List<OrderModel> orders =
+        await OrderService().getUserOrders(await getStoreId());
+    int? orderId;
+
+    for (var order in orders) {
+      orderId = order.orderId;
+    }
+
+    // orderId가 null일 경우 예외 처리
+    if (orderId == null) {
+      throw Exception("No orders found");
+    }
+
+    return orderId;
+  }
+
   // FutureBuilder의 future를 반환하는 함수
   // await getStoreId() 작성할 때 FutureBuilder안에 await 사용할 수 없음
-  Future<List<OrderModel>> getStoreOrders() async {
-    int storeId = await getStoreId();
-    return OrderService().getUserOrders(storeId);
-  }
+  // Future<List<OrderModel>> getStoreOrders() async {
+  //   int storeId = await getStoreId();
+  //   return OrderService().getUserOrders(storeId);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -523,22 +522,9 @@ class _ReceiptPageState extends State<ReceiptPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            ElevatedButton(
-                onPressed: () {
-                  OrderService().order(widget.accessToken);
-                },
-                child: const Text('주문하기')),
-            // 완료된 주문 정보 갯수
-            const Row(
-              children: [
-                SizedBox(width: 20),
-              ],
-            ),
-            const SizedBox(height: 24),
-
             // 주문 정보 컨테이너
             FutureBuilder<List<OrderModel>>(
-              future: getStoreOrders(),
+              future: OrderService().getUserOrders(widget.storeId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/models/order_model.dart';
-import 'package:frontend/user/services/order_service.dart';
+import 'package:frontend/all/services/order_service.dart';
 import 'package:intl/intl.dart';
 
 // 결제 완료 후 이 페이지로 넘어가는 동시에 스낵바로 '주문 완료되었습니다'라고 뜨게 구현(API 할 때 구현할 예정)
@@ -17,6 +17,8 @@ class CompletePage extends StatefulWidget {
 }
 
 class _CompletePageState extends State<CompletePage> {
+  List<OrderModel> orderList = [];
+
   @override
   void initState() {
     super.initState();
@@ -40,13 +42,23 @@ class _CompletePageState extends State<CompletePage> {
         ),
         centerTitle: true,
         backgroundColor: const Color(0xFF374AA3),
-        actions: const [
+        actions: [
           // 홈 화면으로 이동
           Padding(
-            padding: EdgeInsets.only(right: 20),
-            child: Icon(
-              Icons.home,
-              color: Colors.white,
+            padding: const EdgeInsets.only(right: 20),
+            child: IconButton(
+              onPressed: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const UserHomePage(),
+                //   ),
+                // );
+              },
+              icon: const Icon(
+                Icons.home,
+                color: Colors.white,
+              ),
             ),
           ),
         ],
@@ -75,6 +87,9 @@ class _CompletePageState extends State<CompletePage> {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (BuildContext context, int index) {
                   final order = snapshot.data![index];
+                  setState(() {
+                    orderList.add(order);
+                  });
                   return Column(
                     children: [
                       Column(
