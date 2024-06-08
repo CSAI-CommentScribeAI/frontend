@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/owner/charts/feedback_chart.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/feedback_screen.dart';
@@ -31,6 +32,14 @@ class _HomePageState extends State<HomePage> {
   bool thisColor = true; // 선택되었을 때 원 색깔
   bool lastColor = false;
 
+  int storeNum = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getStoreId();
+  }
+
   // 가게 이름 비교를 통한 가게 아이디 반환 함수
   Future<int> getStoreIdByName(String storeName) async {
     List<StoreModel> stores = await UserStoreService().getManyStores();
@@ -40,7 +49,24 @@ class _HomePageState extends State<HomePage> {
         return store.id;
       }
     }
+
     return 0;
+  }
+
+  Future<int> getStoreId() async {
+    List<StoreModel> storeList = await UserStoreService().getManyStores();
+    int? id;
+
+    for (var store in storeList) {
+      id = store.id;
+    }
+
+    // orderId가 null일 경우 예외 처리
+    if (id == null) {
+      throw Exception("No orders found");
+    }
+
+    return id;
   }
 
   Future<void> chooseStore(BuildContext context) async {
@@ -97,7 +123,7 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 18.0),
                       child: FutureBuilder<List<StoreModel>>(
                         // getStore() 메서드를 호출해서 데이터를 가져옴
-                        future: StoreService().getStore(widget.accessToken),
+                        future: StoreService().getStore(),
                         builder: (context, snapshot) {
                           // 데이터가 로드되는 동안 로딩 스피너 표시
                           if (snapshot.connectionState ==
@@ -355,8 +381,7 @@ class _HomePageState extends State<HomePage> {
                                             // expand_less,more
                                             GestureDetector(
                                               onTap: () {
-                                                StoreService().getStore(
-                                                    widget.accessToken);
+                                                StoreService().getStore();
                                                 setState(() {
                                                   isExpanded =
                                                       !isExpanded; // 확장되어 있을 때는 축소하고, 축소되어 있을 때는 확장
@@ -504,7 +529,9 @@ class _HomePageState extends State<HomePage> {
                                   title: '메뉴관리'),
                             ),
                             GestureDetector(
-                              onTap: () {
+                              onTap: () async {
+                                OrderService()
+                                    .getUserOrders(await getStoreId());
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
