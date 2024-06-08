@@ -3,14 +3,14 @@ import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/letter_screen.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
-import 'package:frontend/owner/services/store_service.dart';
-import 'package:frontend/owner/widgets/store_widget.dart';
 import 'package:frontend/owner/services/letter_service.dart';
+import 'package:frontend/owner/widgets/store_widget.dart';
 import 'package:frontend/user/models/order_model.dart';
 import 'package:frontend/user/services/userStore_service.dart';
 
 class ReceiptPage extends StatefulWidget {
-  const ReceiptPage({super.key});
+  final int storeId;
+  const ReceiptPage(this.storeId, {super.key});
 
   @override
   State<ReceiptPage> createState() => _ReceiptPageState();
@@ -24,17 +24,11 @@ class _ReceiptPageState extends State<ReceiptPage> {
 
   List<Map<String, dynamic>> orderList = [
     {
-      'title': 'BBQ 코엑스점',
+      'title': '중찬미식',
       'time': '10:56',
-      'information': '황금올리브 1마리 세트 + 콜라 1.5L',
-      'price': 25000,
+      'information': '짜장면',
+      'price': 6500,
     },
-    {
-      'title': '이남장 서초점',
-      'time': '13:45',
-      'information': '설렁탕(특)',
-      'price': 15000,
-    }
   ];
 
   void handleButtonSelection(int index) {
@@ -52,7 +46,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
     bool isSaved = await LetterService().saveLetter(orderId);
 
     if (isSaved) {
-      // 3초 후에 상태를 배차 / 출력 버튼으로 변경
+      // 3초 후에 상태를 '배차 / 출력' 버튼으로 변경
       Future.delayed(const Duration(seconds: 3), () {
         setState(() {
           orderList[index]['isPrinted'] = true; // 배차 혹은 출력 상태로 활성화
@@ -66,7 +60,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
   }
 
   // 배차 혹은 출력시키는 메서드
-  void acceptDelivery(int index) {
+  void acceptDelivery(int index) async {
     setState(() {
       orderList[index]['isDelivered'] = true; // 배달 중 상태로 활성화
     });
@@ -444,22 +438,6 @@ class _ReceiptPageState extends State<ReceiptPage> {
     );
   }
 
-  Future<int> getOrderId() async {
-    List<OrderModel> orders = await OrderService().getOrder();
-    int? orderId;
-
-    for (var order in orders) {
-      orderId = order.orderId;
-    }
-
-    // orderId가 null일 경우 예외 처리
-    if (orderId == null) {
-      throw Exception("No orders found");
-    }
-
-    return orderId;
-  }
-
   Future<int> getStoreId() async {
     List<StoreModel> storeList = await UserStoreService().getManyStores();
     int? id;
@@ -476,12 +454,29 @@ class _ReceiptPageState extends State<ReceiptPage> {
     return id;
   }
 
+  Future<int> getOrderId() async {
+    List<OrderModel> orders =
+        await OrderService().getUserOrders(await getStoreId());
+    int? orderId;
+
+    for (var order in orders) {
+      orderId = order.orderId;
+    }
+
+    // orderId가 null일 경우 예외 처리
+    if (orderId == null) {
+      throw Exception("No orders found");
+    }
+
+    return orderId;
+  }
+
   // FutureBuilder의 future를 반환하는 함수
   // await getStoreId() 작성할 때 FutureBuilder안에 await 사용할 수 없음
-  Future<List<OrderModel>> getStoreOrders() async {
-    int storeId = await getStoreId();
-    return OrderService().getUserOrders(storeId);
-  }
+  // Future<List<OrderModel>> getStoreOrders() async {
+  //   int storeId = await getStoreId();
+  //   return OrderService().getUserOrders(storeId);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -525,19 +520,11 @@ class _ReceiptPageState extends State<ReceiptPage> {
           vertical: 23.0,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // 완료된 주문 정보 갯수
-            const Row(
-              children: [
-                SizedBox(width: 20),
-              ],
-            ),
-            const SizedBox(height: 24),
-
             // 주문 정보 컨테이너
             FutureBuilder<List<OrderModel>>(
-              future: getStoreOrders(),
+              future: OrderService().getUserOrders(widget.storeId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(

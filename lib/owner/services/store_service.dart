@@ -4,13 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StoreService {
   late String serverAddress;
 
   // 가게 조회 api
-  Future<List<StoreModel>> getStore(String accessToken) async {
+  Future<List<StoreModel>> getStore() async {
     List<StoreModel> storeInstance = [];
+
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
 
     if (Platform.isAndroid) {
       serverAddress = 'http://10.0.2.2:9000/api/v1/store/my';

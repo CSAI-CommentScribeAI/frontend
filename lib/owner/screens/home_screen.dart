@@ -4,6 +4,7 @@ import 'package:frontend/owner/charts/feedback_chart.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/feedback_screen.dart';
 import 'package:frontend/owner/screens/menu_screen.dart';
+import 'package:frontend/owner/screens/orderDetail_screen.dart';
 import 'package:frontend/owner/screens/register_store.dart';
 import 'package:frontend/owner/screens/receipt_screen.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
@@ -23,7 +24,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int storeId = 0; // 메뉴 조회할 때 사용할 가게 아이디
+  int storeId = 0; // 주문내역에 사용할 가게 아이디
   late int storeIndex; // 가게 관리나 메뉴 관리 때 사용할 인덱스
   bool light = true;
   bool isExpanded = false; // 확장 유무(Expaned_less,more)
@@ -163,7 +164,7 @@ class _HomePageState extends State<HomePage> {
                                     setState(() {
                                       selectedStore = store.name;
                                       storeIndex = index;
-                                      storeId = id;
+                                      storeId = id; // id값이 storeId에 실시간 저장
                                       isExpanded = true;
                                     });
 
@@ -487,9 +488,22 @@ class _HomePageState extends State<HomePage> {
                           crossAxisCount: 4, // 1개의 행에 보여줄 item의 개수
                           crossAxisSpacing: 10.0, // 같은 행의 iteme들 사이의 간격
                           children: [
-                            menuItem(
-                                imgPath: 'assets/images/status.png',
-                                title: '전체현황'),
+                            GestureDetector(
+                              onTap: () {
+                                if (selectedStore.isNotEmpty) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          OrderDetailPage(storeId),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: menuItem(
+                                  imgPath: 'assets/images/status.png',
+                                  title: '주문내역'),
+                            ),
                             GestureDetector(
                               onTap: () {
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
@@ -530,12 +544,10 @@ class _HomePageState extends State<HomePage> {
                             ),
                             GestureDetector(
                               onTap: () async {
-                                OrderService()
-                                    .getUserOrders(await getStoreId());
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const ReceiptPage(),
+                                    builder: (context) => ReceiptPage(storeId),
                                   ),
                                 );
                               },

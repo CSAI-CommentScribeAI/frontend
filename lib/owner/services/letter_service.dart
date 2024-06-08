@@ -9,7 +9,7 @@ class LetterService {
   late String serverAddress;
 
   // 편지 저장 API
-  Future<String> getLetter() async {
+  Future<String> getLetter(int orderId) async {
     // SharedPreferences에서 액세스 토큰을 가져옴
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
@@ -19,9 +19,10 @@ class LetterService {
 
     // 현재 플랫폼에 따라 서버 주소 설정
     if (Platform.isAndroid) {
-      serverAddress = 'http://10.0.2.2:9000/api/v1/cart/orders/letter/4';
+      serverAddress = 'http://10.0.2.2:9000/api/v1/cart/orders/letter/$orderId';
     } else if (Platform.isIOS) {
-      serverAddress = 'http://127.0.0.1:9000/api/v1/cart/orders/letter/4';
+      serverAddress =
+          'http://127.0.0.1:9000/api/v1/cart/orders/letter/$orderId';
     }
 
     try {
@@ -66,7 +67,7 @@ class LetterService {
   }
 
   // 주문 수락 후 편지 작성 후 저장 API
-  Future<bool> saveLetter() async {
+  Future<bool> saveLetter(int orderId) async {
     // SharedPreferences에서 액세스 토큰을 가져옴
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
@@ -74,10 +75,10 @@ class LetterService {
     // 현재 플랫폼에 따라 서버 주소 설정
     if (Platform.isAndroid) {
       serverAddress =
-          'http://10.0.2.2:9000/api/v1/cart/orders/place/4?approve=true';
+          'http://10.0.2.2:9000/api/v1/cart/orders/place/$orderId?approve=true';
     } else if (Platform.isIOS) {
       serverAddress =
-          'http://127.0.0.1:9000/api/v1/cart/orders/place/4?approve=true';
+          'http://127.0.0.1:9000/api/v1/cart/orders/place/$orderId?approve=true';
     }
 
     try {

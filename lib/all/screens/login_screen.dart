@@ -107,19 +107,19 @@ class _LoginPageState extends State<LoginPage> {
         // final user = searchUser(); // userRole 값을 user에 저장
         // print(user);
 
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => HomePage(accessToken: accessToken),
-        //   ),
-        // );
-
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => UserHomePage(accessToken),
+            builder: (context) => HomePage(accessToken: accessToken),
           ),
         );
+
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => UserHomePage(accessToken),
+        //   ),
+        // );
       } else {
         // 로그인 실패 시
         print('로그인 실패');

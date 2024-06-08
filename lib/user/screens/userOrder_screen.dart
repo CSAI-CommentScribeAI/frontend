@@ -5,7 +5,7 @@ import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/services/cart_service.dart';
-import 'package:frontend/user/services/order_service.dart';
+import 'package:frontend/all/services/order_service.dart';
 
 class UserOrderPage extends StatefulWidget {
   final StoreModel store;
