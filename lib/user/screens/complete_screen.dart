@@ -6,14 +6,14 @@ import 'package:frontend/user/screens/write_screen.dart';
 
 import 'package:intl/intl.dart';
 
-// 결제 완료 후 이 페이지로 넘어가는 동시에 스낵바로 '주문 완료되었습니다'라고 뜨게 구현(API 할 때 구현할 예정)
 class CompletePage extends StatefulWidget {
   final StoreModel store;
   final bool? isWritten;
   final Map<String, dynamic>? menu;
 
   const CompletePage(this.store,
-      {this.isWritten = false, this.menu, super.key}); // null일 경우를 대비하여 기본값을 설정
+      {this.isWritten = false, this.menu, super.key});
+
   @override
   State<CompletePage> createState() => _CompletePageState();
 }
@@ -24,6 +24,14 @@ class _CompletePageState extends State<CompletePage> {
   @override
   void initState() {
     super.initState();
+    fetchOrders();
+  }
+
+  void fetchOrders() async {
+    List<OrderModel> orders = await OrderService().getOrder();
+    setState(() {
+      orderList = orders;
+    });
   }
 
   @override
@@ -45,7 +53,6 @@ class _CompletePageState extends State<CompletePage> {
         centerTitle: true,
         backgroundColor: const Color(0xFF374AA3),
         actions: [
-          // 홈 화면으로 이동
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: IconButton(
@@ -67,31 +74,16 @@ class _CompletePageState extends State<CompletePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 24.0),
-        child: FutureBuilder<List<OrderModel>>(
-          future: OrderService().getOrder(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
+        child: orderList.isEmpty
+            ? const Center(
                 child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.hasError) {
-              return Center(
-                child: Text('Error: ${snapshot.error}'),
-              );
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(
-                child: Text('등록된 주문이 없습니다.'),
-              );
-            } else {
-              return ListView.builder(
+              )
+            : ListView.builder(
                 shrinkWrap: true,
                 physics: const ScrollPhysics(),
-                itemCount: snapshot.data!.length,
+                itemCount: orderList.length,
                 itemBuilder: (BuildContext context, int index) {
-                  final order = snapshot.data![index];
-                  setState(() {
-                    orderList.add(order);
-                  });
+                  final order = orderList[index];
                   return Column(
                     children: [
                       Column(
@@ -99,7 +91,7 @@ class _CompletePageState extends State<CompletePage> {
                           Card(
                             color: Colors.white,
                             shadowColor: const Color(0xFF374AA3),
-                            elevation: 3.0, // 그림자 설정
+                            elevation: 3.0,
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16.0,
@@ -117,7 +109,6 @@ class _CompletePageState extends State<CompletePage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            // 가게 명
                                             Text(
                                               order.storeName,
                                               style: const TextStyle(
@@ -126,8 +117,6 @@ class _CompletePageState extends State<CompletePage> {
                                               ),
                                             ),
                                             const SizedBox(height: 20),
-
-                                            // 배달 상태
                                             Text(
                                               order.orderStatus,
                                               style: const TextStyle(
@@ -137,7 +126,6 @@ class _CompletePageState extends State<CompletePage> {
                                           ],
                                         ),
                                       ),
-                                      // 가게 로고
                                       Image.network(
                                         order.storeImageUrl,
                                         width: 80,
@@ -146,8 +134,6 @@ class _CompletePageState extends State<CompletePage> {
                                     ],
                                   ),
                                   const SizedBox(height: 5),
-
-                                  // 주문 내용
                                   ListView.builder(
                                     shrinkWrap: true,
                                     physics:
@@ -164,33 +150,30 @@ class _CompletePageState extends State<CompletePage> {
                                     },
                                   ),
                                   const SizedBox(height: 34),
-
-                                  // 주문 가격
                                   Text(
-                                    '합계 : ${f.format(order.totalPrice)}원', // 숫자 세자리마다 콤마 넣는 법
+                                    '합계 : ${f.format(order.totalPrice)}원',
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   const SizedBox(height: 28),
-
-                                  // 리뷰 쓰기 버튼
                                   Center(
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        widget.isWritten!
-                                            ? ''
-                                            : Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        writeReviewPage(
-                                                            widget.store,
-                                                            null) // 나중에 변수로 집어넣을 계획
-                                                    ),
-                                              );
-                                      }, // 리뷰 페이지로 이동
+                                        if (widget.isWritten != null &&
+                                            !widget.isWritten!) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    writeReviewPage(
+                                                        widget.store,
+                                                        null) // 나중에 변수로 집어넣을 계획
+                                                ),
+                                          );
+                                        }
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.white,
                                         minimumSize: const Size(302, 39),
@@ -204,7 +187,6 @@ class _CompletePageState extends State<CompletePage> {
                                         ),
                                       ),
                                       child: const Text(
-                                        // isWritten! ? '작성된 리뷰' :
                                         '리뷰 쓰기',
                                         style: TextStyle(
                                             fontSize: 14, color: Colors.black),
@@ -221,10 +203,7 @@ class _CompletePageState extends State<CompletePage> {
                     ],
                   );
                 },
-              );
-            }
-          },
-        ),
+              ),
       ),
     );
   }

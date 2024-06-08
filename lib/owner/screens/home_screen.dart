@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/owner/charts/feedback_chart.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/feedback_screen.dart';
@@ -165,10 +164,10 @@ class _HomePageState extends State<HomePage> {
                                       selectedStore = store.name;
                                       storeIndex = index;
                                       storeId = id; // id값이 storeId에 실시간 저장
-                                      isExpanded = true;
+                                      isExpanded = false; // 가게 선택 시 닫힘으로 설정
                                     });
 
-                                    print('선택된 가게 아이디: $id');
+                                    print('선택된 가게 아이디: $storeId');
                                     print('현재 인덱스: $storeIndex');
                                     Navigator.pop(context);
                                   },
