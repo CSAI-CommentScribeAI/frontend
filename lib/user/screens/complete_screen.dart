@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/models/order_model.dart';
+import 'package:frontend/user/screens/write_screen.dart';
 import 'package:frontend/user/services/order_service.dart';
 import 'package:intl/intl.dart';
 
@@ -162,16 +163,17 @@ class _CompletePageState extends State<CompletePage> {
                                   Center(
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        // isWritten!
-                                        //     ? ''
-                                        //     : Navigator.push(
-                                        //         context,
-                                        //         MaterialPageRoute(
-                                        //             builder: (context) =>
-                                        //                 writeReviewPage(store,
-                                        //                     null) // 나중에 변수로 집어넣을 계획
-                                        //             ),
-                                        //       );
+                                        widget.isWritten!
+                                            ? ''
+                                            : Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        writeReviewPage(
+                                                            widget.store,
+                                                            null) // 나중에 변수로 집어넣을 계획
+                                                    ),
+                                              );
                                       }, // 리뷰 페이지로 이동
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.white,
