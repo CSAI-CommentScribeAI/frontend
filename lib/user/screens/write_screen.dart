@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pannable_rating_bar/flutter_pannable_rating_bar.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/models/order_model.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/screens/userHome_screen.dart';
+import 'package:frontend/user/services/order_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:frontend/user/services/review_service.dart';
-import 'package:get/get.dart';
 
 class writeReviewPage extends StatefulWidget {
   final StoreModel store;
@@ -125,6 +126,22 @@ class _writeReviewPageState extends State<writeReviewPage> {
         );
       },
     );
+  }
+
+  Future<int> getOrderId() async {
+    List<OrderModel> orders = await OrderService().getOrder();
+    int? orderId;
+
+    for (var order in orders) {
+      orderId = order.orderId;
+    }
+
+    // orderId가 null일 경우 예외 처리
+    if (orderId == null) {
+      throw Exception("No orders found");
+    }
+
+    return orderId;
   }
 
   @override
@@ -327,7 +344,8 @@ class _writeReviewPageState extends State<writeReviewPage> {
             };
 
             // 리뷰 작성 API 호출
-            final success = await _reviewService.writeReview(reviewData);
+            final success = await _reviewService.writeReview(
+                reviewData, await getOrderId());
 
             if (success) {
               // 리뷰 작성 성공 시
@@ -364,8 +382,9 @@ class _writeReviewPageState extends State<writeReviewPage> {
   // 아래에서 위로 페이지 이동하는 애니메이션 함수
   Route downToUpRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          CompletePage(widget.store), // 오른쪽에 있는 isWritten : 위의 isWritte의 값
+      pageBuilder: (context, animation, secondaryAnimation) => CompletePage(
+        widget.store,
+      ), // 오른쪽에 있는 isWritten : 위의 isWritte의 값
       // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 1.0); // 시작점 지정(화면의 아래쪽 의미)

@@ -3,7 +3,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:frontend/owner/services/letter_service.dart';
 import 'package:frontend/owner/services/delivery_service.dart';
-import 'package:frontend/user/services/order_service.dart';
 
 class LetterPage extends StatefulWidget {
   const LetterPage({super.key});
@@ -73,7 +72,6 @@ class _LetterPageState extends State<LetterPage> {
   Future<void> fetchLetters() async {
     // LetterService 클래스의 getLetter 메서드를 호출하여 편지들을 불러오고, 그 결과를 기다림
     String fetchedLetters = await LetterService().getLetter();
-
     // 불러온 편지들로 상태를 업데이트하여, 위젯 트리를 다시 빌드
     setState(() {
       letters = fetchedLetters; // 불러온 편지들을 letters에 할당
