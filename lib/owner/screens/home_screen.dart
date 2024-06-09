@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/owner/charts/feedback_chart.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/feedback_screen.dart';
@@ -13,7 +12,6 @@ import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/circle_widget.dart';
 import 'package:frontend/owner/widgets/current_widget.dart';
 import 'package:frontend/owner/widgets/menuItem_widget.dart';
-import 'package:frontend/user/services/userStore_service.dart';
 
 class HomePage extends StatefulWidget {
   final String accessToken;
@@ -39,36 +37,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
   }
-
-  // 가게 이름 비교를 통한 가게 아이디 반환 함수
-  // Future<int> getStoreIdByName(String storeName) async {
-  //   List<StoreModel> stores = await UserStoreService().getManyStores();
-
-  //   for (var store in stores) {
-  //     if (store.name == storeName) {
-  //       return store.id;
-  //     }
-  //   }
-
-  //   return 0;
-  // }
-
-  // Future<int> getStoreId() async {
-  //   List<StoreModel> storeList = await UserStoreService().getManyStores();
-
-  //   int? id;
-
-  //   for (var store in storeList) {
-  //     id = store.id;
-  //   }
-
-  //   // orderId가 null일 경우 예외 처리
-  //   if (id == null) {
-  //     throw Exception("No orders found");
-  //   }
-
-  //   return id;
-  // }
 
   Future<void> chooseStore(BuildContext context) async {
     // showModalBottomSheet가 반환하는 Future<bool>을 받아옴

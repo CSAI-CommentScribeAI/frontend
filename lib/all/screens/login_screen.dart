@@ -1,6 +1,5 @@
 import 'package:frontend/all/screens/choose_screen.dart';
 import 'package:frontend/owner/screens/home_screen.dart';
-import 'package:frontend/user/screens/userHome_screen.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:io' show Platform;
@@ -102,6 +101,7 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setString('accessToken', accessToken);
         await prefs.setString('refreshToken', refreshToken);
 
+        print('accessToken: $accessToken');
         print('로그인 성공');
         sendDataToServer();
         // final user = searchUser(); // userRole 값을 user에 저장

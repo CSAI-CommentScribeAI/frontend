@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import 'package:frontend/all/models/review_model.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -68,7 +69,56 @@ class ReviewService {
     }
   }
 
-  // 가게8 가게 리뷰 API
+  // 주문 리뷰 요청 API
+  Future<Map<String, dynamic>> getOrderReview(int orderId) async {
+    // SharedPreferences에서 액세스 토큰을 가져옴
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
+
+    // 현재 플랫폼에 따라 서버 주소 설정
+    if (Platform.isAndroid) {
+      serverAddress = 'http://10.0.2.2:9000/api/v1/comment/order/$orderId';
+    } else if (Platform.isIOS) {
+      serverAddress = 'http://127.0.0.1:9000/api/v1/comment/order/$orderId';
+    }
+
+    try {
+      // 서버에 요청 보냄
+      final url = Uri.parse(serverAddress);
+
+      // 헤더에 액세스 토큰 추가
+      final headers = {
+        'Authorization': 'Bearer $accessToken',
+      };
+
+      // POST 요청
+      final response = await http.get(
+        url,
+        headers: headers,
+      );
+
+      // 200 : 요청 성공
+      if (response.statusCode == 200) {
+        final utf8Response = utf8.decode(response.bodyBytes);
+        final reviewResponse = jsonDecode(utf8Response);
+
+        final orderReview = reviewResponse['data'];
+        print('주문 리뷰 요청 성공: $orderReview');
+
+        return orderReview;
+      } else {
+        // 요청 실패 시
+        print('주문 리뷰 요청 실패: ${response.statusCode}');
+        print('응답 본문: ${response.body}');
+
+        return {};
+      }
+    } catch (e) {
+      // 예외 발생 시
+      print('예외 발생: $e');
+      return {};
+
+  // 가게별 가게 리뷰 API
   Future<List<dynamic>> getReview(int storeId) async {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';

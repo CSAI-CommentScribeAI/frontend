@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/all/services/order_service.dart';
-import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/letter_screen.dart';
-import 'package:frontend/owner/screens/review_screen.dart';
+import 'package:frontend/owner/screens/orderReview_screen.dart';
 import 'package:frontend/owner/services/letter_service.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
 import 'package:frontend/user/models/order_model.dart';
-import 'package:frontend/user/services/userStore_service.dart';
+import 'package:frontend/user/services/review_service.dart';
 
 class ReceiptPage extends StatefulWidget {
   final int storeId;
@@ -18,18 +17,20 @@ class ReceiptPage extends StatefulWidget {
 
 class _ReceiptPageState extends State<ReceiptPage> {
   int i = 0; // 각 객체마다 isCompleted에 접근하기 위해 선언
+  // int orderId = 0;
   bool isExpanded = false;
   int selectedButtonIndex = -1;
   bool isOrderAccepted = false; // 주문이 수락되었는지 여부 확인
 
-  List<Map<String, dynamic>> orderList = [
-    {
-      'title': '중찬미식',
-      'time': '10:56',
-      'information': '짜장면',
-      'price': 6500,
-    },
-  ];
+  // 주문 상태 객체
+  // FutureBuilder의 snapshot.data와 같이 있으면 UI 적용이 안됨
+  // 주문이 2개일때는 다 편지작성이 가능하기 때문에 하나만 되게 구현해야함
+  Map<String, dynamic> orderStatus = {
+    'isAccepted': null,
+    'isPrinted': null,
+    'isDelivered': null,
+    'isCompleted': null,
+  };
 
   void handleButtonSelection(int index) {
     setState(() {
@@ -40,7 +41,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
   // 주문을 수락하는 메서드
   void acceptOrder(int index, int orderId) async {
     setState(() {
-      orderList[index]['isAccepted'] = true;
+      orderStatus['isAccepted'] = true;
     });
 
     bool isSaved = await LetterService().saveLetter(orderId);
@@ -49,12 +50,12 @@ class _ReceiptPageState extends State<ReceiptPage> {
       // 3초 후에 상태를 '배차 / 출력' 버튼으로 변경
       Future.delayed(const Duration(seconds: 3), () {
         setState(() {
-          orderList[index]['isPrinted'] = true; // 배차 혹은 출력 상태로 활성화
+          orderStatus['isPrinted'] = true; // 배차 혹은 출력 상태로 활성화
         });
       });
     } else {
       setState(() {
-        orderList[index]['isAccepted'] = false;
+        orderStatus['isAccepted'] = false;
       });
     }
   }
@@ -62,24 +63,24 @@ class _ReceiptPageState extends State<ReceiptPage> {
   // 배차 혹은 출력시키는 메서드
   void acceptDelivery(int index) async {
     setState(() {
-      orderList[index]['isDelivered'] = true; // 배달 중 상태로 활성화
+      orderStatus['isDelivered'] = true; // 배달 중 상태로 활성화
     });
 
     // 주문을 완료 상태로 설정하는 메서드
     void completeOrder(int index) {
       setState(() {
-        orderList[index]['isAccepted'] = true;
-        orderList[index]['isPrinted'] = false;
-        orderList[index]['isDelivered'] = false;
-        orderList[index]['isCompleted'] = true; // 주문을 완료 상태로 설정
+        orderStatus['isAccepted'] = true;
+        orderStatus['isPrinted'] = false;
+        orderStatus['isDelivered'] = false;
+        orderStatus['isCompleted'] = true; // 주문을 완료 상태로 설정
       });
     }
 
     Future.delayed(const Duration(seconds: 1), () {
       setState(() {
         // 배차 혹은 출력 상태는 비활성화, 완료 중 상태로 활성화
-        orderList[index]['isPrinted'] = false;
-        orderList[index]['isCompleted'] = true;
+        orderStatus['isPrinted'] = false;
+        orderStatus['isCompleted'] = true;
       });
     });
   }
@@ -402,9 +403,11 @@ class _ReceiptPageState extends State<ReceiptPage> {
                           onPressed: () {
                             Navigator.pop(context);
                             // 주문 거절 완료 시 주문 내역 리스트(orderList)에 삭제
-                            setState(() {
-                              orderList.remove(orderList[index]);
-                            });
+                            // setState(() {
+                            //   if (orderList.length > index) {
+                            //     orderList.removeAt(index);
+                            //   }
+                            // });
                           },
                           style: TextButton.styleFrom(
                             backgroundColor: const Color(0xFF7B88C2),
@@ -438,25 +441,9 @@ class _ReceiptPageState extends State<ReceiptPage> {
     );
   }
 
-  Future<int> getStoreId() async {
-    List<StoreModel> storeList = await UserStoreService().getManyStores();
-    int? id;
-
-    for (var store in storeList) {
-      id = store.id;
-    }
-
-    // orderId가 null일 경우 예외 처리
-    if (id == null) {
-      throw Exception("No orders found");
-    }
-
-    return id;
-  }
-
   Future<int> getOrderId() async {
     List<OrderModel> orders =
-        await OrderService().getUserOrders(await getStoreId());
+        await OrderService().getUserOrders(widget.storeId);
     int? orderId;
 
     for (var order in orders) {
@@ -470,13 +457,6 @@ class _ReceiptPageState extends State<ReceiptPage> {
 
     return orderId;
   }
-
-  // FutureBuilder의 future를 반환하는 함수
-  // await getStoreId() 작성할 때 FutureBuilder안에 await 사용할 수 없음
-  // Future<List<OrderModel>> getStoreOrders() async {
-  //   int storeId = await getStoreId();
-  //   return OrderService().getUserOrders(storeId);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -539,309 +519,328 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     child: Text('들어온 주문이 없습니다.'),
                   );
                 } else {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const ScrollPhysics(),
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final order = snapshot.data![index]; // 리스트 안의 객체
-                      return Column(
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            height: 150,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFFFFF),
-                              borderRadius: BorderRadius.circular(15.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.25),
-                                  offset: const Offset(0, 4),
-                                  blurRadius: 4.0,
-                                ),
-                              ],
-                            ),
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final order = snapshot.data![index]; // 리스트 안의 객체
 
-                            // 주문 정보
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20.0, vertical: 20.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // 가게 이름과 완료 상태
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        order.storeName,
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 20),
-                                      // 주문이 수락되지 않은 경우에만 "수락" 버튼 보이도록 설정 = 수락되면 사라지도록
-                                      if (orderList[index]['isAccepted'] ==
-                                          null)
-                                        SizedBox(
-                                          height: 20,
-                                          width: 70,
-                                          child: ElevatedButton(
-                                            onPressed: () async {
-                                              acceptOrder(index,
-                                                  await getOrderId()); // 주문 수락 시 acceptOrder() 함수가 호출되어 isOrderAccepted가 true
-                                              // 주문을 수락할 때 추가적으로 해야 할 작업
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    const Color(0xFF374AA3)
-                                                        .withOpacity(0.66),
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            6))),
-                                            child: const Text(
-                                              '수락',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-
-                                      // 수락 버튼 클릭 시 점 아이콘과 "조리 중" 텍스트 표시
-                                      // "..." : if 조건문이 참일 때 "[ ]" 안에 코드 실행
-                                      if (orderList[index]['isAccepted'] ==
-                                              true &&
-                                          orderList[index]['isPrinted'] ==
-                                              null) ...[
-                                        const SizedBox(width: 7),
-                                        const Icon(
-                                          Icons.brightness_1,
-                                          color: Color(0xFF7B88C2),
-                                          size: 12,
-                                        ),
-                                        const SizedBox(width: 5),
-                                        const Text(
-                                          '조리 중',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.black),
-                                        ),
-                                      ],
-
-                                      // 배차 상태일 경우와 배달 중 상태가 아닐 경우 배차 버튼 표시
-                                      if (orderList[index]['isPrinted'] ==
-                                              true &&
-                                          orderList[index]['isDelivered'] ==
-                                              null) ...[
-                                        const SizedBox(width: 7),
-                                        SizedBox(
-                                          height: 20,
-                                          width: 70,
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              acceptDelivery(index);
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const LetterPage()));
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    const Color(0xFF374AA3)
-                                                        .withOpacity(0.66),
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            6))),
-                                            child: const Text(
-                                              '배차',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-
-                                      // 배달 중 상태일 경우와 완료 중 상태가 아닐 경우 배달 중 표시
-                                      // isCompleted = null로 안하면 완료 중이 표시됨
-                                      if (orderList[index]['isDelivered'] ==
-                                              true &&
-                                          orderList[index]['isCompleted'] ==
-                                              null) ...[
-                                        const SizedBox(width: 7),
-                                        const Icon(
-                                          Icons.brightness_1,
-                                          color: Color(0xFF7E7EB2),
-                                          size: 12,
-                                        ),
-                                        const SizedBox(width: 5),
-                                        const Text(
-                                          '배달 중',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.black),
-                                        ),
-                                      ],
-
-                                      // 완료 중 상태일 경우 완료 중 표시
-                                      if (orderList[index]['isCompleted'] ==
-                                          true) ...[
-                                        const SizedBox(width: 7),
-                                        const Icon(
-                                          Icons.brightness_1,
-                                          color: Color(0xFF6DEA6D),
-                                          size: 12,
-                                        ),
-                                        const SizedBox(width: 5),
-                                        const Text(
-                                          '완료',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.black),
-                                        ),
-                                      ],
-
-                                      const SizedBox(width: 7),
-
-                                      // 주문이 수락되지 않은 경우에만 "거절" 버튼 보이도록 설정 = 수락되면 사라지도록
-                                      const SizedBox(width: 7),
-                                      if (orderList[index]['isAccepted'] ==
-                                          null)
-                                        SizedBox(
-                                          height: 20,
-                                          width: 70,
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              // 해당 인덱스 받아 거절 사유 함수로 전달
-                                              // 주문 내역 삭제를 위해 사용
-                                              _showRejectBottomSheet(index);
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    const Color(0xFFA8A8A8)
-                                                        .withOpacity(0.70),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                )),
-                                            child: const Text(
-                                              '거절',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 13),
-
-                                  // 주문 시간
-                                  // Text(
-                                  //   order['time'],
-                                  //   style: const TextStyle(
-                                  //     fontSize: 15,
-                                  //     fontWeight: FontWeight.w500,
-                                  //   ),
-                                  // ),
-                                  // const SizedBox(height: 5),
-
-                                  // 주문 정보
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: order.orderMenus.length,
-                                    itemBuilder: (context, index) {
-                                      final orderMenu = order.orderMenus[index];
-                                      return Text(
-                                        '${orderMenu.menuName}  x ${orderMenu.quantity}',
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  const SizedBox(height: 8),
-
-                                  // 총 가격과 리뷰 보기 버튼
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        '총 가격 : ${order.totalPrice}원',
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-
-                                      // 완료 중 상태 일 경우 리뷰 보기 버튼 표시
-                                      if (orderList[index]['isCompleted'] ==
-                                          true) ...[
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ReviewPage(
-                                                  order.storeName,
-                                                ), // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
-                                              ),
-                                            );
-                                          },
-                                          style: TextButton.styleFrom(
-                                            foregroundColor: Colors.black,
-                                            minimumSize: Size.zero,
-                                            padding: EdgeInsets.zero,
-                                            tapTargetSize: MaterialTapTargetSize
-                                                .shrinkWrap,
-                                          ),
-                                          child: const Row(
-                                            children: [
-                                              Text(
-                                                '리뷰 보기',
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                              SizedBox(width: 11),
-                                              Icon(Icons.arrow_forward_ios),
-                                            ],
-                                          ),
-                                        ),
-                                      ]
-                                    ],
+                        return Column(
+                          children: [
+                            Container(
+                              width: double
+                                  .infinity, // height 지정을 하지 않으면 child 크기에 맞게 지정
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFFFFF),
+                                borderRadius: BorderRadius.circular(15.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.25),
+                                    offset: const Offset(0, 4),
+                                    blurRadius: 4.0,
                                   ),
                                 ],
                               ),
+
+                              // 주문 정보
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20.0, vertical: 20.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // 가게 이름과 완료 상태
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          order.storeName,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 20),
+
+                                        // 주문이 수락되지 않은 경우에만 "수락" 버튼 보이도록 설정 = 수락되면 사라지도록
+                                        if (orderStatus['isAccepted'] == null)
+                                          SizedBox(
+                                            height: 20,
+                                            width: 70,
+                                            child: ElevatedButton(
+                                              onPressed: () async {
+                                                acceptOrder(index,
+                                                    await getOrderId()); // 주문 수락 시 acceptOrder() 함수가 호출되어 isOrderAccepted가 true
+                                                // 주문을 수락할 때 추가적으로 해야 할 작업
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      const Color(0xFF374AA3)
+                                                          .withOpacity(0.66),
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              6))),
+                                              child: const Text(
+                                                '수락',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+
+                                        // 수락 버튼 클릭 시 점 아이콘과 "조리 중" 텍스트 표시
+                                        // "..." : if 조건문이 참일 때 "[ ]" 안에 코드 실행
+                                        if (orderStatus['isAccepted'] == true &&
+                                            orderStatus['isPrinted'] ==
+                                                null) ...[
+                                          const SizedBox(width: 7),
+                                          const Icon(
+                                            Icons.brightness_1,
+                                            color: Color(0xFF7B88C2),
+                                            size: 12,
+                                          ),
+                                          const SizedBox(width: 5),
+                                          const Text(
+                                            '조리 중',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.black),
+                                          ),
+                                        ],
+
+                                        // 배차 상태일 경우와 배달 중 상태가 아닐 경우 배차 버튼 표시
+                                        if (orderStatus['isPrinted'] == true &&
+                                            orderStatus['isDelivered'] ==
+                                                null) ...[
+                                          const SizedBox(width: 7),
+                                          SizedBox(
+                                            height: 20,
+                                            width: 70,
+                                            child: ElevatedButton(
+                                              onPressed: () async {
+                                                int orderId =
+                                                    await getOrderId();
+
+                                                print('orderId: $orderId');
+                                                acceptDelivery(index);
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            LetterPage(
+                                                                orderId:
+                                                                    orderId)));
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      const Color(0xFF374AA3)
+                                                          .withOpacity(0.66),
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              6))),
+                                              child: const Text(
+                                                '배차',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+
+                                        // 배달 중 상태일 경우와 완료 중 상태가 아닐 경우 배달 중 표시
+                                        // isCompleted = null로 안하면 완료 중이 표시됨
+                                        if (orderStatus['isDelivered'] ==
+                                                true &&
+                                            orderStatus['isCompleted'] ==
+                                                null) ...[
+                                          const SizedBox(width: 7),
+                                          const Icon(
+                                            Icons.brightness_1,
+                                            color: Color(0xFF7E7EB2),
+                                            size: 12,
+                                          ),
+                                          const SizedBox(width: 5),
+                                          const Text(
+                                            '배달 중',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.black),
+                                          ),
+                                        ],
+
+                                        // 완료 중 상태일 경우 완료 중 표시
+                                        if (orderStatus['isCompleted'] ==
+                                            true) ...[
+                                          const SizedBox(width: 7),
+                                          const Icon(
+                                            Icons.brightness_1,
+                                            color: Color(0xFF6DEA6D),
+                                            size: 12,
+                                          ),
+                                          const SizedBox(width: 5),
+                                          const Text(
+                                            '완료',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.black),
+                                          ),
+                                        ],
+
+                                        const SizedBox(width: 7),
+
+                                        // 주문이 수락되지 않은 경우에만 "거절" 버튼 보이도록 설정 = 수락되면 사라지도록
+                                        const SizedBox(width: 7),
+                                        if (orderStatus['isAccepted'] == null)
+                                          SizedBox(
+                                            height: 20,
+                                            width: 70,
+                                            child: ElevatedButton(
+                                              onPressed: () {
+                                                // 해당 인덱스 받아 거절 사유 함수로 전달
+                                                // 주문 내역 삭제를 위해 사용
+                                                _showRejectBottomSheet(index);
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      const Color(0xFFA8A8A8)
+                                                          .withOpacity(0.70),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6),
+                                                  )),
+                                              child: const Text(
+                                                '거절',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 13),
+
+                                    // 주문 시간
+                                    // Text(
+                                    //   order['time'],
+                                    //   style: const TextStyle(
+                                    //     fontSize: 15,
+                                    //     fontWeight: FontWeight.w500,
+                                    //   ),
+                                    // ),
+                                    // const SizedBox(height: 5),
+
+                                    // 주문 정보
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: order.orderMenus.length,
+                                      itemBuilder: (context, index) {
+                                        final orderMenu =
+                                            order.orderMenus[index];
+                                        return Text(
+                                          '${orderMenu.menuName}  x ${orderMenu.quantity}',
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(height: 8),
+
+                                    // 총 가격과 리뷰 보기 버튼
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          '총 가격 : ${order.totalPrice}원',
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+
+                                        // 완료 중 상태 일 경우 리뷰 보기 버튼 표시
+                                        if (orderStatus['isCompleted'] ==
+                                            true) ...[
+                                          TextButton(
+                                            onPressed: () async {
+                                              final orderId =
+                                                  await getOrderId();
+                                              try {
+                                                await ReviewService()
+                                                    .getOrderReview(orderId);
+                                                print(orderId);
+
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          OrderReviewPage(
+                                                            storeId:
+                                                                widget.storeId,
+                                                            orderId: orderId,
+                                                          ) // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
+                                                      ),
+                                                );
+                                              } catch (e) {
+                                                print(e.toString());
+                                              }
+                                            },
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: Colors.black,
+                                              minimumSize: Size.zero,
+                                              padding: EdgeInsets.zero,
+                                              tapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                            ),
+                                            child: const Row(
+                                              children: [
+                                                Text(
+                                                  '리뷰 보기',
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 11),
+                                                Icon(Icons.arrow_forward_ios),
+                                              ],
+                                            ),
+                                          ),
+                                        ]
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 40),
-                        ],
-                      );
-                    },
+                            const SizedBox(height: 40),
+                          ],
+                        );
+                      },
+                    ),
                   );
                 }
               },
