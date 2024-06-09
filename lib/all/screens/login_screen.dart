@@ -94,7 +94,6 @@ class _LoginPageState extends State<LoginPage> {
         final responseData = jsonDecode(response.body);
         final accessToken = responseData['accessToken']; // 엑세스 토큰
         final refreshToken = responseData['refreshToken']; // 리프레시 토큰
-        // final userRole = responseData['userRole']; // 사용자 역할
 
         // 4. 토큰을 SharedPreferences에 저장합니다.
         final prefs = await SharedPreferences.getInstance();
@@ -104,22 +103,26 @@ class _LoginPageState extends State<LoginPage> {
         print('accessToken: $accessToken');
         print('로그인 성공');
         sendDataToServer();
-        // final user = searchUser(); // userRole 값을 user에 저장
-        // print(user);
+        final userRole = await searchUser(); // userRole 값을 가져옴
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomePage(accessToken: accessToken),
-          ),
-        );
-
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => UserHomePage(accessToken),
-        //   ),
-        // );
+        // userRole에 따라 페이지 이동
+        if (userRole == 'ROLE_OWNER') {
+          print('Navigating to HomePage');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(accessToken: accessToken),
+            ),
+          );
+        } else if (userRole == 'ROLE_USER') {
+          print('Navigating to UserHomePage');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserHomePage(accessToken),
+            ),
+          );
+        }
       } else {
         // 로그인 실패 시
         print('로그인 실패');
@@ -137,34 +140,34 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Future<String> searchUser() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final accessToken = prefs.getString('accessToken') ?? '';
-  //   try {
-  //     if (Platform.isAndroid) {
-  //       serverAddress = 'http://10.0.2.2:9000/api/v1/user/info';
-  //     } else if (Platform.isIOS) {
-  //       serverAddress = 'http://127.0.0.1:9000/api/v1/user/info';
-  //     }
+  Future<String> searchUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
+    try {
+      if (Platform.isAndroid) {
+        serverAddress = 'http://10.0.2.2:9000/api/v1/user/info';
+      } else if (Platform.isIOS) {
+        serverAddress = 'http://127.0.0.1:9000/api/v1/user/info';
+      }
 
-  //     final url = Uri.parse(serverAddress);
-  //     final response = await http.get(
-  //       url,
-  //       headers: {'Authorization': 'Bearer $accessToken'},
-  //     );
+      final url = Uri.parse(serverAddress);
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $accessToken'},
+      );
 
-  //     if (response.statusCode == 200) {
-  //       final responseData = jsonDecode(response.body);
-  //       print(responseData['userRole']);
-  //       return responseData['userRole'];
-  //     } else {
-  //       return '';
-  //     }
-  //   } catch (e) {
-  //     print(e.toString());
-  //     return '';
-  //   }
-  // }
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        print(responseData['userRole']);
+        return responseData['userRole'];
+      } else {
+        return '';
+      }
+    } catch (e) {
+      print(e.toString());
+      return '';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -322,9 +325,9 @@ class _LoginPageState extends State<LoginPage> {
                       handleLogin(userId, password);
                     },
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
+                      backgroundColor: WidgetStateProperty.all<Color>(
                           const Color(0xff374AA3)),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
                         ),

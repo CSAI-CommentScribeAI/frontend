@@ -450,10 +450,10 @@ class _HomePageState extends State<HomePage> {
                       Flexible(
                         // 전체 메뉴 리스트(Gridview)
                         child: GridView.count(
-                          physics:
-                              const NeverScrollableScrollPhysics(), // Gridview의 스크롤 방지
-                          crossAxisCount: 4, // 1개의 행에 보여줄 item의 개수
+                          physics: const ScrollPhysics(), // Gridview의 스크롤 방지
+                          crossAxisCount: 3, // 1개의 행에 보여줄 item의 개수
                           crossAxisSpacing: 10.0, // 같은 행의 iteme들 사이의 간격
+                          childAspectRatio: 1.5, // Gridview 위젯 높이 조절
                           children: [
                             GestureDetector(
                               onTap: () {
@@ -536,9 +536,6 @@ class _HomePageState extends State<HomePage> {
                                   imgPath: 'assets/images/review.png',
                                   title: '리뷰관리'),
                             ),
-                            menuItem(
-                                imgPath: 'assets/images/connexion.png',
-                                title: '단골고객'),
                             GestureDetector(
                               onTap: () {
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
@@ -556,9 +553,6 @@ class _HomePageState extends State<HomePage> {
                                   imgPath: 'assets/images/feedback2.png',
                                   title: '피드백'),
                             ),
-                            menuItem(
-                                imgPath: 'assets/images/black.png',
-                                title: '블랙'),
                           ],
                         ),
                       ),
