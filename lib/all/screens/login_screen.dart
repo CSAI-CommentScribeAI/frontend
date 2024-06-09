@@ -1,5 +1,6 @@
 import 'package:frontend/all/screens/choose_screen.dart';
 import 'package:frontend/owner/screens/home_screen.dart';
+import 'package:frontend/user/screens/userHome_screen.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:io' show Platform;
@@ -324,15 +325,11 @@ class _LoginPageState extends State<LoginPage> {
                       String password = _passwordController.text;
                       handleLogin(userId, password);
                     },
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all<Color>(
-                          const Color(0xff374AA3)),
-                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                    ),
+                    style: TextButton.styleFrom(
+                        backgroundColor: const Color(0xff374AA3),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        )),
                     child: const Text(
                       'Login',
                       style: TextStyle(
