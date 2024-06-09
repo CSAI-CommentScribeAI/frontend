@@ -117,6 +117,49 @@ class ReviewService {
       // 예외 발생 시
       print('예외 발생: $e');
       return {};
+
+  // 가게별 가게 리뷰 API
+  Future<List<dynamic>> getReview(int storeId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
+
+    if (Platform.isAndroid) {
+      serverAddress = 'http://10.0.2.2:9000/api/v1/comment/store/$storeId';
+    } else if (Platform.isIOS) {
+      serverAddress = 'http://127.0.0.1:9000/api/v1/comment/store/$storeId';
+    }
+
+    try {
+      final url = Uri.parse(serverAddress);
+      final headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      // Get 요청
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final utf8Response = utf8.decode(response.bodyBytes);
+        final dynamic jsonResponse = jsonDecode(utf8Response);
+
+        if (jsonResponse is Map && jsonResponse['data'] is List) {
+          final List<dynamic> reviewInstance = jsonResponse['data'];
+          print('JSON 데이터: $reviewInstance');
+          print('조회 성공 $reviewInstance');
+          return reviewInstance;
+        } else {
+          print('응답이 예상과 다름: $jsonResponse');
+          return [];
+        }
+      } else {
+        print('조회 실패: ${response.statusCode}');
+        print('응답 본문: ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('예외 발생: $e');
+      return [];
     }
   }
 }

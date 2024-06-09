@@ -38,35 +38,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  // // 가게 이름 비교를 통한 가게 아이디 반환 함수
-  // Future<int> getStoreIdByName(String storeName) async {
-  //   List<StoreModel> stores = await UserStoreService().getManyStores();
-
-  //   for (var store in stores) {
-  //     if (store.name == storeName) {
-  //       return store.id;
-  //     }
-  //   }
-
-  //   return 0;
-  // }
-
-  // Future<int> getStoreId() async {
-  //   List<StoreModel> storeList = await UserStoreService().getManyStores();
-  //   int? id;
-
-  //   for (var store in storeList) {
-  //     id = store.id;
-  //   }
-
-  //   // orderId가 null일 경우 예외 처리
-  //   if (id == null) {
-  //     throw Exception("No orders found");
-  //   }
-
-  //   return id;
-  // }
-
   Future<void> chooseStore(BuildContext context) async {
     // showModalBottomSheet가 반환하는 Future<bool>을 받아옴
     final refresh = await showModalBottomSheet<bool>(
@@ -552,17 +523,14 @@ class _HomePageState extends State<HomePage> {
                                   title: '접수관리'),
                             ),
                             GestureDetector(
-                              onTap: () {
-                                // 가게 선택하지 않을 경우 못 들어가게 설정
-                                if (selectedStore.isNotEmpty) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ReviewPage(selectedStore, 0),
-                                    ),
-                                  );
-                                }
+                              onTap: () async {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ReviewPage(selectedStore),
+                                  ),
+                                );
                               },
                               child: menuItem(
                                   imgPath: 'assets/images/review.png',

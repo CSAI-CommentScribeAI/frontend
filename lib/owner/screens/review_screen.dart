@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/all/widgets/userReview_widget.dart';
-import 'package:frontend/owner/screens/filtering_screen.dart';
-import 'package:frontend/owner/widgets/circle_widget.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:frontend/user/services/reply_service.dart';
+import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/owner/screens/filtering_screen.dart';
+import 'package:frontend/owner/screens/reply_screen.dart';
+import 'package:frontend/owner/services/store_service.dart';
+import 'package:frontend/owner/widgets/circle_widget.dart';
 import 'package:frontend/user/services/review_service.dart';
 
 class ReviewPage extends StatefulWidget {
   final String selectedStore;
-  final int orderId;
-  const ReviewPage(this.selectedStore, this.orderId, {super.key});
+  
+  const ReviewPage(this.selectedStore, {super.key});
+
 
   @override
   State<ReviewPage> createState() => _ReviewPageState();
@@ -21,6 +23,9 @@ class _ReviewPageState extends State<ReviewPage> {
   bool isExpanded = false;
   late int reviewNum;
   bool isReplied = false; // 답글 유무
+  late Future<List<dynamic>> review;
+  int storeId = 0;
+  int reviewCount = 0; // 리뷰 개수를 저장할 변수
 
   List<Map<String, dynamic>> dateList = [
     {
@@ -62,35 +67,38 @@ class _ReviewPageState extends State<ReviewPage> {
     }
   ];
 
-  List<Map<String, dynamic>> reviewList = [
-    {
-      // 실제 위젯을 렌더링할 때 이미지가 준비되었는지 확인한 후에 위젯을 생성을 위해
-      // 이미지를 미리 가져와서 사용하기보다는 이미지의 경로를 저장
-      "profileImgPath": 'assets/images/profile1.png',
-      "name": "민택기",
-      "open_date": "2024.01.18",
-      "rate": 4.5,
-      "menu": "황금 올리브 치킨",
-      "review":
-          "추운날 늦은밤까지 맛있게 요리해 주셔서 감사합니다 너무 맛있어요. 기름기 없이 촉촉하게여 먹기에 좋았어요. 감사해요.",
-      "menuImgPath": 'assets/images/chicken.png',
-      "reply": "리뷰를 남겨주셔서 감사합니다. 또 이용해주세요^^",
-      "block": false, // 차단 활성화 값 변경 위해 추가
-      "hide": false // 숨김 활성화 값 변경 위해 추가
-    },
-    {
-      "profileImgPath": 'assets/images/profile2.png',
-      "name": "소진수",
-      "open_date": "2024.01.20",
-      "rate": 4.0,
-      "menu": "자메이카 통다리 치킨",
-      "review": "너무 맛있어요. 기름기 없이 촉촉하게여 먹기에 좋았어요. 살도 진짜 부드러워요. 감사합니다.",
-      "menuImgPath": 'assets/images/jamaica.png',
-      "reply": "다음에도 더 맛있는 자메이카 통다리 만들어보겠습니다!!!",
-      "block": false,
-      "hide": false
-    },
-  ];
+  List<Map<String, dynamic>> reviewList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    review = _getReviews();
+  }
+
+  Future<List<dynamic>> _getReviews() async {
+    int storeId = await getStoreId();
+    List<dynamic> reviewList = await ReviewService().getReview(storeId);
+    setState(() {
+      reviewCount = reviewList.length; // 리뷰 개수를 상태 변수에 저장
+    });
+    return reviewList;
+  }
+
+  Future<int> getStoreId() async {
+    List<StoreModel> storeList = await StoreService().getStore();
+    int? id;
+
+    for (var store in storeList) {
+      id = store.id;
+    }
+
+    // orderId가 null일 경우 예외 처리
+    if (id == null) {
+      throw Exception("No orders found");
+    }
+
+    return id;
+  }
 
   // 날짜 선택하는 바텀시트 호출 함수
   void chooseDate(BuildContext context) async {
@@ -428,7 +436,7 @@ class _ReviewPageState extends State<ReviewPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '리뷰(${reviewList.length}건)',
+                  '리뷰($reviewCount건)',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -469,161 +477,163 @@ class _ReviewPageState extends State<ReviewPage> {
                 color: const Color(0xFF808080).withOpacity(0.7),
               ),
             ),
+            const SizedBox(height: 10),
             Expanded(
-              child: ListView.builder(
-                itemCount: reviewList.length,
-                physics: const ScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  final review = reviewList[index];
-                  // FutureBuilder : 이미지가 로드될 때까지 기다려 해당 이미지가 준비되면 가져오는 방식
-                  return FutureBuilder(
-                    future: precacheImage(
-                        AssetImage(review["profileImgPath"]), context),
-                    builder: (context, profileSnapshot) {
-                      if (profileSnapshot.connectionState ==
-                          ConnectionState.done) {
-                        return FutureBuilder(
-                          future: precacheImage(
-                              AssetImage(review["menuImgPath"]), context),
-                          builder: (context, menuSnapshot) {
-                            if (menuSnapshot.connectionState ==
-                                ConnectionState.done) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 25),
-                                child: Column(
-                                  children: [
-                                    // 고객 리뷰
-                                    // reviewList[index](객체 review)를 전달
-                                    UserReview(
-                                      review: review,
-                                      visibleTrail: true,
-                                    ),
-                                    const SizedBox(height: 20),
-
-                                    // 답글 달기 버튼
-                                    // 아마도 작성 유형이나 답글 등록 버튼 누를 때 isReplied 값 상태 변경할 예정
-                                    if (isReplied)
-                                      // 답글이 생성되었을 때
-                                      Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.only(
-                                            right: 20.0, bottom: 10.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black.withOpacity(0.1),
-                                          borderRadius:
-                                              BorderRadius.circular(5.0),
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            // 사장님 프로필과 등록 날짜
-                                            ListTile(
-                                              leading: const CircleAvatar(
-                                                backgroundImage: AssetImage(
-                                                    'assets/images/sajang.png'),
-                                              ),
-                                              title: Text(
-                                                '사장님',
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black
-                                                      .withOpacity(0.6),
-                                                ),
-                                              ),
-                                              subtitle: Text(
-                                                '2024.01.19',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.black
-                                                      .withOpacity(0.6),
-                                                ),
-                                              ),
-                                            ),
-
-                                            // 답글
-                                            Text(review["reply"]),
-                                            const SizedBox(height: 15),
-
-                                            // 수정과 삭제 버튼
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                edTextBtn(
-                                                  text: '수정',
-                                                  color:
-                                                      const Color(0xFF374AA3),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                edTextBtn(
-                                                  text: '삭제',
-                                                  color:
-                                                      const Color(0xFFFF0000),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    else
-                                      // 답글 생성이 되지 않았을 때
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            isExpanded = !isExpanded;
-
-                                            if (isExpanded == true) {
-                                              chooseWrite(context);
-                                            }
-                                          });
-
-                                          // 답글 달기 버튼을 눌렀을 때 몇번째 답글 버튼인지를 결정하는 index를 가져와서 reviewNum에 저장
-                                          reviewNum = index;
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.white,
-                                            backgroundColor:
-                                                const Color((0xFF374AA3)),
-                                            fixedSize: const Size(350, 40),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5.0),
-                                            )),
-                                        child: const Text(
-                                          '답글 달기',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
+              // 자식 위젯을 사용 가능한 공간을 채우도록 확장
+              child: FutureBuilder<List<dynamic>>(
+                future: review, // 빌더가 대기할 비동기 연산 (future) 입니다.
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // 연결 상태가 진행 중일 때, 로딩 인디케이터 표시
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.hasError) {
+                    // 에러가 발생했을 때, 에러 메시지 표시
+                    return Center(
+                      child: Text('Error: ${snapshot.error}'),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    // 데이터가 없거나 비어있을 때, "등록된 리뷰가 없습니다" 메시지를 표시
+                    return const Center(
+                      child: Text('등록된 리뷰가 없습니다'),
+                    );
+                  } else {
+                    // 데이터가 있을 때, 리뷰를 표시하기 위해 ListView 생성
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length, // 리스트의 항목 수 설정
+                      itemBuilder: (context, index) {
+                        final review =
+                            snapshot.data![index]; // 현재 인덱스의 리뷰 데이터를 가져옴
+                        return ListTile(
+                          // 각 리뷰에 대한 ListTile을 생성합니다.
+                          title: Row(
+                            children: [
+                              Text(
+                                review['nickName'], // 리뷰 작성자의 닉네임을 표시
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              RatingBarIndicator(
+                                rating:
+                                    review['rating'].toDouble(), // 리뷰 평점을 표시
+                                itemSize: 20,
+                                itemBuilder: (context, index) => const Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                review['rating'].toString(), // 리뷰 평점
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const Spacer(), // PopupMenuButton을 오른쪽에 배치
+                              PopupMenuButton<String>(
+                                onSelected: (value) {
+                                  // 메뉴 항목 선택 시의 동작을 정의
+                                  switch (value) {
+                                    case '신고':
+                                      break;
+                                    case '차단':
+                                      break;
+                                    case '숨김':
+                                      break;
+                                  }
+                                },
+                                itemBuilder: (BuildContext context) {
+                                  return {'신고', '차단', '숨김'}
+                                      .map((String choice) {
+                                    return PopupMenuItem<String>(
+                                      value: choice,
+                                      textStyle: const TextStyle(
+                                        color: Colors.black,
+                                      ),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          choice,
+                                          style: const TextStyle(
+                                            color: Colors.black,
                                           ),
                                         ),
                                       ),
-                                  ],
+                                    );
+                                  }).toList();
+                                },
+                                icon: const Icon(Icons.more_vert),
+                              ),
+                            ],
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                review['comment'], // 리뷰 코멘트를 표시
+                                style: const TextStyle(
+                                    fontSize: 15, color: Colors.black54),
+                              ),
+                              const SizedBox(height: 5),
+                              for (var menuItem in review['menuList'])
+                                Container(
+                                  margin: const EdgeInsets.only(top: 5),
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.black54, width: 1.5),
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: Text(
+                                    menuItem.toString(), // 메뉴 항목 표시
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
                                 ),
-                              );
-                            } else {
-                              return const SizedBox(
-                                height: 48,
-                                child: Center(
-                                  child: CircularProgressIndicator(),
+                              const SizedBox(height: 10),
+                              ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    isExpanded = !isExpanded;
+                                    if (isExpanded == true) {
+                                      chooseWrite(
+                                          context); // '답글 달기' 버튼을 클릭했을 때의 동작을 정의합니다.
+                                    }
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: const Color((0xFF374AA3)),
+                                  fixedSize: const Size(380, 40),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                  ),
                                 ),
-                              );
-                            }
-                          },
-                        );
-                      } // 가져오는 것을 대기하고 있을 때 로딩 인디케이터로 로딩 중 표시
-                      else {
-                        return const SizedBox(
-                          height: 48,
-                          child: Center(
-                            child: CircularProgressIndicator(),
+                                child: const Text(
+                                  '답글 달기', // 버튼 텍스트를 정의합니다.
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         );
-                      }
-                    },
-                  );
+                      },
+                    );
+                  }
                 },
               ),
-            ),
+            )
           ],
         ),
       ),
