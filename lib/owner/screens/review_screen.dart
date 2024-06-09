@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/all/widgets/userReview_widget.dart';
 import 'package:frontend/owner/screens/filtering_screen.dart';
-import 'package:frontend/owner/screens/reply_screen.dart';
 import 'package:frontend/owner/widgets/circle_widget.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:frontend/user/services/reply_service.dart';
 import 'package:frontend/user/services/review_service.dart';
 
 class ReviewPage extends StatefulWidget {
   final String selectedStore;
-  const ReviewPage(this.selectedStore, {super.key});
+  final int orderId;
+  const ReviewPage(this.selectedStore, this.orderId, {super.key});
 
   @override
   State<ReviewPage> createState() => _ReviewPageState();
@@ -268,23 +269,24 @@ class _ReviewPageState extends State<ReviewPage> {
                             return ListTile(
                               onTap: () {
                                 if (index == 1) {
-                                  ReviewService().writeReply(1);
+                                  ReplyService().writeAIReply(1);
                                 }
                                 // Navigator.pop을 호출하여 바텀시트를 닫은 후
                                 Navigator.pop(context);
                                 // 그 후에 Navigator.push를 호출하여 새 페이지로 이동
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ReplyPage(
-                                      // reviewNum로 객체 review 접근
-                                      // index가 n인 reviewNum을 여기로 가져오면 n번째 reviewList 정보를 가지고 있는 고객 리뷰로 연결
-                                      // 예시 : 1번째 답글 버튼을 가져와서 reviewNum가 1이기 때문에 reviewList[1]인 객체 정보를 가져옴
-                                      review: reviewList[reviewNum],
-                                      reviewList: reviewList,
-                                    ),
-                                  ),
-                                );
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) => const ReplyPage(
+                                //         // reviewNum로 객체 review 접근
+                                //         // index가 n인 reviewNum을 여기로 가져오면 n번째 reviewList 정보를 가지고 있는 고객 리뷰로 연결
+                                //         // 예시 : 1번째 답글 버튼을 가져와서 reviewNum가 1이기 때문에 reviewList[1]인 객체 정보를 가져옴
+                                //         // review: reviewList[reviewNum],
+                                //         // reviewList: reviewList,
+
+                                //         ),
+                                //   ),
+                                // );
                                 bottomState(() {
                                   setState(() {});
                                 });

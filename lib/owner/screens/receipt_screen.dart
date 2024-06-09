@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/all/services/order_service.dart';
-import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/letter_screen.dart';
-import 'package:frontend/owner/screens/orderReview_scren.dart';
+import 'package:frontend/owner/screens/orderReview_screen.dart';
 import 'package:frontend/owner/services/letter_service.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
 import 'package:frontend/user/models/order_model.dart';
 import 'package:frontend/user/services/review_service.dart';
-import 'package:frontend/user/services/userStore_service.dart';
 
 class ReceiptPage extends StatefulWidget {
   final int storeId;
@@ -19,6 +17,7 @@ class ReceiptPage extends StatefulWidget {
 
 class _ReceiptPageState extends State<ReceiptPage> {
   int i = 0; // 각 객체마다 isCompleted에 접근하기 위해 선언
+  // int orderId = 0;
   bool isExpanded = false;
   int selectedButtonIndex = -1;
   bool isOrderAccepted = false; // 주문이 수락되었는지 여부 확인
@@ -442,25 +441,9 @@ class _ReceiptPageState extends State<ReceiptPage> {
     );
   }
 
-  Future<int> getStoreId() async {
-    List<StoreModel> storeList = await UserStoreService().getManyStores();
-    int? id;
-
-    for (var store in storeList) {
-      id = store.id;
-    }
-
-    // orderId가 null일 경우 예외 처리
-    if (id == null) {
-      throw Exception("No orders found");
-    }
-
-    return id;
-  }
-
   Future<int> getOrderId() async {
     List<OrderModel> orders =
-        await OrderService().getUserOrders(await getStoreId());
+        await OrderService().getUserOrders(widget.storeId);
     int? orderId;
 
     for (var order in orders) {
@@ -541,6 +524,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                       itemCount: snapshot.data!.length,
                       itemBuilder: (BuildContext context, int index) {
                         final order = snapshot.data![index]; // 리스트 안의 객체
+
                         return Column(
                           children: [
                             Container(
@@ -639,13 +623,19 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                             height: 20,
                                             width: 70,
                                             child: ElevatedButton(
-                                              onPressed: () {
+                                              onPressed: () async {
+                                                int orderId =
+                                                    await getOrderId();
+
+                                                print('orderId: $orderId');
                                                 acceptDelivery(index);
                                                 Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
                                                         builder: (context) =>
-                                                            const LetterPage()));
+                                                            LetterPage(
+                                                                orderId:
+                                                                    orderId)));
                                               },
                                               style: ElevatedButton.styleFrom(
                                                   backgroundColor:
@@ -795,16 +785,22 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                             true) ...[
                                           TextButton(
                                             onPressed: () async {
+                                              final orderId =
+                                                  await getOrderId();
                                               try {
                                                 await ReviewService()
-                                                    .getOrderReview(
-                                                        await getOrderId());
+                                                    .getOrderReview(orderId);
+                                                print(orderId);
 
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
-                                                          const OrderReviewPage() // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
+                                                          OrderReviewPage(
+                                                            storeId:
+                                                                widget.storeId,
+                                                            orderId: orderId,
+                                                          ) // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
                                                       ),
                                                 );
                                               } catch (e) {

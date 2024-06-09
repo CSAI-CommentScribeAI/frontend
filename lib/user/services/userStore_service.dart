@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserStoreService {
   String serverAddress = '';
@@ -9,6 +10,10 @@ class UserStoreService {
   // 가게 여러건 조회 API
   Future<List<StoreModel>> getManyStores() async {
     List<StoreModel> userStoreInstance = []; // 모든 가게를 저장할 리스트
+
+    // SharedPreferences에서 토큰을 가져옵니다.
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
 
     if (Platform.isAndroid) {
       serverAddress = 'http://10.0.2.2:9000/api/v1/store/';
@@ -18,7 +23,12 @@ class UserStoreService {
 
     try {
       final url = Uri.parse(serverAddress);
-      final response = await http.get(url);
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
 
       if (response.statusCode == 200) {
         final utf8Response =

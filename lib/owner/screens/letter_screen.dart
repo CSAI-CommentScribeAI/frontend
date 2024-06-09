@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/services/letter_service.dart';
 import 'package:frontend/owner/services/delivery_service.dart';
-import 'package:frontend/user/models/order_model.dart';
-import 'package:frontend/user/services/userStore_service.dart';
+import 'package:frontend/owner/services/store_service.dart';
 
 class LetterPage extends StatefulWidget {
-  const LetterPage({super.key});
+  final int orderId;
+  const LetterPage({required this.orderId, super.key});
 
   @override
   State<LetterPage> createState() => _LetterPageState();
@@ -74,7 +73,7 @@ class _LetterPageState extends State<LetterPage> {
 
   // 가게 아이디 가져오는 함수
   Future<int> getStoreId() async {
-    List<StoreModel> storeList = await UserStoreService().getManyStores();
+    List<StoreModel> storeList = await StoreService().getStore();
     int? id;
 
     for (var store in storeList) {
@@ -89,29 +88,11 @@ class _LetterPageState extends State<LetterPage> {
     return id;
   }
 
-  // 주문 아이디 가져오는 함수
-  Future<int> getOrderId() async {
-    List<OrderModel> orders =
-        await OrderService().getUserOrders(await getStoreId());
-    int? orderId;
-
-    for (var order in orders) {
-      orderId = order.orderId;
-    }
-
-    // orderId가 null일 경우 예외 처리
-    if (orderId == null) {
-      throw Exception("No orders found");
-    }
-
-    return orderId;
-  }
-
   // 서버에서 편지를 불러오는 메서드
   Future<void> fetchLetters() async {
     // LetterService 클래스의 getLetter 메서드를 호출하여 편지들을 불러오고, 그 결과를 기다림
-    String fetchedLetters = await LetterService().getLetter(await getOrderId());
-    
+    String fetchedLetters = await LetterService().getLetter(widget.orderId);
+
     // 불러온 편지들로 상태를 업데이트하여, 위젯 트리를 다시 빌드
     setState(() {
       letters = fetchedLetters; // 불러온 편지들을 letters에 할당
@@ -476,7 +457,7 @@ class _LetterPageState extends State<LetterPage> {
           ? ElevatedButton(
               onPressed: () async {
                 Navigator.pop(context);
-                DeliveryService().completeDelivery(await getOrderId());
+                DeliveryService().completeDelivery(widget.orderId);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF374AA3),

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:frontend/all/widgets/userReview_widget.dart';
 
 class FilteringPage extends StatelessWidget {
-  final String selectedStore;
+  // final String selectedStore;
   final List<Map<String, dynamic>> reviewList;
 
   const FilteringPage({
-    required this.selectedStore,
+    // required this.selectedStore,
     required this.reviewList,
     super.key,
   });
@@ -28,9 +28,9 @@ class FilteringPage extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        title: Text(
-          selectedStore,
-          style: const TextStyle(
+        title: const Text(
+          'selectedStore',
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),

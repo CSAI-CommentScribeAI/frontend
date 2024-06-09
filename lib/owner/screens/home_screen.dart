@@ -12,7 +12,6 @@ import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/circle_widget.dart';
 import 'package:frontend/owner/widgets/current_widget.dart';
 import 'package:frontend/owner/widgets/menuItem_widget.dart';
-import 'package:frontend/user/services/userStore_service.dart';
 
 class HomePage extends StatefulWidget {
   final String accessToken;
@@ -37,37 +36,36 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    getStoreId();
   }
 
-  // 가게 이름 비교를 통한 가게 아이디 반환 함수
-  Future<int> getStoreIdByName(String storeName) async {
-    List<StoreModel> stores = await UserStoreService().getManyStores();
+  // // 가게 이름 비교를 통한 가게 아이디 반환 함수
+  // Future<int> getStoreIdByName(String storeName) async {
+  //   List<StoreModel> stores = await UserStoreService().getManyStores();
 
-    for (var store in stores) {
-      if (store.name == storeName) {
-        return store.id;
-      }
-    }
+  //   for (var store in stores) {
+  //     if (store.name == storeName) {
+  //       return store.id;
+  //     }
+  //   }
 
-    return 0;
-  }
+  //   return 0;
+  // }
 
-  Future<int> getStoreId() async {
-    List<StoreModel> storeList = await UserStoreService().getManyStores();
-    int? id;
+  // Future<int> getStoreId() async {
+  //   List<StoreModel> storeList = await UserStoreService().getManyStores();
+  //   int? id;
 
-    for (var store in storeList) {
-      id = store.id;
-    }
+  //   for (var store in storeList) {
+  //     id = store.id;
+  //   }
 
-    // orderId가 null일 경우 예외 처리
-    if (id == null) {
-      throw Exception("No orders found");
-    }
+  //   // orderId가 null일 경우 예외 처리
+  //   if (id == null) {
+  //     throw Exception("No orders found");
+  //   }
 
-    return id;
-  }
+  //   return id;
+  // }
 
   Future<void> chooseStore(BuildContext context) async {
     // showModalBottomSheet가 반환하는 Future<bool>을 받아옴
@@ -158,16 +156,15 @@ class _HomePageState extends State<HomePage> {
                                     snapshot.data![index]; // 현재 인덱스의 가게 데이터
                                 return ListTile(
                                   onTap: () async {
-                                    int? id =
-                                        await getStoreIdByName(store.name);
                                     setState(() {
                                       selectedStore = store.name;
                                       storeIndex = index;
-                                      storeId = id; // id값이 storeId에 실시간 저장
-                                      isExpanded = false; // 가게 선택 시 닫힘으로 설정
+                                      storeId =
+                                          store.id; // id값이 storeId에 실시간 저장
+                                      isExpanded = false;
                                     });
 
-                                    print('선택된 가게 아이디: $storeId');
+                                    print('선택된 가게 아이디: ${store.id}');
                                     print('현재 인덱스: $storeIndex');
                                     Navigator.pop(context);
                                   },
@@ -562,7 +559,7 @@ class _HomePageState extends State<HomePage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          ReviewPage(selectedStore),
+                                          ReviewPage(selectedStore, 0),
                                     ),
                                   );
                                 }

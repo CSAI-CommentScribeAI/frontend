@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/all/services/order_service.dart';
-import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
 import 'package:frontend/user/models/order_model.dart';
-import 'package:frontend/user/services/userStore_service.dart';
 
 class OrderDetailPage extends StatefulWidget {
   final int storeId;
@@ -167,6 +165,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                             MaterialPageRoute(
                                               builder: (context) => ReviewPage(
                                                 order.storeName,
+                                                order.orderId,
                                               ), // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
                                             ),
                                           );
