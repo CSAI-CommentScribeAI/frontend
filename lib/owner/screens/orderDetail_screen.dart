@@ -165,7 +165,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                             MaterialPageRoute(
                                               builder: (context) => ReviewPage(
                                                 order.storeName,
-                                                order.orderId,
                                               ), // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
                                             ),
                                           );

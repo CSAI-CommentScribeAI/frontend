@@ -117,6 +117,8 @@ class ReviewService {
       // 예외 발생 시
       print('예외 발생: $e');
       return {};
+    }
+  }
 
   // 가게별 가게 리뷰 API
   Future<List<dynamic>> getReview(int storeId) async {

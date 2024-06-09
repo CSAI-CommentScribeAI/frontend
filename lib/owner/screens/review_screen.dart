@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/filtering_screen.dart';
-import 'package:frontend/owner/screens/reply_screen.dart';
 import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/circle_widget.dart';
+import 'package:frontend/user/services/reply_service.dart';
 import 'package:frontend/user/services/review_service.dart';
 
 class ReviewPage extends StatefulWidget {
   final String selectedStore;
-  
-  const ReviewPage(this.selectedStore, {super.key});
 
+  const ReviewPage(this.selectedStore, {super.key});
 
   @override
   State<ReviewPage> createState() => _ReviewPageState();
