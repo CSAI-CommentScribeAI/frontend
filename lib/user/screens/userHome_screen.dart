@@ -53,6 +53,18 @@ class _UserHomePageState extends State<UserHomePage> {
     });
   }
 
+  // 영어 카테고리를 한글로 변환하는 맵
+  Map<String, String> categoryTranslations = {
+    'HAMBURGER': '햄버거',
+    'PIZZA': '피자',
+    'DESSERT': '디저트',
+    'KOREANFOOD': '한식',
+    'CHINESEFOOD': '중식',
+    'FLOURBASEDFOOD': '분식',
+    'JAPANESEFOOD': '일식',
+    'CHICKEN': '치킨',
+  };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -362,10 +374,14 @@ class _UserHomePageState extends State<UserHomePage> {
                                     if (!isDeliveryLogo) ...[
                                       const SizedBox(height: 10),
                                       Text(
-                                        categories[index].category,
+                                        // categories[index].category,
+                                        categoryTranslations[
+                                                categories[index].category] ??
+                                            categories[index].category,
+
                                         style: const TextStyle(
                                           color: Colors.black,
-                                          fontSize: 10,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),

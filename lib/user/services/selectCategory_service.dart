@@ -75,6 +75,10 @@ class SelectCategoryService {
     // 가게 인스턴스를 저장할 리스트 생성
     List<StoreModel> categorySelectInstance = [];
 
+    // SharedPreferences에서 토큰을 가져옵니다.
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
+
     // 현재 플랫폼에 따라 서버 주소 설정.
     if (Platform.isAndroid) {
       serverAddress = 'http://10.0.2.2:9000/api/v1/store/category/stores';
@@ -89,6 +93,7 @@ class SelectCategoryService {
       // 헤더 설정
       final headers = {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
       };
 
       // GET 요청을 보냄
