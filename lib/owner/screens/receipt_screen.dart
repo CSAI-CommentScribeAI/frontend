@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/letter_screen.dart';
-import 'package:frontend/owner/screens/review_screen.dart';
+import 'package:frontend/owner/screens/orderReview_scren.dart';
 import 'package:frontend/owner/services/letter_service.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
 import 'package:frontend/user/models/order_model.dart';
+import 'package:frontend/user/services/review_service.dart';
 import 'package:frontend/user/services/userStore_service.dart';
 
 class ReceiptPage extends StatefulWidget {
@@ -24,6 +25,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
 
   // 주문 상태 객체
   // FutureBuilder의 snapshot.data와 같이 있으면 UI 적용이 안됨
+  // 주문이 2개일때는 다 편지작성이 가능하기 때문에 하나만 되게 구현해야함
   Map<String, dynamic> orderStatus = {
     'isAccepted': null,
     'isPrinted': null,
@@ -542,8 +544,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                         return Column(
                           children: [
                             Container(
-                              width: double.infinity,
-                              height: 150,
+                              width: double
+                                  .infinity, // height 지정을 하지 않으면 child 크기에 맞게 지정
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFFFFFF),
                                 borderRadius: BorderRadius.circular(15.0),
@@ -792,16 +794,22 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                         if (orderStatus['isCompleted'] ==
                                             true) ...[
                                           TextButton(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ReviewPage(
-                                                    order.storeName,
-                                                  ), // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
-                                                ),
-                                              );
+                                            onPressed: () async {
+                                              try {
+                                                await ReviewService()
+                                                    .getOrderReview(
+                                                        await getOrderId());
+
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const OrderReviewPage() // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
+                                                      ),
+                                                );
+                                              } catch (e) {
+                                                print(e.toString());
+                                              }
                                             },
                                             style: TextButton.styleFrom(
                                               foregroundColor: Colors.black,

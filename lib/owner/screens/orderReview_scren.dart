@@ -2,46 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:frontend/all/widgets/userReview_widget.dart';
 import 'package:frontend/owner/screens/filtering_screen.dart';
 import 'package:frontend/owner/screens/reply_screen.dart';
-import 'package:frontend/owner/widgets/circle_widget.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:frontend/user/services/review_service.dart';
 
-class ReviewPage extends StatefulWidget {
-  final String selectedStore;
-  const ReviewPage(this.selectedStore, {super.key});
+class OrderReviewPage extends StatefulWidget {
+  const OrderReviewPage({super.key});
 
   @override
-  State<ReviewPage> createState() => _ReviewPageState();
+  State<OrderReviewPage> createState() => _OrderReviewPageState();
 }
 
-class _ReviewPageState extends State<ReviewPage> {
-  String selectedDate = ''; // 선택된 날짜
+class _OrderReviewPageState extends State<OrderReviewPage> {
   double rate = 0.0; // 선택된 날짜에 해당하는 리뷰들의 평균 별점
   bool isExpanded = false;
   late int reviewNum;
   bool isReplied = false; // 답글 유무
 
-  List<Map<String, dynamic>> dateList = [
-    {
-      "date": "2024. 01. 16 ~ 2024. 01. 23",
-      "style": const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
-      "showCircle": false,
-      "rate": 4.8,
-    },
-    {
-      "date": "2024. 01. 24 ~ 2024. 01. 30",
-      "style": const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
-      "showCircle": false,
-      "rate": 4.3,
-    }
-  ];
-
+  // 답글 작성 유형 리스트
   List<Map<String, dynamic>> writeList = [
     {
       "title": "직접 작성",
@@ -77,130 +53,7 @@ class _ReviewPageState extends State<ReviewPage> {
       "block": false, // 차단 활성화 값 변경 위해 추가
       "hide": false // 숨김 활성화 값 변경 위해 추가
     },
-    {
-      "profileImgPath": 'assets/images/profile2.png',
-      "name": "소진수",
-      "open_date": "2024.01.20",
-      "rate": 4.0,
-      "menu": "자메이카 통다리 치킨",
-      "review": "너무 맛있어요. 기름기 없이 촉촉하게여 먹기에 좋았어요. 살도 진짜 부드러워요. 감사합니다.",
-      "menuImgPath": 'assets/images/jamaica.png',
-      "reply": "다음에도 더 맛있는 자메이카 통다리 만들어보겠습니다!!!",
-      "block": false,
-      "hide": false
-    },
   ];
-
-  // 날짜 선택하는 바텀시트 호출 함수
-  void chooseDate(BuildContext context) async {
-    await showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-      ),
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          // 상태 관리
-          builder: (BuildContext context, StateSetter bottomState) {
-            // StateSetter : 상태 변경 콜백 함수
-            return SizedBox(
-              height: MediaQuery.of(context).size.height * 0.4,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(31.0),
-
-                    // 하단모달 타이틀 & 종료
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          '날짜 선택',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            setState(() {
-                              isExpanded = true;
-                            });
-                          },
-                          icon: const Icon(Icons.close),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // 날짜 선택 리스트
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(18.0),
-                      child: SingleChildScrollView(
-                        physics: const ScrollPhysics(),
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: dateList.length,
-                          separatorBuilder: (BuildContext context, int index) {
-                            return const Divider();
-                          },
-                          itemBuilder: (BuildContext context, int index) {
-                            final date = dateList[index]; // date는 객체가 됨
-                            return ListTile(
-                              onTap: () {
-                                Navigator.pop(context);
-                                bottomState(() {
-                                  setState(() {
-                                    for (int i = 0; i < dateList.length; i++) {
-                                      if (i == index) {
-                                        dateList[i]["showCircle"] =
-                                            !dateList[i]["showCircle"];
-                                        if (dateList[i]["showCircle"] == true) {
-                                          selectedDate = date["date"];
-                                          rate = date["rate"];
-                                        } else {
-                                          selectedDate = '';
-                                          rate = 0.0;
-                                        }
-                                      } else {
-                                        dateList[i]["showCircle"] =
-                                            false; // 다시 눌렀을 때 false가 가능하지게
-                                      }
-                                    }
-                                  });
-                                });
-                              },
-                              title: Text(
-                                date["date"],
-                                style: date["style"],
-                              ),
-                              trailing: date["showCircle"]
-                                  ? const Circle(Color(0xFF7B88C2), 10.0)
-                                  : null,
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-    setState(() {
-      isExpanded = !isExpanded;
-    });
-  }
 
   // 답글 작성법 선택하는 바텀시트 호출 함수
   void chooseWrite(BuildContext context) async {
@@ -325,9 +178,9 @@ class _ReviewPageState extends State<ReviewPage> {
             color: Colors.white,
           ),
         ),
-        title: Text(
-          widget.selectedStore,
-          style: const TextStyle(
+        title: const Text(
+          '주문 리뷰',
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -363,110 +216,33 @@ class _ReviewPageState extends State<ReviewPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 27.0),
         child: Column(
           children: [
-            // 1주 날짜
+            // 미답글 리뷰 버튼
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(
-                  selectedDate.isNotEmpty ? selectedDate : '해당 날짜',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                Checkbox(
+                  value: isReplied,
+                  activeColor: const Color(0xFF374AA3).withOpacity(0.66),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: const VisualDensity(
+                    horizontal: VisualDensity.minimumDensity,
+                    vertical: VisualDensity.minimumDensity,
                   ),
-                ),
-                const SizedBox(width: 5),
-                GestureDetector(
-                  onTap: () {
+                  onChanged: (value) {
                     setState(() {
-                      isExpanded =
-                          !isExpanded; // 확장되어 있을 때는 축소하고, 축소되어 있을 때는 확장
-
-                      // true일 경우에만 하단 모달시트 보여짐
-                      if (isExpanded == true) {
-                        chooseDate(context);
-                      }
+                      isReplied = !isReplied;
                     });
                   },
-                  // 확장 유무에 따라 아이콘 변경
-                  child: isExpanded
-                      ? const Icon(Icons.expand_less)
-                      : const Icon(Icons.expand_more),
                 ),
-              ],
-            ),
-            const SizedBox(height: 35),
-
-            // 평점과 별점
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  rate.toString(),
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(width: 10),
-
-                // 날짜에 해당하는 평점 rate를 가져와 rating에 집어넣어 색상 양 설정
-                RatingBarIndicator(
-                  rating: rate,
-                  itemBuilder: (context, index) => const Icon(
-                    Icons.star,
-                    color: Colors.amber,
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(height: 35),
-
-            // 리뷰 수와 미답글 리뷰 버튼
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '리뷰(${reviewList.length}건)',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: isReplied,
-                      activeColor: const Color(0xFF374AA3).withOpacity(0.66),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      visualDensity: const VisualDensity(
-                        horizontal: VisualDensity.minimumDensity,
-                        vertical: VisualDensity.minimumDensity,
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          isReplied = !isReplied;
-                        });
-                      },
-                    ),
-                    const SizedBox(width: 5),
-                    const Text(
-                      '미답글 리뷰만',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
+                const SizedBox(width: 5),
+                const Text(
+                  '미답글 리뷰만',
+                  style: TextStyle(fontSize: 16),
                 ),
               ],
             ),
             const SizedBox(height: 10),
 
-            // 경계선
-            Container(
-              width: double.infinity,
-              height: 1,
-              decoration: BoxDecoration(
-                color: const Color(0xFF808080).withOpacity(0.7),
-              ),
-            ),
             Expanded(
               child: ListView.builder(
                 itemCount: reviewList.length,
