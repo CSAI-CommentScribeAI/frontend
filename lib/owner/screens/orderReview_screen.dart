@@ -149,31 +149,31 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
         child: Column(
           children: [
             // 미답글 리뷰 버튼
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Checkbox(
-                  value: isReplied,
-                  activeColor: const Color(0xFF374AA3).withOpacity(0.66),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: const VisualDensity(
-                    horizontal: VisualDensity.minimumDensity,
-                    vertical: VisualDensity.minimumDensity,
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      isReplied = !isReplied;
-                    });
-                  },
-                ),
-                const SizedBox(width: 5),
-                const Text(
-                  '미답글 리뷰만',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.end,
+            //   children: [
+            //     Checkbox(
+            //       value: isReplied,
+            //       activeColor: const Color(0xFF374AA3).withOpacity(0.66),
+            //       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            //       visualDensity: const VisualDensity(
+            //         horizontal: VisualDensity.minimumDensity,
+            //         vertical: VisualDensity.minimumDensity,
+            //       ),
+            //       onChanged: (value) {
+            //         setState(() {
+            //           isReplied = !isReplied;
+            //         });
+            //       },
+            //     ),
+            //     const SizedBox(width: 5),
+            //     const Text(
+            //       '미답글 리뷰만',
+            //       style: TextStyle(fontSize: 16),
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 10),
 
             Expanded(
               child: FutureBuilder(
@@ -198,7 +198,7 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
                       children: [
                         ListTile(
                           leading: Image.network(profileLink),
-                          title: Text(reviewer['name']),
+                          title: Text(orderReview['nickName']),
                           subtitle: const Text('2024.06.11'),
                         ),
                         const SizedBox(height: 5),
@@ -235,7 +235,25 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
                           ),
                           child: Text(orderReview['comment']),
                         ),
-                        const SizedBox(height: 50),
+                        for (var menuItem in orderReview['menuList'])
+                          Container(
+                            margin: const EdgeInsets.only(top: 10),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: Colors.black54, width: 1.5),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              menuItem.toString(), // 메뉴 항목 표시
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: 20),
 
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),

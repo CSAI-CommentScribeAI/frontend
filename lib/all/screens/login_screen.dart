@@ -179,14 +179,11 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                '배달반도',
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                ),
+              Image.asset(
+                'assets/images/deliverylogo.png',
+                scale: 1.5,
               ),
-              const SizedBox(height: 20.0),
+              const SizedBox(height: 30),
               SizedBox(
                 height: 55,
                 child: TextField(

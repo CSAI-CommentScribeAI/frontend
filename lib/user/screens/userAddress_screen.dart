@@ -1,3 +1,4 @@
+// UI 수정 필요
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/map_screen.dart';
 import 'package:get/get.dart';
@@ -227,7 +228,7 @@ class _UserAddressPageState extends State<UserAddressPage> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       TextFormField(
-                        style: const TextStyle(fontSize: 10.0),
+                        style: const TextStyle(fontSize: 16.0),
                         controller: detailController,
                         textAlign: TextAlign.center,
                         decoration: const InputDecoration(

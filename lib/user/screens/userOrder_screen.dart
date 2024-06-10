@@ -363,33 +363,22 @@ class _UserOrderPageState extends State<UserOrderPage> {
                                     onPressed: () {
                                       // Navigate to another screen
                                     },
-                                    child: ElevatedButton(
-                                      onPressed: () async {
-                                        final cartInfo =
-                                            await CartService().getCart();
-                                        OrderService().order(
-                                          orderStatus[0],
-                                          widget.menu.storeId,
-                                          totalPrice,
-                                          cartInfo,
-                                          orderMenus, // orderMenus를 주문 API에 포함
-                                        );
-                                      },
-                                      child: const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.add,
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.add,
+                                          color: Colors.black,
+                                        ),
+                                        SizedBox(width: 5),
+                                        Text(
+                                          '더 담으러 가기',
+                                          style: TextStyle(
                                             color: Colors.black,
                                           ),
-                                          SizedBox(width: 5),
-                                          Text('더 담으러 가기',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                              )),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -519,15 +508,34 @@ class _UserOrderPageState extends State<UserOrderPage> {
       ),
       bottomNavigationBar: ElevatedButton(
         onPressed: () async {
-          await OrderService().getOrder();
+          try {
+            // 장바구니 담기 api 호출
+            final cartInfo = await CartService().getCart();
+            OrderService().order(
+              orderStatus[0],
+              widget.menu.storeId,
+              totalPrice,
+              cartInfo,
+              orderMenus,
+            ); // orderMenus를 주문 API에 포함
 
-          Navigator.push(
+            // 주문 담기 api 호출
+            await OrderService().getOrder();
+
+            // 결제 화면으로 이동
+            Navigator.push(
               context,
               cart
                   ? MaterialPageRoute(
-                      builder: (context) => CompletePage(widget.store))
-                  : downToUpRoute());
-        }, // 결제 화면으로 이동
+                      builder: (context) => CompletePage(
+                            widget.store,
+                          ))
+                  : downToUpRoute(),
+            );
+          } catch (e) {
+            print(e.toString());
+          }
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF274AA3),
           shape: const BeveledRectangleBorder(

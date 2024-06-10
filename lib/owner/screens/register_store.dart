@@ -28,7 +28,6 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
   final List<String> categories = [
     '햄버거',
     '피자',
-    '커피',
     '디저트',
     '한식',
     '중식',

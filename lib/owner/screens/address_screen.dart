@@ -178,7 +178,7 @@ class _AddressPageState extends State<AddressPage> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       TextFormField(
-                        style: const TextStyle(fontSize: 10.0),
+                        style: const TextStyle(fontSize: 16.0),
                         controller: detailController,
                         textAlign: TextAlign.center,
                         decoration: const InputDecoration(
