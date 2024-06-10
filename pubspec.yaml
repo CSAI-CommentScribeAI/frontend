@@ -36,6 +36,7 @@ dependencies:
   tosspayments_widget_sdk_flutter: ^1.0.3
   intl: ^0.19.0
   flutter_pannable_rating_bar: ^2.7.2+1
+  printing: ^5.12.0
 
 dev_dependencies:
   flutter_test:
@@ -154,6 +155,12 @@ flutter:
     - family: Adultkid
       fonts:
         - asset: assets/fonts/Adultkid.otf
+    - family: NotoSansKR
+      fonts:
+        - asset: assets/fonts/NotoSansKR-Regular.ttf
+    - family: NotoColorEmoji
+      fonts:
+        - asset: assets/fonts/NotoColorEmoji-Regular.ttf
 
   #  - family: Jersey25Charted
   #    fonts:
