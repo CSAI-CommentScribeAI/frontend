@@ -509,7 +509,6 @@ class _UserOrderPageState extends State<UserOrderPage> {
       bottomNavigationBar: ElevatedButton(
         onPressed: () async {
           try {
-            // 장바구니 담기 api 호출
             final cartInfo = await CartService().getCart();
             OrderService().order(
               orderStatus[0],
@@ -519,7 +518,6 @@ class _UserOrderPageState extends State<UserOrderPage> {
               orderMenus,
             ); // orderMenus를 주문 API에 포함
 
-            // 주문 담기 api 호출
             await OrderService().getOrder();
 
             // 결제 화면으로 이동

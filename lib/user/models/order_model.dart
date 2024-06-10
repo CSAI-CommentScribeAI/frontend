@@ -4,7 +4,7 @@ class OrderModel {
   final int orderId;
   final String storeName;
   final String orderStatus;
-  final String storeImageUrl;
+  // final String storeImageUrl;
   final List<OrderMenu> orderMenus;
   final int totalPrice;
 
@@ -12,7 +12,7 @@ class OrderModel {
     required this.orderId,
     required this.storeName,
     required this.orderStatus,
-    required this.storeImageUrl,
+    // required this.storeImageUrl,
     required this.orderMenus,
     required this.totalPrice,
   });
@@ -30,7 +30,7 @@ class OrderModel {
       orderId: json['orderId'],
       storeName: json['storeName'],
       orderStatus: json['orderStatus'],
-      storeImageUrl: json['storeImageUrl'],
+      // storeImageUrl: json['storeImageUrl'],
       orderMenus: orderMenusList,
       totalPrice: json['totalPrice'],
     );
