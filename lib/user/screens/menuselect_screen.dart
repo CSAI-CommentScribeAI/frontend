@@ -161,9 +161,18 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width / 3,
                         height: 132,
-                        child: Image.network(
-                          widget.store.storeImageUrl,
+                        child: Image.asset(
+                          'assets/images/deliverylogo.png',
                           fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(
+                                Icons.error,
+                                color: Colors.red,
+                                size: 50,
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),

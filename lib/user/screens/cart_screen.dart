@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/screens/userOrder_screen.dart';
@@ -87,7 +88,7 @@ class _CartItemPageState extends State<CartItemPage> {
         ),
       ),
       bottomNavigationBar: ElevatedButton(
-        onPressed: () {
+        onPressed: () async {
           Navigator.push(
             context,
             downToUpRoute(),
