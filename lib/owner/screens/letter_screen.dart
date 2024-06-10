@@ -1,10 +1,15 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // rootBundle을 사용하기 위해 추가
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/services/letter_service.dart';
 import 'package:frontend/owner/services/delivery_service.dart';
 import 'package:frontend/owner/services/store_service.dart';
+import 'package:printing/printing.dart'; // printing 패키지 추가
+import 'package:pdf/pdf.dart'; // pdf 패키지 추가
+import 'package:pdf/widgets.dart' as pw; // pdf 패키지 추가
 
 class LetterPage extends StatefulWidget {
   final int orderId;
@@ -303,6 +308,46 @@ class _LetterPageState extends State<LetterPage> {
     );
   }
 
+  // PDF 생성 및 출력 함수
+  // utf8EncodedText 변수를 초기화하는 부분에서 letterController의 인스턴스 멤버에 접근하려고 할 때 발생
+  // 변수를 초기화할 때 letterController를 직접 사용하지 않고, 메서드 내에서 변환하도록 수정
+  Future<void> _printDocument() async {
+    final doc = pw.Document();
+
+    // letterController.text를 UTF-8로 인코딩
+    String utf8EncodedText = utf8.decode(utf8.encode(letterController.text));
+
+    // NotoSansKR 폰트 로드
+    final fontData =
+        await rootBundle.load('assets/fonts/NotoSansKR-Regular.ttf');
+    final ttf = pw.Font.ttf(fontData);
+
+    // NotoColorEmoji 폰트 로드
+    final fontDataEmoji =
+        await rootBundle.load('assets/fonts/NotoColorEmoji-Regular.ttf');
+    final ttfEmoji = pw.Font.ttf(fontDataEmoji);
+
+    // PDF 페이지 추가
+    doc.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Center(
+            child: pw.Text(
+              utf8EncodedText,
+              // fontFallback 속성을 사용하여 한글과 이모티콘을 함께 사용할 수 있도록 설정
+              style: pw.TextStyle(font: ttf, fontFallback: [ttfEmoji]),
+            ),
+          );
+        },
+      ),
+    );
+
+    // PDF 인쇄
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => doc.save(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -456,8 +501,14 @@ class _LetterPageState extends State<LetterPage> {
       bottomNavigationBar: isCompleted
           ? ElevatedButton(
               onPressed: () async {
-                Navigator.pop(context);
-                DeliveryService().completeDelivery(widget.orderId);
+                await DeliveryService().completeDelivery(widget.orderId);
+                try {
+                  await _printDocument();
+                  Navigator.pop(context);
+                } catch (e) {
+                  print(e.toString());
+                }
+                // 출력하기 버튼을 눌렀을 때 PDF 생성 및 인쇄
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF374AA3),
@@ -472,10 +523,9 @@ class _LetterPageState extends State<LetterPage> {
               child: const Text(
                 '출력하기',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold),
               ),
             )
           : characterOpened
