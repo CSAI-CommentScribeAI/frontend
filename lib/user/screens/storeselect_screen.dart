@@ -404,13 +404,10 @@ class _UserMenuPageState extends State<UserMenuPage> {
                       onPressed: () {
                         // 필터 적용 버튼 클릭 시 수행할 동작을 여기에 추가하세요.
                       },
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all<Color>(
-                            const Color(0xff7E7EB2)),
-                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                      style: TextButton.styleFrom(
+                        backgroundColor: const Color(0xff7E7EB2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       child: const Text(

@@ -2,14 +2,16 @@ import 'package:frontend/user/models/orderMenu_model.dart';
 
 class OrderModel {
   final int orderId;
+  final int storeId;
   final String storeName;
-  final String orderStatus;
+  String orderStatus;
   // final String storeImageUrl;
   final List<OrderMenu> orderMenus;
   final int totalPrice;
 
   OrderModel({
     required this.orderId,
+    required this.storeId,
     required this.storeName,
     required this.orderStatus,
     // required this.storeImageUrl,
@@ -28,6 +30,7 @@ class OrderModel {
 
     return OrderModel(
       orderId: json['orderId'],
+      storeId: json['storeId'],
       storeName: json['storeName'],
       orderStatus: json['orderStatus'],
       // storeImageUrl: json['storeImageUrl'],

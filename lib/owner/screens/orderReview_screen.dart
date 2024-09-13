@@ -148,33 +148,6 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 27.0),
         child: Column(
           children: [
-            // 미답글 리뷰 버튼
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.end,
-            //   children: [
-            //     Checkbox(
-            //       value: isReplied,
-            //       activeColor: const Color(0xFF374AA3).withOpacity(0.66),
-            //       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            //       visualDensity: const VisualDensity(
-            //         horizontal: VisualDensity.minimumDensity,
-            //         vertical: VisualDensity.minimumDensity,
-            //       ),
-            //       onChanged: (value) {
-            //         setState(() {
-            //           isReplied = !isReplied;
-            //         });
-            //       },
-            //     ),
-            //     const SizedBox(width: 5),
-            //     const Text(
-            //       '미답글 리뷰만',
-            //       style: TextStyle(fontSize: 16),
-            //     ),
-            //   ],
-            // ),
-            // const SizedBox(height: 10),
-
             Expanded(
               child: FutureBuilder(
                 future: futureOrderReview(),
@@ -193,6 +166,17 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
                     );
                   } else {
                     final orderReview = snapshot.data!;
+
+                    // replies 값이 배열로 되어있기 때문에 for문으로 사용
+                    // replyItem = orderReview['replies']
+                    for (var replyItem in orderReview['replies']) {
+                      // 답글이 작성되어있다면 저장된 답글을 replyController.text에 저장
+                      if (orderReview['replies'] != null &&
+                          orderReview['replies'].isNotEmpty) {
+                        replyController.text = replyItem['comment'];
+                      }
+                    }
+
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -260,8 +244,6 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
                           child: Form(
                             key: formKey,
                             child: TextFormField(
-                              // 사용자가 입력하거나 포커스를 이동할 때 즉시 유효성 검사가 수행되고 오류 메시지가 표시
-                              // 입력 시 에러메시지 사라짐
                               controller: replyController,
                               autovalidateMode:
                                   AutovalidateMode.onUserInteraction,
@@ -280,15 +262,6 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
                                 }
                                 return null;
                               },
-
-                              // onChanged: (val) {
-                              //   setState(() {
-                              //     // 텍스트필드에 입력했을 때 register 값 true로 변환
-                              //     // 입력값이 비어있는지 확인하여 registerColor 값을 조정(비어있으면 false, 비어있지 않으면 true)
-                              //     registerColor = val.isNotEmpty;
-                              //   });
-                              // },
-
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide(
@@ -351,11 +324,8 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
       // 답글 등록 버튼
       bottomNavigationBar: ElevatedButton(
         onPressed: () async {
-          // formKey.currentState!.validate()와 formKey.currentState!.save()를
-          // 올바른 순서로 호출하여 reply 값이 저장된 후에 서버로 요청
           if (formKey.currentState!.validate()) {
             formKey.currentState!.save();
-
             try {
               await ReplyService()
                   .resisterReply(await getReviewId(), replyController.text);
@@ -365,7 +335,6 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
               print('예외 발생: ${e.toString()}');
             }
           }
-
           print(replyController.text);
         },
         style: ElevatedButton.styleFrom(

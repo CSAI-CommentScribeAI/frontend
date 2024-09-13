@@ -255,7 +255,7 @@ class _UserOrderPageState extends State<UserOrderPage> {
                               alignment: AlignmentDirectional.bottomCenter,
                               children: [
                                 SizedBox(
-                                  height: 230,
+                                  height: 250,
                                   child: Card(
                                     color: Colors.white,
                                     shadowColor: const Color(0xFF374AA3),

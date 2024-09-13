@@ -3,16 +3,16 @@ import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/models/order_model.dart';
 import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/user/screens/write_screen.dart';
-
+import 'package:frontend/user/services/review_service.dart';
 import 'package:intl/intl.dart';
 
 class CompletePage extends StatefulWidget {
   final StoreModel store;
-  final bool? isWritten;
-  final Map<String, dynamic>? menu;
+  final Map<int, bool>? writtenReviews;
+  final Map<int, String>? reviewTexts; // Add this line
 
   const CompletePage(this.store,
-      {this.isWritten = false, this.menu, super.key});
+      {this.writtenReviews, this.reviewTexts, super.key});
 
   @override
   State<CompletePage> createState() => _CompletePageState();
@@ -84,6 +84,9 @@ class _CompletePageState extends State<CompletePage> {
                 itemCount: orderList.length,
                 itemBuilder: (BuildContext context, int index) {
                   final order = orderList[index];
+                  bool isWritten =
+                      widget.writtenReviews?[order.orderId] ?? false;
+
                   return Column(
                     children: [
                       Column(
@@ -158,41 +161,56 @@ class _CompletePageState extends State<CompletePage> {
                                     ),
                                   ),
                                   const SizedBox(height: 28),
-                                  Center(
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        if (widget.isWritten != null &&
-                                            !widget.isWritten!) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    writeReviewPage(
-                                                        widget.store,
-                                                        null) // 나중에 변수로 집어넣을 계획
+
+                                  // 주문상태가 배달일 경우에만 리뷰 쓰기 버튼 활성화
+                                  if (order.orderStatus == 'DELIVERED')
+                                    FutureBuilder(
+                                      future: ReviewService()
+                                          .getOrderReview(order.orderId),
+                                      builder: (context, snapshot) {
+                                        final review = snapshot.data;
+                                        return Center(
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              print(order.orderId);
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      WriteReviewPage(
+                                                    widget.store,
+                                                    null,
+                                                    storeName: order.storeName,
+                                                    orderId: order.orderId,
+                                                  ),
                                                 ),
-                                          );
-                                        }
+                                              );
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.white,
+                                              minimumSize: const Size(302, 39),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5.0),
+                                              ),
+                                              side: const BorderSide(
+                                                color: Color(0xFF7E7EB2),
+                                                width: 2.0,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              // db에 리뷰가 있을 때 작성된 리뷰로 변경
+                                              review!['comment'] != null
+                                                  ? '작성된 리뷰'
+                                                  : '리뷰 쓰기',
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                        );
                                       },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.white,
-                                        minimumSize: const Size(302, 39),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(5.0),
-                                        ),
-                                        side: const BorderSide(
-                                          color: Color(0xFF7E7EB2),
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        '리뷰 쓰기',
-                                        style: TextStyle(
-                                            fontSize: 14, color: Colors.black),
-                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
                             ),

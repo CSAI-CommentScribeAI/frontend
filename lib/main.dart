@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/all/screens/login_screen.dart';
-import 'package:frontend/owner/screens/orderReview_screen.dart';
+import 'package:frontend/user/screens/userHome_screen.dart';
 import 'package:get/get.dart';
 import 'package:kakao_map_plugin/kakao_map_plugin.dart';
 

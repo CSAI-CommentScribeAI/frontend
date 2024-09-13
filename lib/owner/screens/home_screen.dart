@@ -92,7 +92,7 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 18.0),
                       child: FutureBuilder<List<StoreModel>>(
                         // getStore() 메서드를 호출해서 데이터를 가져옴
-                        future: StoreService().getStore(),
+                        future: StoreService().getStore(), // 사장님용 가게 api 메서드
                         builder: (context, snapshot) {
                           // 데이터가 로드되는 동안 로딩 스피너 표시
                           if (snapshot.connectionState ==
@@ -457,6 +457,8 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             GestureDetector(
                               onTap: () {
+                                print('가게 아이디 : $storeId');
+
                                 if (selectedStore.isNotEmpty) {
                                   Navigator.push(
                                     context,

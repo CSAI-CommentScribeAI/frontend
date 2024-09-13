@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/screens/storeselect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
 import 'package:frontend/user/services/selectCategory_service.dart';
@@ -64,6 +65,21 @@ class _UserHomePageState extends State<UserHomePage> {
     'JAPANESEFOOD': '일식',
     'CHICKEN': '치킨',
   };
+
+  Future<StoreModel> getStoreModel() async {
+    List<StoreModel> storeList = await UserStoreService().getManyStores();
+    StoreModel? stores;
+
+    for (var store in storeList) {
+      stores = store;
+    }
+    // 만약 조건에 맞는 store가 없다면 예외를 던질 수 있습니다.
+    if (stores == null) {
+      throw Exception('No store found');
+    }
+
+    return stores;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -144,9 +160,19 @@ class _UserHomePageState extends State<UserHomePage> {
                 ),
               ),
             ),
-            onTap: () {
-              // 여기에 원하는 onTap 동작을 추가하세요.
-              print('Shopping cart icon tapped');
+            onTap: () async {
+              StoreModel storeModel = await getStoreModel();
+
+              print('storeModel : $storeModel');
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CompletePage(
+                    storeModel,
+                  ),
+                ),
+              );
             },
           )
         ],
