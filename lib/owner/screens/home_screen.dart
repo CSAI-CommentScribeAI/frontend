@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/charts/feedback_chart.dart';
 import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/owner/providers/store_provider.dart';
 import 'package:frontend/owner/screens/feedback_screen.dart';
 import 'package:frontend/owner/screens/menu_screen.dart';
 import 'package:frontend/owner/screens/orderDetail_screen.dart';
@@ -12,6 +13,7 @@ import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/circle_widget.dart';
 import 'package:frontend/owner/widgets/current_widget.dart';
 import 'package:frontend/owner/widgets/menuItem_widget.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   final String accessToken;
@@ -36,6 +38,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<List<StoreModel>> getStoreData() async {
+    return Provider.of<StoreProvider>(context, listen: false).storeList;
   }
 
   Future<void> chooseStore(BuildContext context) async {
@@ -78,6 +84,10 @@ class _HomePageState extends State<HomePage> {
                         IconButton(
                           onPressed: () {
                             Navigator.pop(context);
+
+                            setState(() {
+                              isExpanded = false;
+                            });
                           },
                           icon: const Icon(Icons.close),
                         ),
@@ -92,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 18.0),
                       child: FutureBuilder<List<StoreModel>>(
                         // getStore() 메서드를 호출해서 데이터를 가져옴
-                        future: StoreService().getStore(), // 사장님용 가게 api 메서드
+                        future: getStoreData(),
                         builder: (context, snapshot) {
                           // 데이터가 로드되는 동안 로딩 스피너 표시
                           if (snapshot.connectionState ==
@@ -171,7 +181,9 @@ class _HomePageState extends State<HomePage> {
                               builder: (context) => RegisterStorePage(
                                   selectedStore, widget.accessToken)),
                         );
-                        Navigator.pop(context, refreshResult);
+                        if (context.mounted) {
+                          Navigator.pop(context, refreshResult);
+                        }
                       },
                       icon: const Icon(Icons.add),
                       label: const Text(
@@ -349,7 +361,11 @@ class _HomePageState extends State<HomePage> {
                                             // expand_less,more
                                             GestureDetector(
                                               onTap: () {
-                                                StoreService().getStore();
+                                                Provider.of<StoreProvider>(
+                                                        context,
+                                                        listen: false)
+                                                    .getStore(); // 가게 조회 호출
+
                                                 setState(() {
                                                   isExpanded =
                                                       !isExpanded; // 확장되어 있을 때는 축소하고, 축소되어 있을 때는 확장

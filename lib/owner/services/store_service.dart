@@ -11,8 +11,6 @@ class StoreService {
 
   // 가게 조회 api
   Future<List<StoreModel>> getStore() async {
-    List<StoreModel> storeInstance = [];
-
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
 
@@ -33,22 +31,15 @@ class StoreService {
 
       if (response.statusCode == 200) {
         final utf8Response = utf8.decode(response.bodyBytes);
-        final dynamic jsonResponse = jsonDecode(utf8Response);
+        final jsonResponse = jsonDecode(utf8Response);
 
-        if (jsonResponse is List) {
-          final List<dynamic> stores = jsonResponse;
-          print('JSON 데이터: $stores');
-
-          for (var store in stores) {
-            storeInstance.add(StoreModel.fromJson(store));
-          }
-
-          print('조회 성공 $storeInstance');
-          return storeInstance;
-        } else {
-          print('응답이 예상과 다름: $jsonResponse');
-          return [];
+        List<StoreModel> stores = [];
+        for (var store in jsonResponse) {
+          stores.add(StoreModel.fromJson(store));
         }
+
+        print('조회 성공: $jsonResponse');
+        return stores;
       } else {
         print('조회 실패: ${response.statusCode}');
         print('응답 본문: ${response.body}');
