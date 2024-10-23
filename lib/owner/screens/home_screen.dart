@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  Future<List<StoreModel>> getStoreData() async {
+  Future<List<StoreModel>> getStoresData() async {
     return Provider.of<StoreProvider>(context, listen: false).storeList;
   }
 
@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 18.0),
                       child: FutureBuilder<List<StoreModel>>(
                         // getStore() 메서드를 호출해서 데이터를 가져옴
-                        future: getStoreData(),
+                        future: getStoresData(),
                         builder: (context, snapshot) {
                           // 데이터가 로드되는 동안 로딩 스피너 표시
                           if (snapshot.connectionState ==
@@ -145,8 +145,9 @@ class _HomePageState extends State<HomePage> {
                                       isExpanded = false;
                                     });
 
+                                    print('선택된 가게 이름: ${store.name}');
                                     print('선택된 가게 아이디: ${store.id}');
-                                    print('현재 인덱스: $storeIndex');
+
                                     Navigator.pop(context);
                                   },
                                   title: Text(
@@ -364,7 +365,7 @@ class _HomePageState extends State<HomePage> {
                                                 Provider.of<StoreProvider>(
                                                         context,
                                                         listen: false)
-                                                    .getStore(); // 가게 조회 호출
+                                                    .getStores(); // 가게 조회 호출
 
                                                 setState(() {
                                                   isExpanded =
@@ -497,9 +498,8 @@ class _HomePageState extends State<HomePage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => StorePage(
-                                          selectedStore: selectedStore,
-                                          storeIndex: storeIndex,
-                                          accessToken: widget.accessToken),
+                                        storeId: storeId,
+                                      ),
                                     ),
                                   );
                                 }

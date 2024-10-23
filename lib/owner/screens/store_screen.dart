@@ -1,32 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
-import 'package:frontend/owner/services/store_service.dart';
+import 'package:frontend/owner/providers/store_provider.dart';
+import 'package:provider/provider.dart';
 
 class StorePage extends StatefulWidget {
-  final String selectedStore;
-  final int storeIndex;
-  final String accessToken;
-
-  const StorePage(
-      {required this.selectedStore,
-      required this.storeIndex,
-      required this.accessToken,
-      super.key});
+  final int? storeId;
+  const StorePage({this.storeId, super.key});
 
   @override
   _StorePageState createState() => _StorePageState();
 }
 
 class _StorePageState extends State<StorePage> {
-  bool saveColor = false;
   final formKey = GlobalKey<FormState>();
+
+  bool saveColor = false;
+  String storeName = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<StoreProvider>(context, listen: false)
+          .getStore(widget.storeId!);
+
+      setState(() {
+        storeName =
+            Provider.of<StoreProvider>(context, listen: false).store!.name;
+      });
+    });
+  }
+
+  Future<StoreModel> getStoreData() async {
+    return Provider.of<StoreProvider>(context, listen: false).store!;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF3F3FF),
       appBar: AppBar(
-        title: Text(widget.selectedStore),
+        title: Text(storeName),
         backgroundColor: const Color(0xFF274AA3),
         foregroundColor: Colors.white,
         actions: [actionIcon(icon: Icons.delete)], // 삭제 아이콘
@@ -66,54 +81,25 @@ class _StorePageState extends State<StorePage> {
                   ),
                 ),
               ),
-              FutureBuilder<List<StoreModel>>(
-                future: StoreService().getStore(),
+              FutureBuilder<StoreModel>(
+                future: getStoreData(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  } else if (!snapshot.hasData) {
                     return const Center(child: Text('No stores found.'));
                   } else {
                     // 해당 가게의 인덱스를 가져와 가게 정보 객체를 가져옴
                     // 아이디마다 등록한 가게의 리스트가 다르기 때문에 들어온 순서대로 storeIndex 부여
-                    final store = snapshot.data![widget.storeIndex];
+                    final store = snapshot.data;
+
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 75.5, vertical: 10.0),
                       child: Column(
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // 사업자 등록 번호
-                              const Text(
-                                '사업자 등록 번호',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF7E7EB2),
-                                ),
-                              ),
-                              TextFormField(
-                                initialValue: store.businessLicense,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  contentPadding: const EdgeInsets.all(5.0),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(5.0),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
-                                textAlign: TextAlign.center,
-                                readOnly: saveColor ? false : true,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 15),
-
                           // 음식점 이름
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +113,7 @@ class _StorePageState extends State<StorePage> {
                                 ),
                               ),
                               TextFormField(
-                                initialValue: store.name,
+                                initialValue: store!.name,
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white,
@@ -187,7 +173,7 @@ class _StorePageState extends State<StorePage> {
                                 ),
                               ),
                               TextFormField(
-                                initialValue: store.roadAddress,
+                                initialValue: store.fullAddress,
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white,
