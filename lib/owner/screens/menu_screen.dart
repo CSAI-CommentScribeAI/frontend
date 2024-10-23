@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
+import 'package:frontend/owner/providers/menu_provider.dart';
+import 'package:frontend/owner/providers/store_provider.dart';
 import 'package:frontend/owner/screens/addMenu_screen.dart';
-import 'package:frontend/owner/services/menu_service.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class MenuPage extends StatefulWidget {
-  final String selectedStore;
   final int storeId;
-  final String accessToken;
-  const MenuPage(this.selectedStore, this.storeId, this.accessToken,
-      {super.key});
+  const MenuPage(this.storeId, {super.key});
 
   @override
   State<MenuPage> createState() => _MenuPageState();
@@ -21,6 +20,30 @@ class _MenuPageState extends State<MenuPage> {
 
   bool saveColor = false;
   bool isMenuOrderByName = true; // true: 가나다 순, false: 최신 등록 순
+
+  String storeName = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<MenuProvider>(context, listen: false)
+          .getMenus(widget.storeId);
+
+      await Provider.of<StoreProvider>(context, listen: false)
+          .getStore(widget.storeId);
+
+      setState(() {
+        storeName =
+            Provider.of<StoreProvider>(context, listen: false).store!.name;
+      });
+    });
+  }
+
+  Future<List<AddMenuModel>> getMenusData() async {
+    return Provider.of<MenuProvider>(context, listen: false).menuList;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +68,7 @@ class _MenuPageState extends State<MenuPage> {
           ],
           // 가게 이름을 표시하는 타이틀 설정
           title: Text(
-            widget.selectedStore,
+            storeName,
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -81,8 +104,7 @@ class _MenuPageState extends State<MenuPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              AddMenuPage(widget.storeId, widget.accessToken),
+                          builder: (context) => AddMenuPage(widget.storeId),
                         ),
                       );
                     },
@@ -199,7 +221,7 @@ class _MenuPageState extends State<MenuPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 18.0),
                 child: FutureBuilder<List<AddMenuModel>>(
                   // getMenu() 메서드를 호출해서 데이터를 가져옴
-                  future: MenuService().getMenu(widget.storeId),
+                  future: getMenusData(),
                   builder: (context, snapshot) {
                     // 데이터가 로드되는 동안 로딩 스피너 표시
                     if (snapshot.connectionState == ConnectionState.waiting) {

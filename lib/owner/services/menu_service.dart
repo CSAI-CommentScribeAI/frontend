@@ -5,14 +5,13 @@ import 'package:frontend/owner/screens/menu_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MenuService {
   late String serverAddress;
 
-  // 메뉴 조회 API
-  Future<List<AddMenuModel>> getMenu(int storeId) async {
-    List<AddMenuModel> menuInstance = [];
-
+  // 가게별 메뉴 조회 API
+  Future<List<AddMenuModel>> getMenus(int storeId) async {
     // 1. 현재 플랫폼에 따라 로그인을 위한 주소를 설정합니다.
     if (Platform.isAndroid) {
       serverAddress = 'http://10.0.2.2:9000/api/v1/$storeId/menus';
@@ -29,37 +28,28 @@ class MenuService {
       if (response.statusCode == 200) {
         // menus : 여러 객체(메뉴의 이름, 가격, 세부내역, 메뉴 이미지, 가게 Id)
         final utf8Response = utf8.decode(response.bodyBytes);
-        final dynamic jsonResponse = jsonDecode(utf8Response);
+        final jsonResponse = jsonDecode(utf8Response);
+        final dataResponse = jsonResponse['data'];
 
-        // jsonResponse가 Map일 때 data 필드를 추출
-        if (jsonResponse is Map && jsonResponse['data'] is List) {
-          final List<dynamic> menus = jsonResponse['data'];
-          print('JSON 데이터: $menus');
+        List<AddMenuModel> menuList = [];
 
-          for (var menu in menus) {
-            menuInstance.add(AddMenuModel.fromJson(menu));
-          }
-
-          print('조회 성공 $menuInstance');
-          return menuInstance;
-        } else {
-          print('응답이 예상과 다름: $jsonResponse');
-          return [];
+        for (var data in dataResponse) {
+          menuList.add(AddMenuModel.fromJson(data));
         }
+
+        print('조회 성공 $dataResponse');
+        return menuList;
       } else {
-        print('조회 실패: ${response.statusCode}');
-        print('응답 본문: ${response.body}');
-        return [];
+        throw Exception('조회 실패: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      print('예외 발생: $e');
-      return [];
+      throw Exception(e.toString());
     }
   }
 
   // 메뉴 등록 API
   Future<void> registerMenu(String name, String price, String menuDetail,
-      File file, String status, String? accessToken, String storeId
+      File file, String status, String storeId
       // String category,
       ) async {
     final Map<String, String> statusMapping = {
@@ -67,6 +57,9 @@ class MenuService {
       '품절': 'SOLD',
       '숨김': 'HIDING',
     };
+
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
 
     try {
       String serverAddress;

@@ -6,8 +6,7 @@ import 'package:frontend/owner/services/menu_service.dart';
 
 class AddMenuPage extends StatefulWidget {
   final int storeId;
-  final String accessToken;
-  const AddMenuPage(this.storeId, this.accessToken, {super.key});
+  const AddMenuPage(this.storeId, {super.key});
 
   @override
   State<AddMenuPage> createState() => _AddMenuPageState();
@@ -540,12 +539,13 @@ class _AddMenuPageState extends State<AddMenuPage> {
                         menuDetail,
                         _menuImage!,
                         status!,
-                        widget.accessToken,
                         '${widget.storeId}',
                       );
 
-                      Navigator.pop(
-                          context, true); // true -> 메뉴 등록 시 바로 페이지 이동해서 보이도록
+                      if (context.mounted) {
+                        Navigator.pop(
+                            context, true); // true -> 메뉴 등록 시 바로 페이지 이동해서 보이도록
+                      }
                     } catch (e) {
                       print('Error registering menu: $e');
                     }
