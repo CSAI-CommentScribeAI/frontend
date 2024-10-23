@@ -79,19 +79,17 @@ class _LetterPageState extends State<LetterPage> {
 
   // 가게 아이디 가져오는 함수
   Future<int> getStoreId() async {
-    List<StoreModel> storeList = await StoreService().getStore();
+    // List<StoreModel> storeList = await StoreService().getStore();
     int? id;
 
-    for (var store in storeList) {
-      id = store.id;
-    }
+    // for (var store in storeList) {
+    //   id = store.id;
+    // }
 
     // orderId가 null일 경우 예외 처리
-    if (id == null) {
-      throw Exception("No orders found");
-    }
+    throw Exception("No orders found");
 
-    return id;
+    // return id;
   }
 
   // 서버에서 편지를 불러오는 메서드
