@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/models/category_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,13 +9,10 @@ class SelectCategoryService {
   late String serverAddress;
 
   // 카테고리 가져오기 API
-  Future<List<StoreModel>> getCategory(int selectedCategoryIndex) async {
+  Future<List<CategoryModel>> getCategory() async {
     // SharedPreferences에서 액세스 토큰을 가져옴
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
-
-    // 카테고리 인스턴스를 저장할 리스트를 생성
-    List<StoreModel> categoryInstance = [];
 
     // 현재 플랫폼에 따라 서버 주소 설정
     if (Platform.isAndroid) {
@@ -40,33 +38,22 @@ class SelectCategoryService {
         // 디코딩된 응답을 JSON 형태로 변환
         final dynamic jsonResponse = jsonDecode(utf8Response);
 
-        // jsonResponse가 Map이고 data 필드가 List일 경우
-        if (jsonResponse is Map && jsonResponse['data'] is List) {
-          final List<dynamic> categories = jsonResponse['data'];
-          print('JSON 데이터: $categories');
+        final dataResponse = jsonResponse['data'];
+        print('카테고리 조회 성공: $dataResponse');
 
-          // 각 카테고리를 SelectCategoryModel 인스턴스로 변환하여 리스트에 추가
-          for (var category in categories) {
-            categoryInstance.add(StoreModel.fromJson(category));
-          }
-
-          print('조회 성공 $categoryInstance');
-          return categoryInstance;
-        } else {
-          // 응답이 예상과 다를 경우
-          print('응답이 예상과 다름: $jsonResponse');
-          return [];
+        List<CategoryModel> categoryList = [];
+        // 각 카테고리를 SelectCategoryModel 인스턴스로 변환하여 리스트에 추가
+        for (var data in dataResponse) {
+          categoryList.add(CategoryModel.fromJson(data));
         }
+
+        return categoryList;
       } else {
-        // 요청 실패 시
-        print('조회 실패: ${response.statusCode}');
-        print('응답 본문: ${response.body}');
-        return [];
+        throw Exception('조회 실패: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       // 예외 발생 시
-      print('예외 발생: $e');
-      return [];
+      throw Exception('예외 발생: $e');
     }
   }
 
