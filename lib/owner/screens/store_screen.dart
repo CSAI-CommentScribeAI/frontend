@@ -27,13 +27,13 @@ class _StorePageState extends State<StorePage> {
 
       setState(() {
         storeName =
-            Provider.of<StoreProvider>(context, listen: false).store!.name;
+            Provider.of<StoreProvider>(context, listen: false).store['name'];
       });
     });
   }
 
-  Future<StoreModel> getStoreData() async {
-    return Provider.of<StoreProvider>(context, listen: false).store!;
+  Future<Map<String, dynamic>> getStoreData() async {
+    return Provider.of<StoreProvider>(context, listen: false).store;
   }
 
   @override
@@ -81,7 +81,7 @@ class _StorePageState extends State<StorePage> {
                   ),
                 ),
               ),
-              FutureBuilder<StoreModel>(
+              FutureBuilder<Map<String, dynamic>>(
                 future: getStoreData(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -93,7 +93,7 @@ class _StorePageState extends State<StorePage> {
                   } else {
                     // 해당 가게의 인덱스를 가져와 가게 정보 객체를 가져옴
                     // 아이디마다 등록한 가게의 리스트가 다르기 때문에 들어온 순서대로 storeIndex 부여
-                    final store = snapshot.data;
+                    final store = snapshot.data!;
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(
@@ -113,7 +113,7 @@ class _StorePageState extends State<StorePage> {
                                 ),
                               ),
                               TextFormField(
-                                initialValue: store!.name,
+                                initialValue: store['name'],
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white,
@@ -143,7 +143,7 @@ class _StorePageState extends State<StorePage> {
                                 ),
                               ),
                               TextFormField(
-                                initialValue: store.category,
+                                initialValue: store['category'],
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white,
@@ -173,7 +173,8 @@ class _StorePageState extends State<StorePage> {
                                 ),
                               ),
                               TextFormField(
-                                initialValue: store.fullAddress,
+                                initialValue: store['storeAddress']
+                                    ['fullAddress'],
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white,
@@ -203,7 +204,7 @@ class _StorePageState extends State<StorePage> {
                                 ),
                               ),
                               TextFormField(
-                                initialValue: store.info,
+                                initialValue: store['info'],
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white,
@@ -233,7 +234,7 @@ class _StorePageState extends State<StorePage> {
                                 ),
                               ),
                               TextFormField(
-                                initialValue: store.minOrderPrice.toString(),
+                                initialValue: store['minOrderPrice'].toString(),
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white,
@@ -264,7 +265,7 @@ class _StorePageState extends State<StorePage> {
                                 ),
                               ),
                               TextFormField(
-                                initialValue: store.openTime,
+                                initialValue: store['openTime'],
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white,
@@ -294,7 +295,7 @@ class _StorePageState extends State<StorePage> {
                                 ),
                               ),
                               TextFormField(
-                                initialValue: store.closeTime,
+                                initialValue: store['closeTime'],
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white,
@@ -328,7 +329,7 @@ class _StorePageState extends State<StorePage> {
                                 ),
                                 child: Center(
                                   child: Image.network(
-                                    store.storeImageUrl,
+                                    store['storeImageUrl'],
                                     width: 100,
                                     height: 100,
                                   ),

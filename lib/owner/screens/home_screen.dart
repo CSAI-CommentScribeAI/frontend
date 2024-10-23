@@ -361,8 +361,11 @@ class _HomePageState extends State<HomePage> {
                                             const SizedBox(width: 20),
                                             // expand_less,more
                                             GestureDetector(
-                                              onTap: () {
-                                                Provider.of<StoreProvider>(
+                                              onTap: () async {
+                                                // 호출되고 나서 모달시트가 호출
+                                                // async-await를 하지 않으면 호출되기 전에 모달시트가 보여져 가게 목록이 띄워지지 않을 수 있음
+                                                await Provider.of<
+                                                            StoreProvider>(
                                                         context,
                                                         listen: false)
                                                     .getStores(); // 가게 조회 호출
