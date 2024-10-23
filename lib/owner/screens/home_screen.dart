@@ -516,9 +516,8 @@ class _HomePageState extends State<HomePage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => MenuPage(
-                                          selectedStore,
-                                          storeId,
-                                          widget.accessToken),
+                                        storeId,
+                                      ),
                                     ),
                                   );
                                 }

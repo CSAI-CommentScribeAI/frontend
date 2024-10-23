@@ -35,6 +35,7 @@ class StoreModel {
     this.rating,
   });
 
+  // dataResponse를 이용해서 저장하기 위해 사용
   factory StoreModel.fromJson(Map<String, dynamic> json) {
     return StoreModel(
       id: json['id'] ?? 0,
