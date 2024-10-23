@@ -59,9 +59,6 @@ class SelectCategoryService {
 
   // 카테고리별 가게 조회 API
   Future<List<StoreModel>> getSelectCategory(String category) async {
-    // 가게 인스턴스를 저장할 리스트 생성
-    List<StoreModel> categorySelectInstance = [];
-
     // SharedPreferences에서 토큰을 가져옵니다.
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
@@ -91,47 +88,25 @@ class SelectCategoryService {
         // 서버 응답을 UTF-8로 디코딩
         final utf8Response = utf8.decode(response.bodyBytes);
         // 디코딩된 응답을 JSON 형태로 변환
-        final dynamic jsonResponse = jsonDecode(utf8Response);
+        final jsonResponse = jsonDecode(utf8Response);
+        final dataResponse = jsonResponse['data'];
 
-        // jsonResponse가 Map이고 data 필드가 List일 경우
-        if (jsonResponse is Map && jsonResponse['data'] is List) {
-          final List<dynamic> stores = jsonResponse['data'];
-          print('JSON 데이터: $stores');
+        List<StoreModel> storeList = [];
 
-          // 각 가게를 SelectCategoryModel 인스턴스로 변환하여 리스트에 추가
-          for (var store in stores) {
-            categorySelectInstance.add(StoreModel.fromJson(store));
-          }
-
-          print('조회 성공 $categorySelectInstance');
-          return categorySelectInstance;
-        } else if (jsonResponse is List) {
-          // jsonResponse가 List일 경우
-          final List<dynamic> stores = jsonResponse;
-          print('JSON 데이터: $stores');
-
-          // 각 가게를 SelectCategoryModel 인스턴스로 변환하여 리스트에 추가
-          for (var store in stores) {
-            categorySelectInstance.add(StoreModel.fromJson(store));
-          }
-
-          print('조회 성공 $categorySelectInstance');
-          return categorySelectInstance;
-        } else {
-          // 응답이 예상과 다를 경우
-          print('응답이 예상과 다름: $jsonResponse');
-          return [];
+        for (var store in dataResponse) {
+          storeList.add(StoreModel.fromJson(store));
         }
+
+        print('카테고리별 가게 조회 성공: $dataResponse');
+
+        return storeList;
       } else {
         // 요청 실패 시
-        print('조회 실패: ${response.statusCode}');
-        print('응답 본문: ${response.body}');
-        return [];
+        throw Exception('조회 실패 : ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       // 예외 발생 시
-      print('예외 발생: $e');
-      return [];
+      throw Exception('예외 발생: $e');
     }
   }
 }
