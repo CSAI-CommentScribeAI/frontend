@@ -36,7 +36,7 @@ class _MenuPageState extends State<MenuPage> {
 
       setState(() {
         storeName =
-            Provider.of<StoreProvider>(context, listen: false).store!.name;
+            Provider.of<StoreProvider>(context, listen: false).store['name'];
       });
     });
   }
@@ -100,13 +100,20 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                   const SizedBox(width: 4), // 아이콘과 텍스트 사이 간격 조절
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => AddMenuPage(widget.storeId),
                         ),
                       );
+
+                      if (result == true) {
+                        // 메뉴가 추가되었을 때만 다시 목록을 불러옴
+                        await Provider.of<MenuProvider>(context, listen: false)
+                            .getMenus(widget.storeId);
+                        setState(() {}); // 상태 갱신을 통해 UI 업데이트
+                      }
                     },
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,

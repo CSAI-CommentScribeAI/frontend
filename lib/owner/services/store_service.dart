@@ -157,7 +157,7 @@ class StoreService {
     return '$hour:$minute';
   }
 
-  Future<StoreModel> getStore(int storeId) async {
+  Future<Map<String, dynamic>> getStore(int storeId) async {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
 
@@ -181,7 +181,7 @@ class StoreService {
         final jsonResponse = jsonDecode(utf8Response);
         final dataResponse = jsonResponse['data'];
 
-        final store = StoreModel.fromJson(dataResponse);
+        Map<String, dynamic> store = dataResponse;
 
         print('조회 성공: $dataResponse');
         return store;
