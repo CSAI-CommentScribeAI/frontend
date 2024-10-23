@@ -75,7 +75,7 @@ class _ReviewPageState extends State<ReviewPage> {
   }
 
   Future<List<dynamic>> _getReviews() async {
-    int storeId = await getStoreId();
+    // int storeId = await getStoreId();
     List<dynamic> reviewList = await ReviewService().getReview(storeId);
     setState(() {
       reviewCount = reviewList.length; // 리뷰 개수를 상태 변수에 저장
@@ -83,21 +83,21 @@ class _ReviewPageState extends State<ReviewPage> {
     return reviewList;
   }
 
-  Future<int> getStoreId() async {
-    List<StoreModel> storeList = await StoreService().getStore();
-    int? id;
+  // Future<int> getStoreId() async {
+  //   List<StoreModel> storeList = await StoreService().getStore();
+  //   int? id;
 
-    for (var store in storeList) {
-      id = store.id;
-    }
+  //   for (var store in storeList) {
+  //     id = store.id;
+  //   }
 
-    // orderId가 null일 경우 예외 처리
-    if (id == null) {
-      throw Exception("No orders found");
-    }
+  //   // orderId가 null일 경우 예외 처리
+  //   if (id == null) {
+  //     throw Exception("No orders found");
+  //   }
 
-    return id;
-  }
+  //   return id;
+  // }
 
   // 날짜 선택하는 바텀시트 호출 함수
   void chooseDate(BuildContext context) async {
