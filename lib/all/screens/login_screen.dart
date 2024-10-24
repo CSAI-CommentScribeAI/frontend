@@ -32,12 +32,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // 토큰 API
-  Future<void> sendDataToServer() async {
-    // 1. SharedPreferences에서 엑세스 토큰과 리프레시 토큰을 가져옵니다.
-    final prefs = await SharedPreferences.getInstance();
-    final accessToken = prefs.getString('accessToken') ?? '';
-    final refreshToken = prefs.getString('refreshToken') ?? '';
-
+  Future<void> sendDataToServer(String accessToken, String refreshToken) async {
     // 2. 현재 플랫폼에 따라 토큰 갱신을 위한 주소를 설정합니다.
     if (Platform.isAndroid) {
       tokenAddress = 'http://10.0.2.2:9000/api/v1/auth/refresh';
@@ -103,26 +98,30 @@ class _LoginPageState extends State<LoginPage> {
 
         print('accessToken: $accessToken');
         print('로그인 성공');
-        sendDataToServer();
+        sendDataToServer(accessToken, refreshToken);
         final userRole = await searchUser(); // userRole 값을 가져옴
 
         // userRole에 따라 페이지 이동
         if (userRole == 'ROLE_OWNER') {
           print('Navigating to HomePage');
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HomePage(accessToken: accessToken),
-            ),
-          );
+          if (context.mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(accessToken: accessToken),
+              ),
+            );
+          }
         } else if (userRole == 'ROLE_USER') {
           print('Navigating to UserHomePage');
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => UserHomePage(accessToken),
-            ),
-          );
+          if (context.mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UserHomePage(accessToken),
+              ),
+            );
+          }
         }
       } else {
         // 로그인 실패 시

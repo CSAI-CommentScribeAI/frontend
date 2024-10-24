@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/providers/userMenu_provider.dart';
 import 'package:frontend/user/services/cart_service.dart';
-import 'package:frontend/user/services/userMenu_service.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class UserMenuSelectPage extends StatefulWidget {
   final StoreModel store;
@@ -19,6 +20,17 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<UserMenuProvider>(context, listen: false)
+          .fetchMenus(widget.store.id);
+
+      getMenuData();
+    });
+  }
+
+  Future<List<AddMenuModel>> getMenuData() async {
+    return Provider.of<UserMenuProvider>(context, listen: false).userMenuList;
   }
 
   // 숫자 세자리마다 콤마 넣는 코드
@@ -286,7 +298,7 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
 
   Widget allMenuSection() {
     return FutureBuilder<List<AddMenuModel>>(
-      future: userMenuService().fetchMenus('${widget.store.id}'),
+      future: getMenuData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(

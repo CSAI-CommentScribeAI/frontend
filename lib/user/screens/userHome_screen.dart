@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/models/category_model.dart';
@@ -6,7 +5,6 @@ import 'package:frontend/user/providers/category_provider.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/screens/storeSelect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
-import 'package:frontend/user/services/selectCategory_service.dart';
 import 'package:frontend/user/services/userStore_service.dart';
 import 'package:frontend/user/widgets/menuSearch_widget.dart';
 import 'package:provider/provider.dart';
