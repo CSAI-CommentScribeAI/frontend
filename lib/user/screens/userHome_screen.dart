@@ -1,9 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/models/category_model.dart';
 import 'package:frontend/user/providers/category_provider.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
-import 'package:frontend/user/screens/storeselect_screen.dart';
+import 'package:frontend/user/screens/storeSelect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
 import 'package:frontend/user/services/selectCategory_service.dart';
 import 'package:frontend/user/services/userStore_service.dart';
@@ -91,6 +92,10 @@ class _UserHomePageState extends State<UserHomePage> {
     }
 
     return stores;
+  }
+
+  Future<List<CategoryModel>> getCategoryData() async {
+    return Provider.of<CategoryProvider>(context, listen: false).categoryList;
   }
 
   @override
@@ -366,7 +371,7 @@ class _UserHomePageState extends State<UserHomePage> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 19.0),
-                  child: (userAddress == '주소를 설정하세요')
+                  child: (userAddress == 'd')
                       ? const Center(
                           child: Text(
                             '주소를 설정해주세요',
@@ -387,15 +392,21 @@ class _UserHomePageState extends State<UserHomePage> {
                                 bool isDeliveryLogo =
                                     categories[index].category == 'CSAI';
                                 return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => UserMenuPage(
-                                          category: categories[index].category,
+                                  onTap: () async {
+                                    await Provider.of<CategoryProvider>(context,
+                                            listen: false)
+                                        .getSelectCategory(
+                                            categories[index].category);
+
+                                    if (context.mounted) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const StoreSelectPage(),
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    }
                                     print(
                                         "Food item ${categories[index].category} clicked!"); // Example
                                   },

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
-import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/services/cart_service.dart';
 import 'package:frontend/user/services/userMenu_service.dart';
 import 'package:intl/intl.dart';
@@ -9,97 +8,20 @@ import 'package:intl/intl.dart';
 class UserMenuSelectPage extends StatefulWidget {
   final StoreModel store;
   const UserMenuSelectPage({required this.store, super.key});
+
   @override
   State<UserMenuSelectPage> createState() => _UserMenuSelectPageState();
 }
 
-void showReviewsBottomSheet(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    builder: (BuildContext context) {
-      return Container(
-          padding: const EdgeInsets.all(30.0),
-          height: 270,
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  '리뷰 유형',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
-            // 여기에 리뷰 목록을 추가하세요.
-            Row(
-              children: [
-                const Text(
-                  '우리 배달앱 리뷰보기',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(width: 184),
-                ClipRRect(
-                  // 둥근 정도 조절
-                  borderRadius: BorderRadius.circular(5.0),
-                  child: SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: Image.asset(
-                      'assets/images/mydelivery.png',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 21),
-            const Divider(), // 구분선 생성
-            const SizedBox(height: 21),
-            Row(
-              children: [
-                const Text(
-                  '우리 배달앱 리뷰보기',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(width: 180),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(5.0),
-                  child: SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: Image.asset(
-                      'assets/images/maindelivery.png',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ]));
-    },
-  );
-}
-
 class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
-  var f = NumberFormat('###,###,###,###'); // 숫자 세자리마다 콤마 넣는 코드
+  var f = NumberFormat('###,###,###,###');
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  // 숫자 세자리마다 콤마 넣는 코드
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -390,13 +312,13 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                     try {
                       await CartService().putCart(userMenu);
                       // 장바구니 담기에 성공하면 장바구니에 페이지로 이동
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              CartItemPage(widget.store, userMenu),
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) =>
+                      //         CartItemPage(widget.store, userMenu),
+                      //   ),
+                      // );
                     } catch (e) {
                       // 장바구니에 담은 경우 다른 가게의 메뉴를 담을려고 할 때 경고창 구현
                       showDialog(
@@ -508,4 +430,89 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
       },
     );
   }
+}
+
+void showReviewsBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return Container(
+          padding: const EdgeInsets.all(30.0),
+          height: 270,
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  '리뷰 유형',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 40),
+            // 여기에 리뷰 목록을 추가하세요.
+            Row(
+              children: [
+                const Text(
+                  '우리 배달앱 리뷰보기',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(width: 184),
+                ClipRRect(
+                  // 둥근 정도 조절
+                  borderRadius: BorderRadius.circular(5.0),
+                  child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: Image.asset(
+                      'assets/images/mydelivery.png',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 21),
+            const Divider(), // 구분선 생성
+            const SizedBox(height: 21),
+            Row(
+              children: [
+                const Text(
+                  '우리 배달앱 리뷰보기',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(width: 180),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(5.0),
+                  child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: Image.asset(
+                      'assets/images/maindelivery.png',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ]));
+    },
+  );
 }

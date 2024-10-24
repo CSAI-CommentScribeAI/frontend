@@ -5,29 +5,29 @@ import 'package:frontend/user/screens/menuselect_screen.dart';
 import 'package:frontend/user/services/selectCategory_service.dart';
 import 'package:provider/provider.dart';
 
-class UserMenuPage extends StatefulWidget {
-  final String category; // 선택된 카테고리
-  const UserMenuPage({required this.category, super.key});
+class StoreSelectPage extends StatefulWidget {
+  const StoreSelectPage({
+    super.key,
+  });
 
   @override
-  State<UserMenuPage> createState() => _UserMenuPageState();
+  State<StoreSelectPage> createState() => _StoreSelectPageState();
 }
 
-class _UserMenuPageState extends State<UserMenuPage> {
+class _StoreSelectPageState extends State<StoreSelectPage> {
   int selectedButtonIndex = -1;
   double rating = 1.0; // 별점
   double deliveryFee = 0; // 배달비
   double minOrder = 3000; // 최소주문
-  List<StoreModel> stores = [];
   final SelectCategoryService selectCategoryService = SelectCategoryService();
 
   @override
   void initState() {
     super.initState(); // initState 메서드를 호출하여 초기화
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Provider.of<CategoryProvider>(context, listen: false)
-          .getSelectCategory(widget.category);
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   await Provider.of<CategoryProvider>(context, listen: false)
+    //       .getSelectCategory(widget.category);
+    // });
   }
 
   void handleButtonSelection(int index) {
@@ -667,8 +667,8 @@ class _UserMenuPageState extends State<UserMenuPage> {
                       return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
                       return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData) {
-                      return const Center(child: Text('No stores found.'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('등록된 가게가 없습니다.'));
                     } else {
                       return ListView.builder(
                         itemCount: snapshot.data!.length,
@@ -676,7 +676,9 @@ class _UserMenuPageState extends State<UserMenuPage> {
                           final store = snapshot.data![index];
 
                           return GestureDetector(
-                            onTap: () {
+                            onTap: () async {
+                              print('가게 아이디: ${store.id}');
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
