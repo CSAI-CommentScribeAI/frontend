@@ -3,11 +3,11 @@ import 'dart:io' show Platform;
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:http/http.dart' as http;
 
-class userMenuService {
+class UserMenuService {
   String serverAddress = '';
 
-  Future<List<AddMenuModel>> fetchMenus(String storeId) async {
-    List<AddMenuModel> userMenuInstance = [];
+  // 가게별 메뉴 전체 조회
+  Future<List<AddMenuModel>> fetchMenus(int storeId) async {
     if (Platform.isAndroid) {
       serverAddress = 'http://10.0.2.2:9000/api/v1/$storeId/menus';
     } else if (Platform.isIOS) {
@@ -21,23 +21,20 @@ class userMenuService {
         final utf8Response = utf8.decode(response.bodyBytes);
         final dynamic jsonResponse = jsonDecode(utf8Response);
 
-        if (jsonResponse is Map && jsonResponse['data'] is List) {
-          final List<dynamic> userMenus = jsonResponse['data'];
-          print('JSON 데이터: $userMenus');
+        final dataResponse = jsonResponse['data'];
+        List<AddMenuModel> userMenuList = [];
 
-          for (var menu in userMenus) {
-            userMenuInstance.add(AddMenuModel.fromJson(menu));
-          }
+        for (var data in dataResponse) {
+          userMenuList.add(AddMenuModel.fromJson(data));
         }
-        print('조회 성공: $userMenuInstance');
-        return userMenuInstance;
+
+        print('가게별 메뉴 조회 성공: $dataResponse');
+        return userMenuList;
       } else {
-        print('조회 실패');
-        return [];
+        throw Exception('조회 실패: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      print(e.toString());
-      return [];
+      throw Exception(e.toString());
     }
   }
 }

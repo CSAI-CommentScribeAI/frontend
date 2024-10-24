@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/models/category_model.dart';
+import 'package:frontend/user/providers/category_provider.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
-import 'package:frontend/user/screens/storeselect_screen.dart';
+import 'package:frontend/user/screens/storeSelect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
-import 'package:frontend/user/services/selectCategory_service.dart';
 import 'package:frontend/user/services/userStore_service.dart';
 import 'package:frontend/user/widgets/menuSearch_widget.dart';
+import 'package:provider/provider.dart';
 
 class UserHomePage extends StatefulWidget {
   final String accessToken;
@@ -16,7 +18,7 @@ class UserHomePage extends StatefulWidget {
 }
 
 class _UserHomePageState extends State<UserHomePage> {
-  List<StoreModel> categories = [];
+  List<CategoryModel> categories = [];
   late Future<List<StoreModel>> futureStores;
 
   TextEditingController searchController = TextEditingController();
@@ -26,24 +28,33 @@ class _UserHomePageState extends State<UserHomePage> {
   @override
   void initState() {
     super.initState();
-    fetchCategories(); // 카테고리 정보를 가져오는 메서드를 호출하여 초기화 시 데이터 로드
-    futureStores =
-        UserStoreService().getManyStores(); // 모든 가게 리스트를 futureStores에 저장
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<CategoryProvider>(context, listen: false).getCategory();
+
+      setState(() {
+        List<CategoryModel> getCategories =
+            Provider.of<CategoryProvider>(context, listen: false).categoryList;
+
+        for (var category in getCategories) {
+          categories.add(category);
+        }
+      });
+    });
   }
 
 // 카테고리 정보를 서버에서 가져오는 메서드
-  void fetchCategories() async {
-    // SelectCategoryService 인스턴스를 생성
-    SelectCategoryService categoryService = SelectCategoryService();
+  // void fetchCategories() async {
+  //   // SelectCategoryService 인스턴스를 생성
+  //   SelectCategoryService categoryService = SelectCategoryService();
 
-    // categoryService를 사용하여 카테고리 정보를 비동기적으로 가져옴
-    List<StoreModel> fetchedCategories = await categoryService.getCategory(0);
+  //   // categoryService를 사용하여 카테고리 정보를 비동기적으로 가져옴
+  //   List<StoreModel> fetchedCategories = await categoryService.getCategory(0);
 
-    // 상태를 업데이트하여 가져온 카테고리 정보를 categories 리스트에 저장
-    setState(() {
-      categories = fetchedCategories;
-    });
-  }
+  //   // 상태를 업데이트하여 가져온 카테고리 정보를 categories 리스트에 저장
+  //   setState(() {
+  //     categories = fetchedCategories;
+  //   });
+  // }
 
   void filterSearchResults(String query) {}
 
@@ -79,6 +90,10 @@ class _UserHomePageState extends State<UserHomePage> {
     }
 
     return stores;
+  }
+
+  Future<List<CategoryModel>> getCategoryData() async {
+    return Provider.of<CategoryProvider>(context, listen: false).categoryList;
   }
 
   @override
@@ -349,75 +364,95 @@ class _UserHomePageState extends State<UserHomePage> {
                 ),
               ),
               const SizedBox(height: 20),
+
               // 음식 메뉴
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 19.0),
-                  child: categories.isEmpty
-                      ? const Center(child: CircularProgressIndicator())
-                      : GridView.count(
-                          crossAxisCount: 3, // 3 x 3
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          children: List.generate(categories.length, (index) {
-                            bool isDeliveryLogo =
-                                categories[index].category == 'CSAI';
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => UserMenuPage(
-                                      category: categories[index].category,
+                  child: (userAddress == 'd')
+                      ? const Center(
+                          child: Text(
+                            '주소를 설정해주세요',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )
+                      : categories.isEmpty
+                          ? const Center(child: CircularProgressIndicator())
+                          : GridView.count(
+                              crossAxisCount: 3, // 3 x 3
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              children:
+                                  List.generate(categories.length, (index) {
+                                bool isDeliveryLogo =
+                                    categories[index].category == 'CSAI';
+                                return GestureDetector(
+                                  onTap: () async {
+                                    await Provider.of<CategoryProvider>(context,
+                                            listen: false)
+                                        .getSelectCategory(
+                                            categories[index].category);
+
+                                    if (context.mounted) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const StoreSelectPage(),
+                                        ),
+                                      );
+                                    }
+                                    print(
+                                        "Food item ${categories[index].category} clicked!"); // Example
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF374AA3)
+                                              .withOpacity(0.5),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/${categories[index].category.toLowerCase()}.png',
+                                          height: isDeliveryLogo ? 108 : 50,
+                                          width: isDeliveryLogo ? 108 : 50,
+                                        ),
+                                        if (!isDeliveryLogo) ...[
+                                          const SizedBox(height: 10),
+                                          Text(
+                                            // categories[index].category,
+                                            categoryTranslations[
+                                                    categories[index]
+                                                        .category] ??
+                                                categories[index].category,
+
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
                                     ),
                                   ),
                                 );
-                                print(
-                                    "Food item ${categories[index].category} clicked!"); // Example
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF374AA3)
-                                          .withOpacity(0.5),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/${categories[index].category.toLowerCase()}.png',
-                                      height: isDeliveryLogo ? 108 : 50,
-                                      width: isDeliveryLogo ? 108 : 50,
-                                    ),
-                                    if (!isDeliveryLogo) ...[
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        // categories[index].category,
-                                        categoryTranslations[
-                                                categories[index].category] ??
-                                            categories[index].category,
-
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
+                              }),
+                            ),
                 ),
               ),
             ],

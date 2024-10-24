@@ -1,28 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/providers/category_provider.dart';
 import 'package:frontend/user/screens/menuselect_screen.dart';
 import 'package:frontend/user/services/selectCategory_service.dart';
+import 'package:provider/provider.dart';
 
-class UserMenuPage extends StatefulWidget {
-  final String category; // 선택된 카테고리
-  const UserMenuPage({required this.category, super.key});
+class StoreSelectPage extends StatefulWidget {
+  const StoreSelectPage({
+    super.key,
+  });
 
   @override
-  State<UserMenuPage> createState() => _UserMenuPageState();
+  State<StoreSelectPage> createState() => _StoreSelectPageState();
 }
 
-class _UserMenuPageState extends State<UserMenuPage> {
+class _StoreSelectPageState extends State<StoreSelectPage> {
   int selectedButtonIndex = -1;
   double rating = 1.0; // 별점
   double deliveryFee = 0; // 배달비
   double minOrder = 3000; // 최소주문
-  List<StoreModel> stores = [];
   final SelectCategoryService selectCategoryService = SelectCategoryService();
 
   @override
   void initState() {
     super.initState(); // initState 메서드를 호출하여 초기화
-    fetchStoresByCategory(widget.category); // 카테고리 기반으로 가게 정보를 가져오는 메서드 호출
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   await Provider.of<CategoryProvider>(context, listen: false)
+    //       .getSelectCategory(widget.category);
+    // });
   }
 
   void handleButtonSelection(int index) {
@@ -40,21 +45,8 @@ class _UserMenuPageState extends State<UserMenuPage> {
     });
   }
 
-  // 카테고리별 가게 정보를 가져오는 메서드
-  Future<void> fetchStoresByCategory(String category) async {
-    try {
-      // SelectCategoryService 인스턴스를 통해 카테고리에 해당하는 가게 정보를 가져옴
-      List<StoreModel> fetchedStores =
-          await selectCategoryService.getSelectCategory(category);
-
-      // 상태를 업데이트하여 가져온 가게 정보를 stores 리스트에 저장
-      setState(() {
-        stores = fetchedStores;
-      });
-    } catch (e) {
-      // 예외 발생 시 에러 메시지 출력
-      print('Error fetching stores: $e');
-    }
+  Future<List<StoreModel>> getStoreData() async {
+    return Provider.of<CategoryProvider>(context, listen: false).storeList;
   }
 
   Widget buildBottomSheet(BuildContext context) {
@@ -668,110 +660,131 @@ class _UserMenuPageState extends State<UserMenuPage> {
 
               // 가게 리스트
               Expanded(
-                child: ListView.builder(
-                  itemCount: stores.length,
-                  itemBuilder: (context, index) {
-                    final store = stores[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UserMenuSelectPage(
-                              store: store,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Hero(
-                        tag: store.id, // 가게 아이디로 태그 설정
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 18),
-                          width: double.infinity,
-                          height: 132,
-                          padding: const EdgeInsets.only(right: 20.0),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFFFFF),
-                            borderRadius: BorderRadius.circular(15.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.25),
-                                offset: const Offset(0, 4),
-                                blurRadius: 4.0,
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(15.0),
-                                child: SizedBox(
-                                  width: MediaQuery.of(context).size.width / 3,
-                                  height: 132,
-                                  child: Image.asset(
-                                    'assets/images/deliverylogo.png',
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Center(
-                                        child: Icon(
-                                          Icons.error,
-                                          color: Colors.red,
-                                          size: 50,
-                                        ),
-                                      );
-                                    },
+                child: FutureBuilder<List<StoreModel>>(
+                  future: getStoreData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('등록된 가게가 없습니다.'));
+                    } else {
+                      return ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          final store = snapshot.data![index];
+
+                          return GestureDetector(
+                            onTap: () async {
+                              print('가게 아이디: ${store.id}');
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UserMenuSelectPage(
+                                    store: store,
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 16.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        store.name,
-                                        style: const TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
+                              );
+                            },
+                            child: Hero(
+                              tag: store.id, // 가게 아이디로 태그 설정
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 18),
+                                width: double.infinity,
+                                height: 132,
+                                padding: const EdgeInsets.only(right: 20.0),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFFFFF),
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.25),
+                                      offset: const Offset(0, 4),
+                                      blurRadius: 4.0,
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                      child: SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                3,
+                                        height: 132,
+                                        child: Image.asset(
+                                          'assets/images/deliverylogo.png',
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return const Center(
+                                              child: Icon(
+                                                Icons.error,
+                                                color: Colors.red,
+                                                size: 50,
+                                              ),
+                                            );
+                                          },
                                         ),
                                       ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        '최소 주문 ${store.minOrderPrice}원',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Color(0xFF808080),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      const Row(
-                                        children: [
-                                          Icon(Icons.star,
-                                              color: Color(0xFFDFB300),
-                                              size: 15),
-                                          SizedBox(width: 4),
-                                          Text(
-                                            '4.5',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black,
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 16.0),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              store.name,
+                                              style: const TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              '최소 주문 ${store.minOrderPrice}원',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Color(0xFF808080),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            const Row(
+                                              children: [
+                                                Icon(Icons.star,
+                                                    color: Color(0xFFDFB300),
+                                                    size: 15),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  '4.5',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
+                            ),
+                          );
+                        },
+                      );
+                    }
                   },
                 ),
               ),
