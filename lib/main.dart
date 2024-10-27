@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/providers/menu_provider.dart';
 import 'package:frontend/user/providers/category_provider.dart';
+import 'package:frontend/user/providers/userInfo_provider.dart';
 import 'package:frontend/user/providers/userMenu_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -32,6 +33,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => MenuProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ChangeNotifierProvider(create: (_) => UserMenuProvider()),
+        ChangeNotifierProvider(create: (_) => UserInfoProvider()),
       ],
       child: const MyApp(),
     ),
@@ -46,6 +48,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // snackbar를 사용하기 위해 GetX 컨텍스트 초기화를 위해 작성
     return const GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       home: LoginPage(),
     );
   }

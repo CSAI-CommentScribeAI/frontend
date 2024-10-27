@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/models/category_model.dart';
 import 'package:frontend/user/providers/category_provider.dart';
+import 'package:frontend/user/providers/userInfo_provider.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/screens/storeSelect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
@@ -10,8 +11,7 @@ import 'package:frontend/user/widgets/menuSearch_widget.dart';
 import 'package:provider/provider.dart';
 
 class UserHomePage extends StatefulWidget {
-  final String accessToken;
-  const UserHomePage(this.accessToken, {super.key});
+  const UserHomePage({super.key});
 
   @override
   State<UserHomePage> createState() => _UserHomePageState();
@@ -19,6 +19,7 @@ class UserHomePage extends StatefulWidget {
 
 class _UserHomePageState extends State<UserHomePage> {
   List<CategoryModel> categories = [];
+  Map<String, dynamic> userInfo = {};
   late Future<List<StoreModel>> futureStores;
 
   TextEditingController searchController = TextEditingController();
@@ -31,6 +32,9 @@ class _UserHomePageState extends State<UserHomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Provider.of<CategoryProvider>(context, listen: false).getCategory();
 
+      await Provider.of<UserInfoProvider>(context, listen: false)
+          .fetchUserInfo();
+
       setState(() {
         List<CategoryModel> getCategories =
             Provider.of<CategoryProvider>(context, listen: false).categoryList;
@@ -38,6 +42,9 @@ class _UserHomePageState extends State<UserHomePage> {
         for (var category in getCategories) {
           categories.add(category);
         }
+
+        userInfo =
+            Provider.of<UserInfoProvider>(context, listen: false).userInfo;
       });
     });
   }
@@ -92,10 +99,6 @@ class _UserHomePageState extends State<UserHomePage> {
     return stores;
   }
 
-  Future<List<CategoryModel>> getCategoryData() async {
-    return Provider.of<CategoryProvider>(context, listen: false).categoryList;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,7 +114,9 @@ class _UserHomePageState extends State<UserHomePage> {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: userAddress, // 사용자 주소
+                  text: (userInfo['address'] != null)
+                      ? userInfo['address']['fullAddress']
+                      : '주소를 설정하세요', // 사용자 주소
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -126,7 +131,6 @@ class _UserHomePageState extends State<UserHomePage> {
                         MaterialPageRoute(
                           builder: (context) => UserAddressPage(
                             (p0, p1, p2, p3, p4) => null,
-                            widget.accessToken,
                             onUserAddressSelected:
                                 onUserAdddressSelected, // 필수 요소
                           ),
@@ -150,6 +154,7 @@ class _UserHomePageState extends State<UserHomePage> {
         centerTitle: false,
         actions: [
           GestureDetector(
+            onTap: () {},
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Padding(
@@ -369,7 +374,7 @@ class _UserHomePageState extends State<UserHomePage> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 19.0),
-                  child: (userAddress == 'd')
+                  child: (userInfo['address'] == null)
                       ? const Center(
                           child: Text(
                             '주소를 설정해주세요',

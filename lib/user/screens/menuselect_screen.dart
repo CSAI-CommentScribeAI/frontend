@@ -296,6 +296,7 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
     );
   }
 
+  // 가게 메뉴 리스트
   Widget allMenuSection() {
     return FutureBuilder<List<AddMenuModel>>(
       future: getMenuData(),
@@ -333,23 +334,25 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                       // );
                     } catch (e) {
                       // 장바구니에 담은 경우 다른 가게의 메뉴를 담을려고 할 때 경고창 구현
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('경고'),
-                            content: const Text('다른 가게의 메뉴를 추가할 수 없습니다.'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('확인'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      if (context.mounted) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('경고'),
+                              content: const Text('다른 가게의 메뉴를 추가할 수 없습니다.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('확인'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
                     }
                   },
                   child: Card(
