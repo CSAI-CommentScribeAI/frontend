@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/providers/cart_provider.dart';
 import 'package:frontend/user/screens/userOrder_screen.dart';
-import 'package:frontend/user/services/cart_service.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:intl/intl.dart';
 
@@ -54,7 +53,7 @@ class _CartItemPageState extends State<CartItemPage> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 24.0),
         child: FutureBuilder<Map<String, dynamic>>(
-          future: CartService().getCart(),
+          future: CartProvider().getCart(),
           builder: (context, snapshot) {
             // 데이터가 로드되는 동안 로딩 스피너 표시
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -74,6 +73,7 @@ class _CartItemPageState extends State<CartItemPage> {
               // 데이터가 성공적으로 로드될 경우 가게 목록 표시
             } else {
               final List<dynamic> cartItems = snapshot.data!['cartItems'];
+
               return ListView.builder(
                 shrinkWrap: true,
                 physics: const ScrollPhysics(),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/providers/userMenu_provider.dart';
+import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/services/cart_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -325,13 +326,15 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                     try {
                       await CartService().putCart(userMenu);
                       // 장바구니 담기에 성공하면 장바구니에 페이지로 이동
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) =>
-                      //         CartItemPage(widget.store, userMenu),
-                      //   ),
-                      // );
+                      if (context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                CartItemPage(widget.store, userMenu),
+                          ),
+                        );
+                      }
                     } catch (e) {
                       // 장바구니에 담은 경우 다른 가게의 메뉴를 담을려고 할 때 경고창 구현
                       if (context.mounted) {
