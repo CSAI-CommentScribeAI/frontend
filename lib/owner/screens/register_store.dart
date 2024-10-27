@@ -8,9 +8,8 @@ import 'package:image_picker/image_picker.dart';
 class RegisterStorePage extends StatefulWidget {
   // home_screen.dart에서 selectedStore 값을 가져옴
   final String selectedStore;
-  final String accessToken;
 
-  const RegisterStorePage(this.selectedStore, this.accessToken, {super.key});
+  const RegisterStorePage(this.selectedStore, {super.key});
 
   @override
   State<RegisterStorePage> createState() => _RegisterStorePageState();
@@ -615,7 +614,6 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
                         openInitialTime,
                         closeInitialTime,
                         _menuImage!,
-                        widget.accessToken,
                       );
 
                       Navigator.pop(

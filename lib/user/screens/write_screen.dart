@@ -151,7 +151,7 @@ class _WriteReviewPageState extends State<WriteReviewPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const UserHomePage(''),
+                      builder: (context) => const UserHomePage(),
                     ),
                   );
                 },

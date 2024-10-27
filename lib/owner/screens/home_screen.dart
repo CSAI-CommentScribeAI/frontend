@@ -9,15 +9,13 @@ import 'package:frontend/owner/screens/register_store.dart';
 import 'package:frontend/owner/screens/receipt_screen.dart';
 import 'package:frontend/owner/screens/review_screen.dart';
 import 'package:frontend/owner/screens/store_screen.dart';
-import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/circle_widget.dart';
 import 'package:frontend/owner/widgets/current_widget.dart';
 import 'package:frontend/owner/widgets/menuItem_widget.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
-  final String accessToken;
-  const HomePage({required this.accessToken, super.key});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -179,8 +177,8 @@ class _HomePageState extends State<HomePage> {
                         final refreshResult = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => RegisterStorePage(
-                                  selectedStore, widget.accessToken)),
+                              builder: (context) =>
+                                  RegisterStorePage(selectedStore)),
                         );
                         if (context.mounted) {
                           Navigator.pop(context, refreshResult);

@@ -67,7 +67,6 @@ class StoreService {
     TimeOfDay openTime,
     TimeOfDay closeTime,
     File file,
-    String? accessToken,
   ) async {
     final Map<String, String> categoryMapping = {
       '햄버거': 'HAMBURGER',
@@ -79,6 +78,9 @@ class StoreService {
       '일식': 'JAPANESEFOOD',
       '치킨': 'CHICKEN',
     };
+
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
 
     try {
       String serverAddress;

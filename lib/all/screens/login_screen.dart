@@ -108,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => HomePage(accessToken: accessToken),
+                builder: (context) => const HomePage(),
               ),
             );
           }
@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => UserHomePage(accessToken),
+                builder: (context) => const UserHomePage(),
               ),
             );
           }

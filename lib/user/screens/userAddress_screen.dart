@@ -1,18 +1,19 @@
 // UI 수정 필요
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/screens/map_screen.dart';
-import 'package:get/get.dart';
+import 'package:frontend/user/screens/userHome_screen.dart';
 import 'package:kpostal/kpostal.dart';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class UserAddressPage extends StatefulWidget {
   final Function(String) onUserAddressSelected;
   Function(String, String, String, String, String) sendAddress;
-  final String accessToken;
 
-  UserAddressPage(this.sendAddress, this.accessToken,
+  UserAddressPage(this.sendAddress,
       {required this.onUserAddressSelected, super.key});
 
   @override
@@ -44,13 +45,16 @@ class _UserAddressPageState extends State<UserAddressPage> {
       serverAddress = 'http://127.0.0.1:9000/api/v1/user/addresses';
     }
 
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
+
     try {
       final url = Uri.parse(serverAddress);
       final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${widget.accessToken}',
+          'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode({
           'fullAddress': fullAddress,
@@ -279,7 +283,12 @@ class _UserAddressPageState extends State<UserAddressPage> {
               double.parse(latitude),
               double.parse(longitude),
             );
-            Navigator.pop(context);
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const UserHomePage(),
+                ),
+                (route) => false);
           } catch (e) {
             print('위도 및 경도 변환 오류: ${e.toString()}');
           }
