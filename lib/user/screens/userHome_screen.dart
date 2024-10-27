@@ -3,7 +3,7 @@ import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/models/category_model.dart';
 import 'package:frontend/user/providers/category_provider.dart';
 import 'package:frontend/user/providers/userInfo_provider.dart';
-import 'package:frontend/user/screens/complete_screen.dart';
+import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/storeSelect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
 import 'package:frontend/user/services/userStore_service.dart';
@@ -168,6 +168,8 @@ class _UserHomePageState extends State<UserHomePage> {
               ),
             ),
           ),
+
+          // 장바구니 아이콘
           GestureDetector(
             child: const Padding(
               padding: EdgeInsets.all(8.0),
@@ -181,18 +183,18 @@ class _UserHomePageState extends State<UserHomePage> {
               ),
             ),
             onTap: () async {
-              StoreModel storeModel = await getStoreModel();
+              // StoreModel storeModel = await getStoreModel();
 
-              print('storeModel : $storeModel');
+              // print('storeModel : $storeModel');
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CompletePage(
-                    storeModel,
+              if (context.mounted) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CartItemPage(),
                   ),
-                ),
-              );
+                );
+              }
             },
           )
         ],

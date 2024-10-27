@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cart_stepper/cart_stepper.dart';
+import 'package:frontend/user/models/cartMenu_model.dart';
+import 'package:frontend/user/services/cart_service.dart';
 import 'package:intl/intl.dart';
 
 class CartWidget extends StatefulWidget {
-  final Map<String, dynamic> cart;
-  const CartWidget(this.cart, {super.key});
+  final CartMenuModel cart;
+  final String storeName;
+  const CartWidget(this.cart, this.storeName, {super.key});
   @override
   State<CartWidget> createState() => _CartWidgetState();
 }
@@ -19,7 +22,7 @@ class _CartWidgetState extends State<CartWidget> {
       alignment: AlignmentDirectional.bottomCenter,
       children: [
         SizedBox(
-          height: 230, // 275,
+          height: MediaQuery.of(context).size.width / 1.6,
           child: Card(
             color: Colors.white,
             shadowColor: const Color(0xFF374AA3),
@@ -29,41 +32,30 @@ class _CartWidgetState extends State<CartWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     // 주문 가게 이름
                     children: [
                       // 추후에 구현 예정
-                      // Text(
-                      //   carts.menuName,
-                      //   style: const TextStyle(
-                      //     fontSize: 16,
-                      //     color: Color(0xFF808080),
-                      //   ),
-                      // ),
-                      // 삭제 버튼
-                      // IconButton(
-                      //   onPressed: () {},
-                      //   icon: const Icon(
-                      //     Icons.delete,
-                      //     color: Color(0xFF7E7EB2),
-                      //   ),
-                      // ),
-                    ],
-                  ),
-                  // 주문 메뉴 이름
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
                       Text(
-                        widget.cart['menuName'],
+                        widget.storeName,
                         style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Color(0xFF808080),
                         ),
                       ),
+
+                      // 삭제 버튼
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          try {
+                            await CartService().deleteCart(widget.cart.menuId);
+                          } catch (e) {
+                            print(e.toString());
+                          }
+
+                          setState(() {});
+                        },
                         icon: const Icon(
                           Icons.delete,
                           color: Color(0xFF7E7EB2),
@@ -71,7 +63,17 @@ class _CartWidgetState extends State<CartWidget> {
                       ),
                     ],
                   ),
+
+                  // 주문 메뉴 이름
+                  Text(
+                    widget.cart.menuName,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 20),
+
                   // 주문 가격과 수량
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -80,15 +82,16 @@ class _CartWidgetState extends State<CartWidget> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10.0),
                         child: Image.network(
-                          widget.cart['imageUrl'],
+                          widget.cart.imageUrl,
                           width: 120,
                           alignment: Alignment.topLeft,
                         ),
                       ),
                       Row(
                         children: [
-                          Text('${widget.cart['price']}원'),
+                          Text('${widget.cart.price}원'),
                           const SizedBox(width: 10),
+
                           // 수량 증가/감소 버튼
                           CartStepperInt(
                             value: counterLimit,
