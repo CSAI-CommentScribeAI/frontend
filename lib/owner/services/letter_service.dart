@@ -8,14 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LetterService {
   late String serverAddress;
 
-  // 편지 저장 API
-  Future<String> getLetter(int orderId) async {
+  // 편지 불러오기 API
+  Future<Map<String, dynamic>> getLetter(int orderId) async {
     // SharedPreferences에서 액세스 토큰을 가져옴
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
-
-    // 편지 인스턴스를 저장할 리스트를 생성
-    // List<Map<String, dynamic>> letterInstance = [];
 
     // 현재 플랫폼에 따라 서버 주소 설정
     if (Platform.isAndroid) {
@@ -40,29 +37,18 @@ class LetterService {
         // 서버 응답을 UTF-8로 디코딩
         final utf8Response = utf8.decode(response.bodyBytes);
         // 디코딩된 응답을 JSON 형태로 변환
-        final dynamic jsonResponse = jsonDecode(utf8Response);
+        final jsonResponse = jsonDecode(utf8Response);
 
-        // jsonResponse가 Map이고 data 필드가 List일 경우
-        if (jsonResponse is Map) {
-          final String letters = jsonResponse['messageContent'];
-
-          print('조회 성공 $letters');
-          return letters;
-        } else {
-          // 응답이 예상과 다를 경우
-          print('응답이 예상과 다름: $jsonResponse');
-          return '';
-        }
+        print('편지 불러오기 성공 $jsonResponse');
+        return jsonResponse;
       } else {
         // 요청 실패 시
-        print('조회 실패: ${response.statusCode}');
-        print('응답 본문: ${response.body}');
-        return '';
+        throw Exception(
+            '편지 불러오기 실패: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       // 예외 발생 시
-      print('예외 발생: $e');
-      return '';
+      throw Exception('예외 발생: $e');
     }
   }
 

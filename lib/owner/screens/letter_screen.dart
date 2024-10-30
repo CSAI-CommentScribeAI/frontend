@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // rootBundle을 사용하기 위해 추가
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:frontend/all/services/order_service.dart';
-import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/owner/providers/letter_provider.dart';
 import 'package:frontend/owner/services/letter_service.dart';
 import 'package:frontend/owner/services/delivery_service.dart';
-import 'package:frontend/owner/services/store_service.dart';
 import 'package:printing/printing.dart'; // printing 패키지 추가
 import 'package:pdf/pdf.dart'; // pdf 패키지 추가
-import 'package:pdf/widgets.dart' as pw; // pdf 패키지 추가
+import 'package:pdf/widgets.dart' as pw;
+import 'package:provider/provider.dart'; // pdf 패키지 추가
 
 class LetterPage extends StatefulWidget {
   final int orderId;
@@ -74,33 +73,16 @@ class _LetterPageState extends State<LetterPage> {
   @override
   void initState() {
     super.initState(); // 부모 클래스의 initState 메서드를 호출하여 초기화 수행
-    fetchLetters(); // 위젯이 처음 생성될 때 서버에서 편지들을 불러오는 메서드 호출
-  }
 
-  // 가게 아이디 가져오는 함수
-  Future<int> getStoreId() async {
-    // List<StoreModel> storeList = await StoreService().getStore();
-    int? id;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<LetterProvider>(context, listen: false)
+          .getLetter(widget.orderId);
 
-    // for (var store in storeList) {
-    //   id = store.id;
-    // }
-
-    // orderId가 null일 경우 예외 처리
-    throw Exception("No orders found");
-
-    // return id;
-  }
-
-  // 서버에서 편지를 불러오는 메서드
-  Future<void> fetchLetters() async {
-    // LetterService 클래스의 getLetter 메서드를 호출하여 편지들을 불러오고, 그 결과를 기다림
-    String fetchedLetters = await LetterService().getLetter(widget.orderId);
-
-    // 불러온 편지들로 상태를 업데이트하여, 위젯 트리를 다시 빌드
-    setState(() {
-      letters = fetchedLetters; // 불러온 편지들을 letters에 할당
-      letterController.text = letters; // letterController에 불러온 편지 내용 설정
+      setState(() {
+        letterContent = Provider.of<LetterProvider>(context, listen: false)
+            .letter['messageContent'];
+        letterController.text = letterContent; // TextFormField 초기화
+      });
     });
   }
 
@@ -535,6 +517,7 @@ class _LetterPageState extends State<LetterPage> {
     );
   }
 
+  // 편지
   CarouselSlider makeList() {
     return CarouselSlider.builder(
       carouselController: controller,

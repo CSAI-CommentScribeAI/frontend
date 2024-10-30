@@ -17,430 +17,369 @@ class ReceiptPage extends StatefulWidget {
 }
 
 class _ReceiptPageState extends State<ReceiptPage> {
+  bool isCooking = false; // 조리 중 상태
+
   int i = 0; // 각 객체마다 isCompleted에 접근하기 위해 선언
   // int orderId = 0;
   bool isExpanded = false;
   int selectedButtonIndex = -1;
   bool isOrderAccepted = false; // 주문이 수락되었는지 여부 확인
 
-  // // 주문 상태 객체
-  // // FutureBuilder의 snapshot.data와 같이 있으면 UI 적용이 안됨
-  // // 주문이 2개일때는 다 편지작성이 가능하기 때문에 하나만 되게 구현해야함
-  // Map<String, dynamic> orderStatus = {
-  //   'isAccepted': null,
-  //   'isPrinted': null,
-  //   'isDelivered': null,
-  //   'isCompleted': null,
-  // };
-
-  void handleButtonSelection(int index) {
-    setState(() {
-      selectedButtonIndex = index;
-    });
-  }
-
-  // // 주문을 수락하는 메서드
-  // void acceptOrder(int index, int orderId) async {
-  //   setState(() {
-  //     orderStatus['isAccepted'] = true;
-  //   });
-
-  //   bool isSaved = await LetterService().saveLetter(orderId);
-
-  //   if (isSaved) {
-  //     // 3초 후에 상태를 '배차 / 출력' 버튼으로 변경
-  //     Future.delayed(const Duration(seconds: 3), () {
-  //       setState(() {
-  //         orderStatus['isPrinted'] = true; // 배차 혹은 출력 상태로 활성화
-  //       });
-  //     });
-  //   } else {
-  //     setState(() {
-  //       orderStatus['isAccepted'] = false;
-  //     });
-  //   }
-  // }
-
-  // // 배차 혹은 출력시키는 메서드
-  // void acceptDelivery(int index) async {
-  //   setState(() {
-  //     orderStatus['isDelivered'] = true; // 배달 중 상태로 활성화
-  //   });
-
-  //   // 주문을 완료 상태로 설정하는 메서드
-  //   void completeOrder(int index) {
-  //     setState(() {
-  //       orderStatus['isAccepted'] = true;
-  //       orderStatus['isPrinted'] = false;
-  //       orderStatus['isDelivered'] = false;
-  //       orderStatus['isCompleted'] = true; // 주문을 완료 상태로 설정
-  //     });
-  //   }
-
-  //   Future.delayed(const Duration(seconds: 1), () {
-  //     setState(() {
-  //       // 배차 혹은 출력 상태는 비활성화, 완료 중 상태로 활성화
-  //       orderStatus['isPrinted'] = false;
-  //       orderStatus['isCompleted'] = true;
-  //     });
-  //   });
-  // }
-
   // 거절 버튼 누를 시 작용하는 Bottomsheet
-  void _showRejectBottomSheet(int index) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          // bottomState는 하단 시트 내에서 상태를 업데이트하는 데 사용되는 함수 = 즉시 업데이트 가능
-          builder: (BuildContext context, StateSetter bottomState) {
-            return SizedBox(
-              height: MediaQuery.of(context).size.height * 0.5,
-              child: Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(31.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            '거절 사유',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              setState(() {
-                                isExpanded = true;
-                              });
-                            },
-                            icon: const Icon(Icons.close),
-                          ),
-                        ],
-                      ),
-                    ),
+  // void _showRejectBottomSheet(int index) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return StatefulBuilder(
+  //         // bottomState는 하단 시트 내에서 상태를 업데이트하는 데 사용되는 함수 = 즉시 업데이트 가능
+  //         builder: (BuildContext context, StateSetter bottomState) {
+  //           return SizedBox(
+  //             height: MediaQuery.of(context).size.height * 0.5,
+  //             child: Center(
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.center,
+  //                 children: [
+  //                   Padding(
+  //                     padding: const EdgeInsets.all(31.0),
+  //                     child: Row(
+  //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                       children: [
+  //                         const Text(
+  //                           '거절 사유',
+  //                           style: TextStyle(
+  //                             fontSize: 22,
+  //                             fontWeight: FontWeight.bold,
+  //                           ),
+  //                         ),
+  //                         IconButton(
+  //                           onPressed: () {
+  //                             Navigator.pop(context);
+  //                             setState(() {
+  //                               isExpanded = true;
+  //                             });
+  //                           },
+  //                           icon: const Icon(Icons.close),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ),
 
-                    // 텍스트 버튼
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 145,
-                          height: 40,
-                          child: TextButton(
-                            onPressed: () {
-                              bottomState(() {
-                                handleButtonSelection(0);
-                              });
-                            },
-                            style: TextButton.styleFrom(
-                              backgroundColor: selectedButtonIndex == 0
-                                  ? const Color(0xFF7B88C2)
-                                  : const Color(0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              // 박스 데코레이션 추가
-                              side: BorderSide(
-                                  color: Colors.white.withOpacity(0.25)),
-                              // 그림자 추가
-                              shadowColor: Colors.black,
-                              elevation: 5,
-                            ),
-                            child: const Text(
-                              '가게 사정',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 25),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 31.0),
-                          child: SizedBox(
-                            width: 145,
-                            height: 40,
-                            child: TextButton(
-                              onPressed: () {
-                                bottomState(() {
-                                  handleButtonSelection(1);
-                                });
-                              },
-                              style: TextButton.styleFrom(
-                                backgroundColor: selectedButtonIndex == 1
-                                    ? const Color(0xFF7B88C2)
-                                    : const Color(
-                                        0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                // 박스 데코레이션 추가
-                                side: BorderSide(
-                                    color: Colors.white.withOpacity(0.25)),
-                                // 그림자 추가
-                                shadowColor: Colors.black,
-                                elevation: 5,
-                              ),
-                              child: const Text(
-                                '조리 지연',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 25),
-                    // 텍스트 버튼
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 145,
-                          height: 40,
-                          child: TextButton(
-                            onPressed: () {
-                              bottomState(() {
-                                handleButtonSelection(2);
-                              });
-                            },
-                            style: TextButton.styleFrom(
-                              backgroundColor: selectedButtonIndex == 2
-                                  ? const Color(0xFF7B88C2)
-                                  : const Color(0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              // 박스 데코레이션 추가
-                              side: BorderSide(
-                                  color: Colors.white.withOpacity(0.25)),
-                              // 그림자 추가
-                              shadowColor: Colors.black,
-                              elevation: 5,
-                            ),
-                            child: const Text(
-                              '재료 소진',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 25),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 31.0),
-                          child: SizedBox(
-                            width: 145,
-                            height: 40,
-                            child: TextButton(
-                              onPressed: () {
-                                bottomState(() {
-                                  handleButtonSelection(3);
-                                });
-                              },
-                              style: TextButton.styleFrom(
-                                backgroundColor: selectedButtonIndex == 3
-                                    ? const Color(0xFF7B88C2)
-                                    : const Color(
-                                        0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                // 박스 데코레이션 추가
-                                side: BorderSide(
-                                    color: Colors.white.withOpacity(0.25)),
-                                // 그림자 추가
-                                shadowColor: Colors.black,
-                                elevation: 5,
-                              ),
-                              child: const Text(
-                                '배달 불가 지역',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 25),
-                    // 텍스트 버튼
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 145,
-                          height: 40,
-                          child: TextButton(
-                            onPressed: () {
-                              bottomState(() {
-                                handleButtonSelection(4);
-                              });
-                            },
-                            style: TextButton.styleFrom(
-                              backgroundColor: selectedButtonIndex == 4
-                                  ? const Color(0xFF7B88C2)
-                                  : const Color(0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              // 박스 데코레이션 추가
-                              side: BorderSide(
-                                  color: Colors.white.withOpacity(0.25)),
-                              // 그림자 추가
-                              shadowColor: Colors.black,
-                              elevation: 5,
-                            ),
-                            child: const Text(
-                              '배달원 부재',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 25),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 31.0),
-                          child: SizedBox(
-                            width: 145,
-                            height: 40,
-                            child: TextButton(
-                              onPressed: () {
-                                bottomState(() {
-                                  handleButtonSelection(5);
-                                });
-                              },
-                              style: TextButton.styleFrom(
-                                backgroundColor: selectedButtonIndex == 5
-                                    ? const Color(0xFF7B88C2)
-                                    : const Color(
-                                        0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                // 박스 데코레이션 추가
-                                side: BorderSide(
-                                    color: Colors.white.withOpacity(0.25)),
-                                // 그림자 추가
-                                shadowColor: Colors.black,
-                                elevation: 5,
-                              ),
-                              child: const Text(
-                                '메뉴 또는 가격 변동',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 25),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 42.0),
-                          child: SizedBox(
-                            width: 145,
-                            height: 40,
-                            child: TextButton(
-                              onPressed: () {
-                                bottomState(() {
-                                  handleButtonSelection(6);
-                                });
-                              },
-                              style: TextButton.styleFrom(
-                                backgroundColor: selectedButtonIndex == 6
-                                    ? const Color(0xFF7B88C2)
-                                    : const Color(
-                                        0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                // 박스 데코레이션 추가
-                                side: BorderSide(
-                                    color: Colors.white.withOpacity(0.25)),
-                                // 그림자 추가
-                                shadowColor: Colors.black,
-                                elevation: 5,
-                              ),
-                              child: const Text(
-                                '요청 사항 적용 불가',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 25),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 31.0),
-                      child: SizedBox(
-                        width: 259,
-                        height: 52,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            // 주문 거절 완료 시 주문 내역 리스트(orderList)에 삭제
-                            // setState(() {
-                            //   if (orderList.length > index) {
-                            //     orderList.removeAt(index);
-                            //   }
-                            // });
-                          },
-                          style: TextButton.styleFrom(
-                            backgroundColor: const Color(0xFF7B88C2),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            // 박스 데코레이션 추가
-                            side: BorderSide(
-                                color: Colors.white.withOpacity(0.25)),
-                            // 그림자 추가
-                            shadowColor: Colors.black,
-                            elevation: 5,
-                          ),
-                          child: const Text(
-                            '주문 거절 완료',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+  //                   // 텍스트 버튼
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.center,
+  //                     children: [
+  //                       SizedBox(
+  //                         width: 145,
+  //                         height: 40,
+  //                         child: TextButton(
+  //                           onPressed: () {
+  //                             bottomState(() {
+  //                               handleButtonSelection(0);
+  //                             });
+  //                           },
+  //                           style: TextButton.styleFrom(
+  //                             backgroundColor: selectedButtonIndex == 0
+  //                                 ? const Color(0xFF7B88C2)
+  //                                 : const Color(0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(8.0),
+  //                             ),
+  //                             // 박스 데코레이션 추가
+  //                             side: BorderSide(
+  //                                 color: Colors.white.withOpacity(0.25)),
+  //                             // 그림자 추가
+  //                             shadowColor: Colors.black,
+  //                             elevation: 5,
+  //                           ),
+  //                           child: const Text(
+  //                             '가게 사정',
+  //                             style: TextStyle(
+  //                               color: Colors.white,
+  //                               fontSize: 14,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                       const SizedBox(width: 25),
+  //                       Padding(
+  //                         padding: const EdgeInsets.only(left: 31.0),
+  //                         child: SizedBox(
+  //                           width: 145,
+  //                           height: 40,
+  //                           child: TextButton(
+  //                             onPressed: () {
+  //                               bottomState(() {
+  //                                 handleButtonSelection(1);
+  //                               });
+  //                             },
+  //                             style: TextButton.styleFrom(
+  //                               backgroundColor: selectedButtonIndex == 1
+  //                                   ? const Color(0xFF7B88C2)
+  //                                   : const Color(
+  //                                       0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
+  //                               shape: RoundedRectangleBorder(
+  //                                 borderRadius: BorderRadius.circular(8.0),
+  //                               ),
+  //                               // 박스 데코레이션 추가
+  //                               side: BorderSide(
+  //                                   color: Colors.white.withOpacity(0.25)),
+  //                               // 그림자 추가
+  //                               shadowColor: Colors.black,
+  //                               elevation: 5,
+  //                             ),
+  //                             child: const Text(
+  //                               '조리 지연',
+  //                               style: TextStyle(
+  //                                 color: Colors.white,
+  //                                 fontSize: 14,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 25),
+  //                   // 텍스트 버튼
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.center,
+  //                     children: [
+  //                       SizedBox(
+  //                         width: 145,
+  //                         height: 40,
+  //                         child: TextButton(
+  //                           onPressed: () {
+  //                             bottomState(() {
+  //                               handleButtonSelection(2);
+  //                             });
+  //                           },
+  //                           style: TextButton.styleFrom(
+  //                             backgroundColor: selectedButtonIndex == 2
+  //                                 ? const Color(0xFF7B88C2)
+  //                                 : const Color(0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(8.0),
+  //                             ),
+  //                             // 박스 데코레이션 추가
+  //                             side: BorderSide(
+  //                                 color: Colors.white.withOpacity(0.25)),
+  //                             // 그림자 추가
+  //                             shadowColor: Colors.black,
+  //                             elevation: 5,
+  //                           ),
+  //                           child: const Text(
+  //                             '재료 소진',
+  //                             style: TextStyle(
+  //                               color: Colors.white,
+  //                               fontSize: 14,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                       const SizedBox(width: 25),
+  //                       Padding(
+  //                         padding: const EdgeInsets.only(left: 31.0),
+  //                         child: SizedBox(
+  //                           width: 145,
+  //                           height: 40,
+  //                           child: TextButton(
+  //                             onPressed: () {
+  //                               bottomState(() {
+  //                                 handleButtonSelection(3);
+  //                               });
+  //                             },
+  //                             style: TextButton.styleFrom(
+  //                               backgroundColor: selectedButtonIndex == 3
+  //                                   ? const Color(0xFF7B88C2)
+  //                                   : const Color(
+  //                                       0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
+  //                               shape: RoundedRectangleBorder(
+  //                                 borderRadius: BorderRadius.circular(8.0),
+  //                               ),
+  //                               // 박스 데코레이션 추가
+  //                               side: BorderSide(
+  //                                   color: Colors.white.withOpacity(0.25)),
+  //                               // 그림자 추가
+  //                               shadowColor: Colors.black,
+  //                               elevation: 5,
+  //                             ),
+  //                             child: const Text(
+  //                               '배달 불가 지역',
+  //                               style: TextStyle(
+  //                                 color: Colors.white,
+  //                                 fontSize: 14,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 25),
+  //                   // 텍스트 버튼
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.center,
+  //                     children: [
+  //                       SizedBox(
+  //                         width: 145,
+  //                         height: 40,
+  //                         child: TextButton(
+  //                           onPressed: () {
+  //                             bottomState(() {
+  //                               handleButtonSelection(4);
+  //                             });
+  //                           },
+  //                           style: TextButton.styleFrom(
+  //                             backgroundColor: selectedButtonIndex == 4
+  //                                 ? const Color(0xFF7B88C2)
+  //                                 : const Color(0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(8.0),
+  //                             ),
+  //                             // 박스 데코레이션 추가
+  //                             side: BorderSide(
+  //                                 color: Colors.white.withOpacity(0.25)),
+  //                             // 그림자 추가
+  //                             shadowColor: Colors.black,
+  //                             elevation: 5,
+  //                           ),
+  //                           child: const Text(
+  //                             '배달원 부재',
+  //                             style: TextStyle(
+  //                               color: Colors.white,
+  //                               fontSize: 14,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                       const SizedBox(width: 25),
+  //                       Padding(
+  //                         padding: const EdgeInsets.only(left: 31.0),
+  //                         child: SizedBox(
+  //                           width: 145,
+  //                           height: 40,
+  //                           child: TextButton(
+  //                             onPressed: () {
+  //                               bottomState(() {
+  //                                 handleButtonSelection(5);
+  //                               });
+  //                             },
+  //                             style: TextButton.styleFrom(
+  //                               backgroundColor: selectedButtonIndex == 5
+  //                                   ? const Color(0xFF7B88C2)
+  //                                   : const Color(
+  //                                       0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
+  //                               shape: RoundedRectangleBorder(
+  //                                 borderRadius: BorderRadius.circular(8.0),
+  //                               ),
+  //                               // 박스 데코레이션 추가
+  //                               side: BorderSide(
+  //                                   color: Colors.white.withOpacity(0.25)),
+  //                               // 그림자 추가
+  //                               shadowColor: Colors.black,
+  //                               elevation: 5,
+  //                             ),
+  //                             child: const Text(
+  //                               '메뉴 또는 가격 변동',
+  //                               style: TextStyle(
+  //                                 color: Colors.white,
+  //                                 fontSize: 14,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 25),
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.start,
+  //                     children: [
+  //                       Padding(
+  //                         padding: const EdgeInsets.only(left: 42.0),
+  //                         child: SizedBox(
+  //                           width: 145,
+  //                           height: 40,
+  //                           child: TextButton(
+  //                             onPressed: () {
+  //                               bottomState(() {
+  //                                 handleButtonSelection(6);
+  //                               });
+  //                             },
+  //                             style: TextButton.styleFrom(
+  //                               backgroundColor: selectedButtonIndex == 6
+  //                                   ? const Color(0xFF7B88C2)
+  //                                   : const Color(
+  //                                       0xFFD9D9D9), // 클릭 여부에 따라 색상 변경
+  //                               shape: RoundedRectangleBorder(
+  //                                 borderRadius: BorderRadius.circular(8.0),
+  //                               ),
+  //                               // 박스 데코레이션 추가
+  //                               side: BorderSide(
+  //                                   color: Colors.white.withOpacity(0.25)),
+  //                               // 그림자 추가
+  //                               shadowColor: Colors.black,
+  //                               elevation: 5,
+  //                             ),
+  //                             child: const Text(
+  //                               '요청 사항 적용 불가',
+  //                               style: TextStyle(
+  //                                 color: Colors.white,
+  //                                 fontSize: 14,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 25),
+  //                   Padding(
+  //                     padding: const EdgeInsets.only(left: 31.0),
+  //                     child: SizedBox(
+  //                       width: 259,
+  //                       height: 52,
+  //                       child: TextButton(
+  //                         onPressed: () {
+  //                           Navigator.pop(context);
+  //                           // 주문 거절 완료 시 주문 내역 리스트(orderList)에 삭제
+  //                           // setState(() {
+  //                           //   if (orderList.length > index) {
+  //                           //     orderList.removeAt(index);
+  //                           //   }
+  //                           // });
+  //                         },
+  //                         style: TextButton.styleFrom(
+  //                           backgroundColor: const Color(0xFF7B88C2),
+  //                           shape: RoundedRectangleBorder(
+  //                             borderRadius: BorderRadius.circular(8.0),
+  //                           ),
+  //                           // 박스 데코레이션 추가
+  //                           side: BorderSide(
+  //                               color: Colors.white.withOpacity(0.25)),
+  //                           // 그림자 추가
+  //                           shadowColor: Colors.black,
+  //                           elevation: 5,
+  //                         ),
+  //                         child: const Text(
+  //                           '주문 거절 완료',
+  //                           style: TextStyle(
+  //                             color: Colors.white,
+  //                             fontSize: 20,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   Future<int> getOrderId() async {
     List<OrderModel> orders =
@@ -552,8 +491,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                   children: [
                                     // 가게 이름과 완료 상태
                                     Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           order.storeName,
@@ -563,171 +502,100 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                           ),
                                         ),
                                         const SizedBox(width: 20),
-
-                                        // 주문이 수락되지 않은 경우에만 "수락" 버튼 보이도록 설정 = 수락되면 사라지도록
-                                        if (order.orderStatus == "REQUEST")
-                                          SizedBox(
-                                            height: 20,
-                                            width: 70,
-                                            child: ElevatedButton(
-                                              onPressed: () async {
-                                                print(
-                                                    '주문 아이디 : ${order.orderId}');
-
-                                                await LetterService()
-                                                    .saveLetter(order.orderId);
-
-                                                setState(() {
-                                                  order.orderStatus == "ACCEPT";
-                                                });
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      const Color(0xFF374AA3)
-                                                          .withOpacity(0.66),
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              6))),
-                                              child: const Text(
-                                                '수락',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-
-                                        // if (order.orderStatus == "ACCEPT")
-                                        //   const Row(
-                                        //     children: [
-                                        //       SizedBox(width: 7),
-                                        //       Icon(
-                                        //         Icons.brightness_1,
-                                        //         color: Color(0xFF7B88C2),
-                                        //         size: 12,
-                                        //       ),
-                                        //       SizedBox(width: 5),
-                                        //       Text(
-                                        //         '조리 중',
-                                        //         style: TextStyle(
-                                        //             fontSize: 14,
-                                        //             fontWeight:
-                                        //                 FontWeight.normal,
-                                        //             color: Colors.black),
-                                        //       ),
-                                        //     ],
-                                        //   ),
-
-                                        if (order.orderStatus == "ACCEPT")
-                                          Row(
-                                            children: [
-                                              const SizedBox(width: 7),
-                                              SizedBox(
-                                                height: 20,
-                                                width: 70,
-                                                child: ElevatedButton(
-                                                  onPressed: () async {
-                                                    print(
-                                                        '주문 아이디 : ${order.orderId}');
-
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            LetterPage(
-                                                                orderId: order
-                                                                    .orderId),
+                                        (order.orderStatus == 'REQUEST')
+                                            ?
+                                            // isCooking가 true일 때 조리 중으로 보여지게 구현
+                                            (isCooking)
+                                                ? Row(
+                                                    children: [
+                                                      Container(
+                                                        height: 12,
+                                                        width: 12,
+                                                        alignment:
+                                                            Alignment.center,
+                                                        decoration:
+                                                            const BoxDecoration(
+                                                                color: Color(
+                                                                    0xFF7B88C2),
+                                                                shape: BoxShape
+                                                                    .circle),
                                                       ),
-                                                    );
-
-                                                    setState(() {
-                                                      order.orderStatus ==
-                                                          "DELIVERED";
-                                                    });
-                                                  },
-                                                  style: ElevatedButton.styleFrom(
+                                                      const SizedBox(width: 8),
+                                                      const Text(
+                                                        '조리 중',
+                                                        style: TextStyle(
+                                                          fontSize: 15,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : ElevatedButton(
+                                                    onPressed: () async {
+                                                      setState(() {
+                                                        isCooking =
+                                                            true; // 주문 수락 후 편지 작성 후 저장 API가 성공하기 전에 true로 바꿔 조리 중으로 뜨게 구현
+                                                      });
+                                                      await LetterService()
+                                                          .saveLetter(
+                                                              order.orderId);
+                                                      setState(() {
+                                                        isCooking =
+                                                            false; // API가 끝나면 false로 다시 돌아와 배차/수락 버튼으로 변경
+                                                      });
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
                                                       backgroundColor:
                                                           const Color(
-                                                                  0xFF374AA3)
-                                                              .withOpacity(
-                                                                  0.66),
+                                                              0xFF7B88C2),
+                                                      foregroundColor:
+                                                          Colors.white,
+                                                      textStyle:
+                                                          const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
                                                       shape:
                                                           RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          6))),
-                                                  child: const Text(
-                                                    '배차',
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(6.0),
+                                                      ),
+                                                      minimumSize:
+                                                          const Size(50, 30),
                                                     ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-
-                                        // 완료 중 상태일 경우 완료 중 표시
-                                        if (order.orderStatus == "DELIVERED")
-                                          const Row(
-                                            children: [
-                                              SizedBox(width: 7),
-                                              Icon(
-                                                Icons.brightness_1,
-                                                color: Color(0xFF6DEA6D),
-                                                size: 12,
-                                              ),
-                                              SizedBox(width: 5),
-                                              Text(
-                                                '완료',
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    color: Colors.black),
-                                              ),
-                                              SizedBox(width: 7),
-                                            ],
-                                          ),
-
-                                        // 주문이 수락되지 않은 경우에만 "거절" 버튼 보이도록 설정 = 수락되면 사라지도록
-                                        const SizedBox(width: 7),
-                                        if (order.orderStatus == "CANCELED")
-                                          SizedBox(
-                                            height: 20,
-                                            width: 70,
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                // 해당 인덱스 받아 거절 사유 함수로 전달
-                                                // 주문 내역 삭제를 위해 사용
-                                                _showRejectBottomSheet(index);
-                                              },
-                                              style: ElevatedButton.styleFrom(
+                                                    child: const Text('수락'),
+                                                  )
+                                            // 주문상태가 DELIVERED일 경우 배차/출력 버튼으로 변경
+                                            : ElevatedButton(
+                                                onPressed: () async {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          LetterPage(
+                                                              orderId: order
+                                                                  .orderId),
+                                                    ),
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
                                                   backgroundColor:
-                                                      const Color(0xFFA8A8A8)
-                                                          .withOpacity(0.70),
+                                                      const Color(0xFF7B88C2),
+                                                  foregroundColor: Colors.white,
+                                                  textStyle: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            6),
-                                                  )),
-                                              child: const Text(
-                                                '거절',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
+                                                            6.0),
+                                                  ),
+                                                  minimumSize:
+                                                      const Size(50, 30),
                                                 ),
+                                                child: const Text('배차 / 출력'),
                                               ),
-                                            ),
-                                          ),
                                       ],
                                     ),
                                     const SizedBox(height: 13),
@@ -777,7 +645,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                           ),
                                         ),
 
-                                        // 완료 중 상태 일 경우 리뷰 보기 버튼 표시
+                                        // 리뷰 보기 버튼
+                                        // 주문상태가 DELIVERED일 경우 보이게 구현
                                         if (order.orderStatus == "DELIVERED")
                                           TextButton(
                                             onPressed: () async {

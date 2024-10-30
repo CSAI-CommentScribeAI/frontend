@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/owner/providers/letter_provider.dart';
 import 'package:frontend/owner/providers/menu_provider.dart';
 import 'package:frontend/owner/providers/order_provider.dart';
 import 'package:frontend/user/providers/cart_provider.dart';
@@ -40,6 +41,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => UserStoreProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => LetterProvider()),
       ],
       child: const MyApp(),
     ),
