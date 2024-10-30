@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/owner/screens/orderReview_screen.dart';
+import 'package:frontend/owner/services/letter_service.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
 import 'package:frontend/user/models/order_model.dart';
 
@@ -13,6 +14,8 @@ class OrderDetailPage extends StatefulWidget {
 }
 
 class _OrderDetailPageState extends State<OrderDetailPage> {
+  bool isCooking = false; // 조리 중 상태
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,7 +76,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     );
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Center(
-                      child: Text('들어왔던 주문이 없습니다.'),
+                      child: Text('들어온 주문이 없습니다.'),
                     );
                   } else {
                     return ListView.builder(
@@ -102,17 +105,107 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               // 주문 정보
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 20.0, vertical: 20.0),
+                                    horizontal: 20.0, vertical: 15.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     // 가게 이름과 완료 상태
-                                    Text(
-                                      order.storeName,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          order.storeName,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        (order.orderStatus == 'REQUEST')
+                                            ?
+                                            // isCooking가 true일 때 조리 중으로 보여지게 구현
+                                            (isCooking)
+                                                ? Row(
+                                                    children: [
+                                                      Container(
+                                                        height: 15,
+                                                        width: 15,
+                                                        alignment:
+                                                            Alignment.center,
+                                                        decoration:
+                                                            const BoxDecoration(
+                                                                color: Color(
+                                                                    0xFF7B88C2),
+                                                                shape: BoxShape
+                                                                    .circle),
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      const Text(
+                                                        '조리 중',
+                                                        style: TextStyle(
+                                                          fontSize: 15,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : ElevatedButton(
+                                                    onPressed: () async {
+                                                      setState(() {
+                                                        isCooking =
+                                                            true; // 주문 수락 후 편지 작성 후 저장 API가 성공하기 전에 true로 바꿔 조리 중으로 뜨게 구현
+                                                      });
+                                                      await LetterService()
+                                                          .saveLetter(
+                                                              order.orderId);
+                                                      setState(() {
+                                                        isCooking =
+                                                            false; // API가 끝나면 false로 다시 돌아와 배차/수락 버튼으로 변경
+                                                      });
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color(
+                                                              0xFF7B88C2),
+                                                      foregroundColor:
+                                                          Colors.white,
+                                                      textStyle:
+                                                          const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(6.0),
+                                                      ),
+                                                      minimumSize:
+                                                          const Size(50, 30),
+                                                    ),
+                                                    child: const Text('수락'),
+                                                  )
+                                            // 주문상태가 DELIVERED일 경우 배차/출력 버튼으로 변경
+                                            : ElevatedButton(
+                                                onPressed: () async {},
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      const Color(0xFF7B88C2),
+                                                  foregroundColor: Colors.white,
+                                                  textStyle: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6.0),
+                                                  ),
+                                                  minimumSize:
+                                                      const Size(50, 30),
+                                                ),
+                                                child: const Text('배차 / 출력'),
+                                              ),
+                                      ],
                                     ),
                                     const SizedBox(height: 13),
 
