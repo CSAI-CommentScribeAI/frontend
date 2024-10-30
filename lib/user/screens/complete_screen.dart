@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/models/order_model.dart';
-import 'package:frontend/all/services/order_service.dart';
-import 'package:frontend/user/screens/write_screen.dart';
-import 'package:frontend/user/services/review_service.dart';
+import 'package:frontend/user/services/userOrder_service.dart';
 import 'package:intl/intl.dart';
 
 class CompletePage extends StatefulWidget {
-  final StoreModel store;
-  final Map<int, bool>? writtenReviews;
-  final Map<int, String>? reviewTexts; // Add this line
-
-  const CompletePage(this.store,
-      {this.writtenReviews, this.reviewTexts, super.key});
+  const CompletePage({super.key});
 
   @override
   State<CompletePage> createState() => _CompletePageState();
@@ -24,14 +16,10 @@ class _CompletePageState extends State<CompletePage> {
   @override
   void initState() {
     super.initState();
-    fetchOrders();
-  }
 
-  void fetchOrders() async {
-    List<OrderModel> orders = await OrderService().getOrder();
-    setState(() {
-      orderList = orders;
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   await
+    //  });
   }
 
   @override
@@ -74,18 +62,24 @@ class _CompletePageState extends State<CompletePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 24.0),
-        child: orderList.isEmpty
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : ListView.builder(
+        child: FutureBuilder(
+          future: UserOrderService().getOrder(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Text('등록된 장바구니가 없습니다.');
+            } else {
+              return ListView.builder(
                 shrinkWrap: true,
                 physics: const ScrollPhysics(),
-                itemCount: orderList.length,
+                itemCount: snapshot.data!.length,
                 itemBuilder: (BuildContext context, int index) {
-                  final order = orderList[index];
-                  bool isWritten =
-                      widget.writtenReviews?[order.orderId] ?? false;
+                  final order = snapshot.data![index];
+                  // bool isWritten =
+                  //     widget.writtenReviews?[order.orderId] ?? false;
 
                   return Column(
                     children: [
@@ -112,6 +106,7 @@ class _CompletePageState extends State<CompletePage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
+                                            // 주문 가게
                                             Text(
                                               order.storeName,
                                               style: const TextStyle(
@@ -120,6 +115,8 @@ class _CompletePageState extends State<CompletePage> {
                                               ),
                                             ),
                                             const SizedBox(height: 20),
+
+                                            // 주문 상태
                                             Text(
                                               order.orderStatus,
                                               style: const TextStyle(
@@ -129,14 +126,18 @@ class _CompletePageState extends State<CompletePage> {
                                           ],
                                         ),
                                       ),
-                                      Image.asset(
-                                        'assets/images/deliverylogo.png',
+
+                                      // 주문 가게 이미지
+                                      Image.network(
+                                        order.storeImageUrl,
                                         width: 80,
                                         height: 80,
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 5),
+
+                                  // 주문 메뉴
                                   ListView.builder(
                                     shrinkWrap: true,
                                     physics:
@@ -163,54 +164,54 @@ class _CompletePageState extends State<CompletePage> {
                                   const SizedBox(height: 28),
 
                                   // 주문상태가 배달일 경우에만 리뷰 쓰기 버튼 활성화
-                                  if (order.orderStatus == 'DELIVERED')
-                                    FutureBuilder(
-                                      future: ReviewService()
-                                          .getOrderReview(order.orderId),
-                                      builder: (context, snapshot) {
-                                        final review = snapshot.data;
-                                        return Center(
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              print(order.orderId);
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      WriteReviewPage(
-                                                    widget.store,
-                                                    null,
-                                                    storeName: order.storeName,
-                                                    orderId: order.orderId,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.white,
-                                              minimumSize: const Size(302, 39),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(5.0),
-                                              ),
-                                              side: const BorderSide(
-                                                color: Color(0xFF7E7EB2),
-                                                width: 2.0,
-                                              ),
-                                            ),
-                                            child: Text(
-                                              // db에 리뷰가 있을 때 작성된 리뷰로 변경
-                                              review!['comment'] != null
-                                                  ? '작성된 리뷰'
-                                                  : '리뷰 쓰기',
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
+                                  // if (order.orderStatus == 'DELIVERED')
+                                  //   FutureBuilder(
+                                  //     future: ReviewService()
+                                  //         .getOrderReview(order.orderId),
+                                  //     builder: (context, snapshot) {
+                                  //       final review = snapshot.data;
+                                  //       return Center(
+                                  //         child: ElevatedButton(
+                                  //           onPressed: () {
+                                  //             print(order.orderId);
+                                  //             // Navigator.push(
+                                  //             //   context,
+                                  //             //   MaterialPageRoute(
+                                  //             //     builder: (context) =>
+                                  //             //         WriteReviewPage(
+                                  //             //       widget.store,
+                                  //             //       null,
+                                  //             //       storeName: order.storeName,
+                                  //             //       orderId: order.orderId,
+                                  //             //     ),
+                                  //             //   ),
+                                  //             // );
+                                  //           },
+                                  //           style: ElevatedButton.styleFrom(
+                                  //             backgroundColor: Colors.white,
+                                  //             minimumSize: const Size(302, 39),
+                                  //             shape: RoundedRectangleBorder(
+                                  //               borderRadius:
+                                  //                   BorderRadius.circular(5.0),
+                                  //             ),
+                                  //             side: const BorderSide(
+                                  //               color: Color(0xFF7E7EB2),
+                                  //               width: 2.0,
+                                  //             ),
+                                  //           ),
+                                  //           child: Text(
+                                  //             // db에 리뷰가 있을 때 작성된 리뷰로 변경
+                                  //             review!['comment'] != null
+                                  //                 ? '작성된 리뷰'
+                                  //                 : '리뷰 쓰기',
+                                  //             style: const TextStyle(
+                                  //                 fontSize: 14,
+                                  //                 color: Colors.black),
+                                  //           ),
+                                  //         ),
+                                  //       );
+                                  //     },
+                                  //   ),
                                 ],
                               ),
                             ),
@@ -221,7 +222,10 @@ class _CompletePageState extends State<CompletePage> {
                     ],
                   );
                 },
-              ),
+              );
+            }
+          },
+        ),
       ),
     );
   }
