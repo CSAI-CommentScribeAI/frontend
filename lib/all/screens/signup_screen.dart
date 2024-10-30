@@ -108,6 +108,7 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
+  // 회원가입 API
   Future handleSignUp(String nickname, String email, String userId,
       String password, String userRole) async {
     try {
@@ -317,7 +318,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ),
                     child: const Text(
-                      'Sign up',
+                      '회원가입',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

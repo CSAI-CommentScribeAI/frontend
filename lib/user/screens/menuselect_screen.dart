@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/providers/userMenu_provider.dart';
+import 'package:frontend/user/screens/cart_screen.dart';
+import 'package:frontend/user/screens/userHome_screen.dart';
 import 'package:frontend/user/services/cart_service.dart';
+import 'package:frontend/user/services/userMenu_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -39,21 +42,43 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF3F3FF),
       appBar: AppBar(
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 23.0),
-            child: Icon(
-              Icons.home,
-              size: 30,
-              color: Colors.black,
+            padding: const EdgeInsets.only(right: 23.0),
+            child: IconButton(
+              onPressed: () {
+                // 이전 페이지 스택 모두 제거
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const UserHomePage(),
+                  ),
+                  (route) => false,
+                );
+              },
+              icon: const Icon(
+                Icons.home,
+                size: 30,
+                color: Colors.black,
+              ),
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(right: 23.0),
-            child: Icon(
-              Icons.shopping_cart,
-              size: 30,
-              color: Colors.black,
+            padding: const EdgeInsets.only(right: 23.0),
+            child: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CartItemPage(),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.shopping_cart,
+                size: 30,
+                color: Colors.black,
+              ),
             ),
           ),
         ],
@@ -296,9 +321,10 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
     );
   }
 
+  // 가게 메뉴 리스트
   Widget allMenuSection() {
     return FutureBuilder<List<AddMenuModel>>(
-      future: getMenuData(),
+      future: UserMenuService().fetchMenus(widget.store.id),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
@@ -324,32 +350,35 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                     try {
                       await CartService().putCart(userMenu);
                       // 장바구니 담기에 성공하면 장바구니에 페이지로 이동
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) =>
-                      //         CartItemPage(widget.store, userMenu),
-                      //   ),
-                      // );
+                      if (context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CartItemPage(),
+                          ),
+                        );
+                      }
                     } catch (e) {
                       // 장바구니에 담은 경우 다른 가게의 메뉴를 담을려고 할 때 경고창 구현
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('경고'),
-                            content: const Text('다른 가게의 메뉴를 추가할 수 없습니다.'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('확인'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      if (context.mounted) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('경고'),
+                              content: const Text('다른 가게의 메뉴를 추가할 수 없습니다.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('확인'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
                     }
                   },
                   child: Card(

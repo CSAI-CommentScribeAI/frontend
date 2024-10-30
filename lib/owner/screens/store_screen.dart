@@ -329,7 +329,7 @@ class _StorePageState extends State<StorePage> {
                                 ),
                                 child: Center(
                                   child: Image.network(
-                                    store['storeImageUrl'],
+                                    store['storeImageUrl'] ?? '',
                                     width: 100,
                                     height: 100,
                                   ),

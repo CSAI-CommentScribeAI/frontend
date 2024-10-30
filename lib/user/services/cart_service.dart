@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:frontend/owner/models/menu_model.dart';
-import 'package:frontend/user/models/cartMenu_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -42,9 +41,9 @@ class CartService {
       if (response.statusCode == 200) {
         final utf8Response = utf8.decode(response.bodyBytes);
         final jsonResponse = jsonDecode(utf8Response);
-        print('담기 성공: $jsonResponse');
+        print('장바구니 담기 성공: $jsonResponse');
       } else {
-        throw Exception('담기 실패: ${response.body}');
+        throw Exception('장바구니 담기 실패: ${response.body}');
       }
     } catch (e) {
       print('Error: $e');
@@ -52,6 +51,7 @@ class CartService {
     }
   }
 
+  // 장바구니 조회
   Future<Map<String, dynamic>> getCart() async {
     // SharedPreferences에서 액세스 토큰을 가져옴
     final prefs = await SharedPreferences.getInstance();
@@ -76,24 +76,53 @@ class CartService {
 
       if (response.statusCode == 200) {
         final utf8Response = utf8.decode(response.bodyBytes);
-        final dynamic jsonResponse = jsonDecode(utf8Response);
+        final jsonResponse = jsonDecode(utf8Response);
+        final dataResponse = jsonResponse['data'];
 
-        if (jsonResponse is Map<String, dynamic> &&
-            jsonResponse['data'] is Map<String, dynamic>) {
-          final carts = jsonResponse['data'];
-          print('JSON 데이터: ${jsonResponse['data']}');
-          return carts;
-        } else {
-          print('잘못된 응답 형식');
-          return {};
-        }
+        print('장바구니 조회 성공: ${jsonResponse['data']}');
+        return dataResponse;
       } else {
-        print('조회 실패: ${response.statusCode}');
-        return {};
+        throw Exception('장바구니 조회 실패: ${response.statusCode}');
       }
     } catch (e) {
-      print(e.toString());
-      return {};
+      throw Exception(e.toString());
+    }
+  }
+
+  // 장바구니 삭제
+  Future<void> deleteCart(int menuId) async {
+    // SharedPreferences에서 액세스 토큰을 가져옴
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
+
+    String serverAddress = '';
+    if (Platform.isAndroid) {
+      serverAddress = 'http://10.0.2.2:9000/api/v1/cart/remove/$menuId';
+    } else if (Platform.isIOS) {
+      serverAddress = 'http://127.0.0.1:9000/api/v1/cart/remove/$menuId';
+    }
+
+    try {
+      final url = Uri.parse(serverAddress);
+
+      final response = await http.delete(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final utf8Response = utf8.decode(response.bodyBytes);
+        final jsonResponse = jsonDecode(utf8Response);
+        // final dataResponse = jsonResponse['data'];
+
+        print('장바구니 삭제 성공: $jsonResponse');
+      } else {
+        throw Exception('장바구니 조회 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 }

@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/all/services/order_service.dart';
-import 'package:frontend/owner/models/menu_model.dart';
-import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/models/cartMenu_model.dart';
+import 'package:frontend/user/screens/userHome_screen.dart';
 import 'package:frontend/user/screens/userOrder_screen.dart';
 import 'package:frontend/user/services/cart_service.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:intl/intl.dart';
 
 class CartItemPage extends StatefulWidget {
-  final StoreModel store;
-  final AddMenuModel userMenu;
-  const CartItemPage(this.store, this.userMenu, {super.key});
+  const CartItemPage({super.key});
   @override
   State<CartItemPage> createState() => _CartItemPageState();
 }
@@ -40,13 +37,24 @@ class _CartItemPageState extends State<CartItemPage> {
         ),
         centerTitle: true,
         backgroundColor: const Color(0xFF374AA3),
-        actions: const [
+        actions: [
           // 홈 화면으로 이동
           Padding(
-            padding: EdgeInsets.only(right: 20),
-            child: Icon(
-              Icons.home,
-              color: Colors.white,
+            padding: const EdgeInsets.only(right: 20),
+            child: IconButton(
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const UserHomePage(),
+                  ),
+                  (route) => false,
+                );
+              },
+              icon: const Icon(
+                Icons.home,
+                color: Colors.white,
+              ),
             ),
           ),
         ],
@@ -63,24 +71,33 @@ class _CartItemPageState extends State<CartItemPage> {
               );
               // 데이터 로드 중 에러 발생 시 오류 메세지 표시
             } else if (snapshot.hasError) {
-              return Center(
-                child: Text('Error: ${snapshot.error}'),
+              return const Center(
+                child: Text('장바구니에 담은 메뉴가 없습니다.'),
               );
               // 데이터가 없거나 빈 리스트일 경우 '등록된 가게가 없습니다' 메시지 표시
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return const Center(
-                child: Text('등록된 장바구니가 없습니다.'),
+                child: Text('장바구니에 담은 메뉴가 없습니다.'),
               );
               // 데이터가 성공적으로 로드될 경우 가게 목록 표시
             } else {
-              final List<dynamic> cartItems = snapshot.data!['cartItems'];
+              final storeName = snapshot.data!['storeName'];
+              // List<CartMenuModel> 타입으로 변환
+              // 이유: FutureBuilder 타입이 Map<String, dynamic>로 되어있어
+              // cartItem안에 Map<String, dynamic>으로 되어있기 때문
+              final List<CartMenuModel> cartItems = List<CartMenuModel>.from(
+                snapshot.data!['cartItems']
+                    .map((item) => CartMenuModel.fromJson(item)),
+              ).toList();
+
               return ListView.builder(
                 shrinkWrap: true,
                 physics: const ScrollPhysics(),
                 itemCount: cartItems.length,
                 itemBuilder: (BuildContext context, int index) {
-                  final Map<String, dynamic> cart = cartItems[index];
-                  return CartWidget(cart);
+                  final CartMenuModel cart =
+                      cartItems[index]; // 하나의 cartItem 변수 지정
+                  return CartWidget(cart, storeName);
                 },
               );
             }
@@ -95,7 +112,7 @@ class _CartItemPageState extends State<CartItemPage> {
           );
         }, // 결제 화면으로 이동
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF274AA3),
+          backgroundColor: const Color(0xFF374AA3),
           shape: const BeveledRectangleBorder(
             borderRadius: BorderRadiusDirectional.zero,
           ),
@@ -116,7 +133,7 @@ class _CartItemPageState extends State<CartItemPage> {
   Route downToUpRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
-          UserOrderPage(widget.store, widget.userMenu),
+          const UserOrderPage(),
       // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 1.0); // 시작점 지정(화면의 아래쪽 의미)

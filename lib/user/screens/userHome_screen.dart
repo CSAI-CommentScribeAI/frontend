@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/models/category_model.dart';
+import 'package:frontend/user/providers/cart_provider.dart';
 import 'package:frontend/user/providers/category_provider.dart';
-import 'package:frontend/user/screens/complete_screen.dart';
+import 'package:frontend/user/providers/userInfo_provider.dart';
+import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/storeSelect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
 import 'package:frontend/user/services/userStore_service.dart';
@@ -10,8 +12,7 @@ import 'package:frontend/user/widgets/menuSearch_widget.dart';
 import 'package:provider/provider.dart';
 
 class UserHomePage extends StatefulWidget {
-  final String accessToken;
-  const UserHomePage(this.accessToken, {super.key});
+  const UserHomePage({super.key});
 
   @override
   State<UserHomePage> createState() => _UserHomePageState();
@@ -19,17 +20,29 @@ class UserHomePage extends StatefulWidget {
 
 class _UserHomePageState extends State<UserHomePage> {
   List<CategoryModel> categories = [];
+  Map<String, dynamic> userInfo = {};
   late Future<List<StoreModel>> futureStores;
 
   TextEditingController searchController = TextEditingController();
   String userAddress = '주소를 설정하세요'; // 고객 주소
   String fullAddress = '';
 
+  Map<String, dynamic> cart = {};
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Provider.of<CategoryProvider>(context, listen: false).getCategory();
+
+      if (context.mounted) {
+        await Provider.of<UserInfoProvider>(context, listen: false)
+            .fetchUserInfo();
+      }
+
+      // if (context.mounted) {
+      //   await Provider.of<CartProvider>(context, listen: false).getCart();
+      // }
 
       setState(() {
         List<CategoryModel> getCategories =
@@ -38,6 +51,11 @@ class _UserHomePageState extends State<UserHomePage> {
         for (var category in getCategories) {
           categories.add(category);
         }
+
+        userInfo =
+            Provider.of<UserInfoProvider>(context, listen: false).userInfo;
+
+        // cart = Provider.of<CartProvider>(context, listen: false).cart;
       });
     });
   }
@@ -92,10 +110,6 @@ class _UserHomePageState extends State<UserHomePage> {
     return stores;
   }
 
-  Future<List<CategoryModel>> getCategoryData() async {
-    return Provider.of<CategoryProvider>(context, listen: false).categoryList;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,7 +125,9 @@ class _UserHomePageState extends State<UserHomePage> {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: userAddress, // 사용자 주소
+                  text: (userInfo['address'] != null)
+                      ? userInfo['address']['fullAddress']
+                      : '주소를 설정하세요', // 사용자 주소
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -126,7 +142,6 @@ class _UserHomePageState extends State<UserHomePage> {
                         MaterialPageRoute(
                           builder: (context) => UserAddressPage(
                             (p0, p1, p2, p3, p4) => null,
-                            widget.accessToken,
                             onUserAddressSelected:
                                 onUserAdddressSelected, // 필수 요소
                           ),
@@ -150,6 +165,7 @@ class _UserHomePageState extends State<UserHomePage> {
         centerTitle: false,
         actions: [
           GestureDetector(
+            onTap: () {},
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Padding(
@@ -163,32 +179,55 @@ class _UserHomePageState extends State<UserHomePage> {
               ),
             ),
           ),
-          GestureDetector(
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Padding(
-                padding: EdgeInsets.only(right: 10.0),
-                child: Icon(
-                  Icons.shopping_cart,
-                  size: 26, // 아이콘 크기 설정
-                  color: Colors.white, // 아이콘 색상 설정
-                ),
-              ),
-            ),
-            onTap: () async {
-              StoreModel storeModel = await getStoreModel();
 
-              print('storeModel : $storeModel');
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CompletePage(
-                    storeModel,
+          // 장바구니 아이콘
+          Stack(
+            children: [
+              GestureDetector(
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 10.0),
+                    child: Icon(
+                      Icons.shopping_cart,
+                      size: 26, // 아이콘 크기 설정
+                      color: Colors.white, // 아이콘 색상 설정
+                    ),
                   ),
                 ),
-              );
-            },
+                onTap: () async {
+                  // StoreModel storeModel = await getStoreModel();
+
+                  // print('storeModel : $storeModel');
+
+                  if (context.mounted) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CartItemPage(),
+                      ),
+                    );
+                  }
+                },
+              ),
+              // if (cart.isNotEmpty)
+              //   if (cart['cartItems'] != null)
+              //     Positioned(
+              //       right: 12,
+              //       top: 5,
+              //       child: Container(
+              //         padding: const EdgeInsets.all(4),
+              //         decoration: BoxDecoration(
+              //           color: Colors.red,
+              //           borderRadius: BorderRadius.circular(12),
+              //         ),
+              //         constraints: const BoxConstraints(
+              //           minWidth: 6,
+              //           minHeight: 6,
+              //         ),
+              //       ),
+              //     ),
+            ],
           )
         ],
       ),
@@ -369,7 +408,7 @@ class _UserHomePageState extends State<UserHomePage> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 19.0),
-                  child: (userAddress == 'd')
+                  child: (userInfo['address'] == null)
                       ? const Center(
                           child: Text(
                             '주소를 설정해주세요',
