@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // rootBundle을 사용하기 위해 추가
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/owner/providers/letter_provider.dart';
 import 'package:frontend/owner/services/letter_service.dart';
 import 'package:frontend/owner/services/delivery_service.dart';
@@ -68,6 +69,7 @@ class _LetterPageState extends State<LetterPage> {
 
   String letterContent = '';
   // 서버에서 불러온 편지들을 저장할 리스트
+  int? storeId;
   String letters = '';
 
   @override
@@ -81,6 +83,8 @@ class _LetterPageState extends State<LetterPage> {
       setState(() {
         letterContent = Provider.of<LetterProvider>(context, listen: false)
             .letter['messageContent'];
+        storeId = Provider.of<LetterProvider>(context, listen: false)
+            .letter['storeId'];
         letterController.text = letterContent; // TextFormField 초기화
       });
     });
@@ -482,14 +486,16 @@ class _LetterPageState extends State<LetterPage> {
       bottomNavigationBar: isCompleted
           ? ElevatedButton(
               onPressed: () async {
+                // 출력하기 버튼을 눌렀을 때 PDF 생성 및 인쇄
                 await DeliveryService().completeDelivery(widget.orderId);
                 try {
-                  await _printDocument();
-                  Navigator.pop(context);
+                  // await _printDocument();
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
                 } catch (e) {
                   print(e.toString());
                 }
-                // 출력하기 버튼을 눌렀을 때 PDF 생성 및 인쇄
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF374AA3),
