@@ -52,7 +52,6 @@ class DeliveryService {
         // jsonResponse가 Map이고 orderMenus 필드가 List일 경우
         if (jsonResponse is Map && jsonResponse['orderMenus'] is List) {
           final List<dynamic> deliveries = jsonResponse['orderMenus'];
-          print('JSON 데이터: $deliveries');
 
           for (var delivery in deliveries) {
             if (delivery is Map<String, dynamic>) {

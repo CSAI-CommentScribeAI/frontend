@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/all/services/order_service.dart';
 import 'package:frontend/owner/screens/orderReview_screen.dart';
+import 'package:frontend/owner/services/letter_service.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
 import 'package:frontend/user/models/order_model.dart';
 
@@ -73,7 +74,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     );
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Center(
-                      child: Text('들어왔던 주문이 없습니다.'),
+                      child: Text('들어온 주문이 없습니다.'),
                     );
                   } else {
                     return ListView.builder(
@@ -82,127 +83,135 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       itemCount: snapshot.data!.length,
                       itemBuilder: (BuildContext context, int index) {
                         final order = snapshot.data![index]; // 리스트 안의 객체
-                        return Column(
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              height: 150,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFFFFF),
-                                borderRadius: BorderRadius.circular(15.0),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.25),
-                                    offset: const Offset(0, 4),
-                                    blurRadius: 4.0,
-                                  ),
-                                ],
-                              ),
 
-                              // 주문 정보
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20.0, vertical: 20.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // 가게 이름과 완료 상태
-                                    Text(
-                                      order.storeName,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 13),
-
-                                    // 주문 시간
-                                    // Text(
-                                    //   order['time'],
-                                    //   style: const TextStyle(
-                                    //     fontSize: 15,
-                                    //     fontWeight: FontWeight.w500,
-                                    //   ),
-                                    // ),
-                                    // const SizedBox(height: 5),
-
-                                    // 주문 정보
-                                    ListView.builder(
-                                      shrinkWrap: true,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      itemCount: order.orderMenus.length,
-                                      itemBuilder: (context, index) {
-                                        final orderMenu =
-                                            order.orderMenus[index];
-                                        return Text(
-                                          '${orderMenu.menuName}  x ${orderMenu.quantity}',
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    const SizedBox(height: 8),
-
-                                    // 총 가격과 리뷰 보기 버튼
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text('총 가격 : ${order.totalPrice}원',
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
-                                            )),
-                                        TextButton(
-                                          onPressed: () {
-                                            print(order.storeId);
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      OrderReviewPage(
-                                                          storeId:
-                                                              order.storeId,
-                                                          orderId: order
-                                                              .orderId) // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
-                                                  ),
-                                            );
-                                          },
-                                          style: TextButton.styleFrom(
-                                            foregroundColor: Colors.black,
-                                            minimumSize: Size.zero,
-                                            padding: EdgeInsets.zero,
-                                            tapTargetSize: MaterialTapTargetSize
-                                                .shrinkWrap,
-                                          ),
-                                          child: const Row(
-                                            children: [
-                                              Text(
-                                                '리뷰 보기',
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                              SizedBox(width: 11),
-                                              Icon(Icons.arrow_forward_ios),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                        if (order.orderStatus == 'DELIVERED') {
+                          return Column(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: 150,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFFFFF),
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.25),
+                                      offset: const Offset(0, 4),
+                                      blurRadius: 4.0,
                                     ),
                                   ],
                                 ),
+
+                                // 주문 정보
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0, vertical: 20.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // 가게 이름과 완료 상태
+                                      Text(
+                                        order.storeName,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 13),
+
+                                      // 주문 시간
+                                      // Text(
+                                      //   order['time'],
+                                      //   style: const TextStyle(
+                                      //     fontSize: 15,
+                                      //     fontWeight: FontWeight.w500,
+                                      //   ),
+                                      // ),
+                                      // const SizedBox(height: 5),
+
+                                      // 주문 정보
+                                      ListView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: order.orderMenus.length,
+                                        itemBuilder: (context, index) {
+                                          final orderMenu =
+                                              order.orderMenus[index];
+                                          return Text(
+                                            '${orderMenu.menuName}  x ${orderMenu.quantity}',
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      const SizedBox(height: 8),
+
+                                      // 총 가격과 리뷰 보기 버튼
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            '총 가격 : ${order.totalPrice}원',
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              print(order.storeId);
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        OrderReviewPage(
+                                                            storeId:
+                                                                order.storeId,
+                                                            orderId: order
+                                                                .orderId) // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
+                                                    ),
+                                              );
+                                            },
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: Colors.black,
+                                              minimumSize: Size.zero,
+                                              padding: EdgeInsets.zero,
+                                              tapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                            ),
+                                            child: const Row(
+                                              children: [
+                                                Text(
+                                                  '리뷰 보기',
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 11),
+                                                Icon(Icons.arrow_forward_ios),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 40),
-                          ],
-                        );
+                              const SizedBox(height: 40),
+                            ],
+                          );
+                        }
+                        return null;
                       },
                     );
                   }
