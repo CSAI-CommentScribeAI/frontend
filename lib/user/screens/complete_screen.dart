@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/user/models/order_model.dart';
+import 'package:frontend/user/screens/userHome_screen.dart';
+import 'package:frontend/user/screens/write_screen.dart';
+import 'package:frontend/user/services/review_service.dart';
 import 'package:frontend/user/services/userOrder_service.dart';
 import 'package:intl/intl.dart';
 
@@ -11,15 +14,11 @@ class CompletePage extends StatefulWidget {
 }
 
 class _CompletePageState extends State<CompletePage> {
-  List<OrderModel> orderList = [];
+  bool isWritten = false; // 리뷰 작성 여부
 
   @override
   void initState() {
     super.initState();
-
-    // WidgetsBinding.instance.addPostFrameCallback((_) async {
-    //   await
-    //  });
   }
 
   @override
@@ -29,7 +28,16 @@ class _CompletePageState extends State<CompletePage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 70,
-        leading: const BackButton(
+        leading: BackButton(
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const UserHomePage(),
+              ),
+              (route) => false,
+            );
+          },
           color: Colors.white,
         ),
         title: const Text(
@@ -107,11 +115,17 @@ class _CompletePageState extends State<CompletePage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             // 주문 가게
-                                            Text(
-                                              order.storeName,
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
+                                            GestureDetector(
+                                              onTap: () {
+                                                ReviewService().getOrderReview(
+                                                    order.orderId);
+                                              },
+                                              child: Text(
+                                                order.storeName,
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                             ),
                                             const SizedBox(height: 20),
@@ -164,54 +178,96 @@ class _CompletePageState extends State<CompletePage> {
                                   const SizedBox(height: 28),
 
                                   // 주문상태가 배달일 경우에만 리뷰 쓰기 버튼 활성화
-                                  // if (order.orderStatus == 'DELIVERED')
-                                  //   FutureBuilder(
-                                  //     future: ReviewService()
-                                  //         .getOrderReview(order.orderId),
-                                  //     builder: (context, snapshot) {
-                                  //       final review = snapshot.data;
-                                  //       return Center(
-                                  //         child: ElevatedButton(
-                                  //           onPressed: () {
-                                  //             print(order.orderId);
-                                  //             // Navigator.push(
-                                  //             //   context,
-                                  //             //   MaterialPageRoute(
-                                  //             //     builder: (context) =>
-                                  //             //         WriteReviewPage(
-                                  //             //       widget.store,
-                                  //             //       null,
-                                  //             //       storeName: order.storeName,
-                                  //             //       orderId: order.orderId,
-                                  //             //     ),
-                                  //             //   ),
-                                  //             // );
-                                  //           },
-                                  //           style: ElevatedButton.styleFrom(
-                                  //             backgroundColor: Colors.white,
-                                  //             minimumSize: const Size(302, 39),
-                                  //             shape: RoundedRectangleBorder(
-                                  //               borderRadius:
-                                  //                   BorderRadius.circular(5.0),
-                                  //             ),
-                                  //             side: const BorderSide(
-                                  //               color: Color(0xFF7E7EB2),
-                                  //               width: 2.0,
-                                  //             ),
-                                  //           ),
-                                  //           child: Text(
-                                  //             // db에 리뷰가 있을 때 작성된 리뷰로 변경
-                                  //             review!['comment'] != null
-                                  //                 ? '작성된 리뷰'
-                                  //                 : '리뷰 쓰기',
-                                  //             style: const TextStyle(
-                                  //                 fontSize: 14,
-                                  //                 color: Colors.black),
-                                  //           ),
-                                  //         ),
-                                  //       );
-                                  //     },
-                                  //   ),
+                                  if (order.orderStatus == 'DELIVERED')
+                                    FutureBuilder<List<Map<String, dynamic>>>(
+                                        future: ReviewService()
+                                            .getUserReview(order.userId),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return const CircularProgressIndicator();
+                                          } else if (snapshot.hasError) {
+                                            return Text(
+                                                'Error: ${snapshot.error}');
+                                          } else if (!snapshot.hasData ||
+                                              snapshot.data!.isEmpty) {
+                                            return Center(
+                                              child: ElevatedButton(
+                                                onPressed: () async {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          WriteReviewPage(
+                                                        storeName:
+                                                            order.storeName,
+                                                        orderId: order.orderId,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.white,
+                                                  minimumSize:
+                                                      const Size(302, 39),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5.0),
+                                                  ),
+                                                  side: const BorderSide(
+                                                    color: Color(0xFF7E7EB2),
+                                                    width: 2.0,
+                                                  ),
+                                                ),
+                                                child: const Text(
+                                                  '리뷰 쓰기',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            return Center(
+                                              child: ElevatedButton(
+                                                onPressed: () async {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          WriteReviewPage(
+                                                        storeName:
+                                                            order.storeName,
+                                                        orderId: order.orderId,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.white,
+                                                  minimumSize:
+                                                      const Size(302, 39),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5.0),
+                                                  ),
+                                                  side: const BorderSide(
+                                                    color: Color(0xFF7E7EB2),
+                                                    width: 2.0,
+                                                  ),
+                                                ),
+                                                child: const Text(
+                                                  '작성된 리뷰 보기',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        }),
                                 ],
                               ),
                             ),
