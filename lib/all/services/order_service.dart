@@ -102,8 +102,6 @@ class OrderService {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
 
-    List<OrderModel> userOrdersInstance = [];
-
     if (Platform.isAndroid) {
       serverAddress = 'http://10.0.2.2:9000/api/v1/cart/orders/$storeId';
     } else if (Platform.isIOS) {
@@ -120,26 +118,21 @@ class OrderService {
 
       if (response.statusCode == 200) {
         final utf8Response = utf8.decode(response.bodyBytes);
-        final dynamic jsonResponse = jsonDecode(utf8Response);
+        final jsonResponse = jsonDecode(utf8Response);
 
-        final List<dynamic> orders = jsonResponse;
-        print('주문 JSON 데이터: $orders');
+        final List<OrderModel> orderList = [];
 
-        for (var order in orders) {
-          userOrdersInstance.add(OrderModel.fromJson(order));
+        for (var json in jsonResponse) {
+          orderList.add(OrderModel.fromJson(json));
         }
 
-        print('주문 조회 성공: $userOrdersInstance');
-        return userOrdersInstance;
+        print('주문 조회 성공: $jsonResponse');
+        return orderList;
       } else {
-        print('주문 조회 실패');
-        return [];
+        throw Exception('주문 조회 실패');
       }
     } catch (e) {
-      print(
-        e.toString(),
-      );
-      return [];
+      throw Exception(e.toString());
     }
   }
 }
