@@ -167,8 +167,7 @@ class _WriteReviewPageState extends State<WriteReviewPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            CartItemPage(widget.store, widget.userMenu!),
+                        builder: (context) => const CartItemPage(),
                       ),
                     );
                   },

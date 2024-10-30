@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/models/category_model.dart';
+import 'package:frontend/user/providers/cart_provider.dart';
 import 'package:frontend/user/providers/category_provider.dart';
 import 'package:frontend/user/providers/userInfo_provider.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
@@ -26,14 +27,22 @@ class _UserHomePageState extends State<UserHomePage> {
   String userAddress = '주소를 설정하세요'; // 고객 주소
   String fullAddress = '';
 
+  Map<String, dynamic> cart = {};
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Provider.of<CategoryProvider>(context, listen: false).getCategory();
 
-      await Provider.of<UserInfoProvider>(context, listen: false)
-          .fetchUserInfo();
+      if (context.mounted) {
+        await Provider.of<UserInfoProvider>(context, listen: false)
+            .fetchUserInfo();
+      }
+
+      // if (context.mounted) {
+      //   await Provider.of<CartProvider>(context, listen: false).getCart();
+      // }
 
       setState(() {
         List<CategoryModel> getCategories =
@@ -45,6 +54,8 @@ class _UserHomePageState extends State<UserHomePage> {
 
         userInfo =
             Provider.of<UserInfoProvider>(context, listen: false).userInfo;
+
+        // cart = Provider.of<CartProvider>(context, listen: false).cart;
       });
     });
   }
@@ -170,32 +181,53 @@ class _UserHomePageState extends State<UserHomePage> {
           ),
 
           // 장바구니 아이콘
-          GestureDetector(
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Padding(
-                padding: EdgeInsets.only(right: 10.0),
-                child: Icon(
-                  Icons.shopping_cart,
-                  size: 26, // 아이콘 크기 설정
-                  color: Colors.white, // 아이콘 색상 설정
-                ),
-              ),
-            ),
-            onTap: () async {
-              // StoreModel storeModel = await getStoreModel();
-
-              // print('storeModel : $storeModel');
-
-              if (context.mounted) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CartItemPage(),
+          Stack(
+            children: [
+              GestureDetector(
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 10.0),
+                    child: Icon(
+                      Icons.shopping_cart,
+                      size: 26, // 아이콘 크기 설정
+                      color: Colors.white, // 아이콘 색상 설정
+                    ),
                   ),
-                );
-              }
-            },
+                ),
+                onTap: () async {
+                  // StoreModel storeModel = await getStoreModel();
+
+                  // print('storeModel : $storeModel');
+
+                  if (context.mounted) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CartItemPage(),
+                      ),
+                    );
+                  }
+                },
+              ),
+              // if (cart.isNotEmpty)
+              //   if (cart['cartItems'] != null)
+              //     Positioned(
+              //       right: 12,
+              //       top: 5,
+              //       child: Container(
+              //         padding: const EdgeInsets.all(4),
+              //         decoration: BoxDecoration(
+              //           color: Colors.red,
+              //           borderRadius: BorderRadius.circular(12),
+              //         ),
+              //         constraints: const BoxConstraints(
+              //           minWidth: 6,
+              //           minHeight: 6,
+              //         ),
+              //       ),
+              //     ),
+            ],
           )
         ],
       ),

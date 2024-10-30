@@ -9,8 +9,8 @@ class OrderService {
   String serverAddress = '';
   int? currentStoreId; // 현재 장바구니에 담긴 가게 ID를 저장
 
-  // 주문 api
-  Future<int> order(
+  // 주문
+  Future<void> order(
     String? orderStatus,
     int? storeId,
     int? totalPrice,
@@ -46,13 +46,8 @@ class OrderService {
 
       if (response.statusCode == 200) {
         print('주문 성공: ${response.body}');
-        final responseBody = jsonDecode(response.body);
-        final userId = responseBody['userId'];
-
-        return userId;
       } else {
-        print('주문 실패');
-        return 0;
+        print('주문 실패: ${response.body}');
       }
     } catch (e) {
       print('Error: $e');

@@ -511,6 +511,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             GestureDetector(
                               onTap: () {
+                                print('storeId: $storeId');
                                 // 가게 선택하지 않을 경우 못 들어가게 설정
                                 if (selectedStore.isNotEmpty) {
                                   Navigator.push(

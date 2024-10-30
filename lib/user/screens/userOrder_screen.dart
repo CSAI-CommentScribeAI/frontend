@@ -1,16 +1,16 @@
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
-import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/owner/screens/address_screen.dart';
+import 'package:frontend/user/providers/cart_provider.dart';
+import 'package:frontend/user/providers/userMenu_provider.dart';
 import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/services/cart_service.dart';
 import 'package:frontend/all/services/order_service.dart';
+import 'package:provider/provider.dart';
 
 class UserOrderPage extends StatefulWidget {
-  final StoreModel store;
-  final AddMenuModel menu;
-  const UserOrderPage(this.store, this.menu, {super.key});
+  const UserOrderPage({super.key});
 
   @override
   State<UserOrderPage> createState() => _UserOrderPageState();
@@ -21,60 +21,71 @@ class _UserOrderPageState extends State<UserOrderPage> {
   bool ownerChecked = false;
   bool riderChecked = false;
   bool cart = true;
-  String userAddress = '';
+
   int totalPrice = 0;
   int totalQuantity = 0;
-  Map<int, int> itemCounts = {}; // 각 장바구니의 수량을 저장
-  List<Map<String, dynamic>> orderMenus = []; // 주문 메뉴(주문 api 요청 바디에 있음)
 
-  final List<String> orderStatus = [
-    'REQUEST', // 대기 중
-    'ACCEPT', // 수락
-    'DELIVERED', // 배달 완료
-    'CANCEL',
-  ];
+  String userAddress = '';
+
+  Map<int, int> itemCounts = {}; // 각 장바구니의 수량을 저장
+  Map<String, dynamic> cartInfo = {}; // 해당 주문 정보
+
+  List<Map<String, dynamic>> cartMenu = []; // 해당 주문의 메뉴 정보 리스트
+  List<AddMenuModel> userMenuList = []; // 가게별 메뉴 리스트(가게별 메뉴 조회 API)
+  List<Map<String, dynamic>> cartItems = []; // 주문된 메뉴 리스트(주문 조회 API)
+  List<Map<String, dynamic>> orderMenus = []; // 주문 메뉴(주문 api 요청 바디에 있음)
 
   @override
   void initState() {
     super.initState();
-    fetchUserAddress();
-    calculateTotalPrice();
-    getCartInfo();
-  }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<CartProvider>(context, listen: false).getCart();
 
-  // 장바구니 정보 가져오는 메서드
-  Future<Map<String, dynamic>> getCartInfo() async {
-    try {
-      Map<String, dynamic> cartInfo = await CartService().getCart();
-      if (cartInfo.isEmpty || cartInfo['cartItems'] == null) {
-        throw Exception('장바구니가 비어 있습니다.');
-      }
-      return cartInfo;
-    } catch (e) {
-      print(e);
-      return {};
-    }
-  }
+      setState(() {
+        cartInfo =
+            Provider.of<CartProvider>(context, listen: false).cart; // 주문 정보 저장
 
-  // 주소 가져오기 메서드
-  Future<void> fetchUserAddress() async {
-    Map<String, dynamic> cartInstance = await CartService().getCart();
-    setState(() {
-      if (cartInstance.isNotEmpty) {
-        userAddress = cartInstance['userAddress'];
+        // cartItems를 List<Map<String, dynamic>> 형태로 변환하여 저장
+        cartItems = List<Map<String, dynamic>>.from(
+            cartInfo['cartItems'] ?? []); // 주문된 메뉴 리스트 저장
+      });
+
+      if (cartInfo.isNotEmpty) {
+        if (context.mounted) {
+          await Provider.of<UserMenuProvider>(context, listen: false)
+              .fetchMenus(cartInfo['storeId']);
+
+          setState(() {
+            userMenuList = Provider.of<UserMenuProvider>(context, listen: false)
+                .userMenuList; // 가게별 메뉴 리스트 저장
+
+            // userMenuList와 cartItems를 비교해서 동일한 menuId를 가진 userMenu를 cartMenu에 추가
+            for (var userMenu in userMenuList) {
+              for (var cartItem in cartItems) {
+                if (cartItem['menuId'] == userMenu.id) {
+                  cartMenu.add(userMenu.toJson());
+                }
+              }
+            }
+
+            for (var cartItem in cartItems) {
+              totalPrice += int.parse(cartItem['price'].toString()); // 총 가격
+            }
+          });
+        }
       }
     });
+
+    calculateTotalPrice(); // 총 가격 계산하는 메서드
   }
 
   // 가격 합 계산 함수
   void calculateTotalPrice() async {
-    Map<String, dynamic> cartInstance = await CartService().getCart();
-
     int tempTotalPrice = 0;
     int tempTotalQuantity = 0;
 
-    if (cartInstance.isNotEmpty) {
-      List<dynamic> cartItems = cartInstance['cartItems'];
+    if (cartInfo.isNotEmpty) {
+      List<dynamic> cartItems = cartInfo['cartItems'];
       for (var item in cartItems) {
         int itemId = item['menuId']; // 해당 메뉴 아이디 저장
         int itemCount = itemCounts[itemId] ?? 1; // 수량 업데이트 함수에서 수량 값 들어있음
@@ -117,13 +128,18 @@ class _UserOrderPageState extends State<UserOrderPage> {
         ),
         centerTitle: true,
         backgroundColor: const Color(0xFF374AA3),
-        actions: const [
+        actions: [
           // 홈 화면으로 이동
           Padding(
-            padding: EdgeInsets.only(right: 20),
-            child: Icon(
-              Icons.home,
-              color: Colors.white,
+            padding: const EdgeInsets.only(right: 20),
+            child: IconButton(
+              onPressed: () {
+                print(cartMenu);
+              },
+              icon: const Icon(
+                Icons.home,
+                color: Colors.white,
+              ),
             ),
           ),
         ],
@@ -184,7 +200,7 @@ class _UserOrderPageState extends State<UserOrderPage> {
                           ),
                           const SizedBox(height: 15),
                           Text(
-                            userAddress,
+                            cartInfo['userAddress'] ?? '',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -193,6 +209,7 @@ class _UserOrderPageState extends State<UserOrderPage> {
                         ],
                       ),
                     ),
+
                     // 주소 입력 경고 컨테이너
                     Container(
                       width: double.infinity,
@@ -218,6 +235,7 @@ class _UserOrderPageState extends State<UserOrderPage> {
                 ),
               ),
               const SizedBox(height: 17),
+
               // 주문 내용
               FutureBuilder(
                 future: CartService().getCart(),
@@ -230,22 +248,24 @@ class _UserOrderPageState extends State<UserOrderPage> {
                     return const Text('등록된 장바구니가 없습니다.');
                   } else {
                     final List<dynamic> cartItems = snapshot.data!['cartItems'];
-                    orderMenus = []; // orderMenus 초기화
+                    orderMenus.clear(); // orderMenus 초기화
+
                     return ListView.builder(
                       shrinkWrap: true,
                       physics: const ScrollPhysics(),
                       itemCount: cartItems.length,
                       itemBuilder: (BuildContext context, int index) {
-                        final Map<String, dynamic> cart = cartItems[index];
+                        final Map<String, dynamic> cartItem = cartItems[index];
 
-                        int itemId = cart['menuId']; // 해당 메뉴 아이디 저장
+                        int itemId = cartItem['menuId']; // 해당 메뉴 아이디 저장
                         int itemCount = itemCounts[itemId] ??
                             1; // 수량 값(itemId와 키,값 쌍을 이룸)을 itemCount에 저장(1 초기값)
 
                         // orderMenus에 추가
                         orderMenus.add({
-                          'menuId': cart['menuId'],
-                          'imageUrl': cart['imageUrl'],
+                          'menuId': cartItem['menuId'],
+                          'menuName': cartItem['menuName'],
+                          'imageUrl': cartItem['imageUrl'],
                           'quantity': itemCount,
                         });
 
@@ -278,7 +298,7 @@ class _UserOrderPageState extends State<UserOrderPage> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                cart['menuName'],
+                                                cartItem['menuName'],
                                                 style: const TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
@@ -294,6 +314,8 @@ class _UserOrderPageState extends State<UserOrderPage> {
                                             ],
                                           ),
                                           const SizedBox(height: 20),
+
+                                          // 사진, 가격, 수량
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -304,14 +326,14 @@ class _UserOrderPageState extends State<UserOrderPage> {
                                                 borderRadius:
                                                     BorderRadius.circular(10.0),
                                                 child: Image.network(
-                                                  cart['imageUrl'],
+                                                  cartItem['imageUrl'],
                                                   width: 120,
                                                   alignment: Alignment.topLeft,
                                                 ),
                                               ),
                                               Row(
                                                 children: [
-                                                  Text('${cart['price']}원'),
+                                                  Text('${cartItem['price']}원'),
                                                   const SizedBox(width: 10),
                                                   CartStepperInt(
                                                     value: itemCount,
@@ -343,6 +365,8 @@ class _UserOrderPageState extends State<UserOrderPage> {
                                     ),
                                   ),
                                 ),
+
+                                // 더 담으러 가기 버튼
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 5.0,
@@ -393,6 +417,7 @@ class _UserOrderPageState extends State<UserOrderPage> {
                 },
               ),
               const SizedBox(height: 17),
+
               // 요청사항
               Card(
                 color: Colors.white,
@@ -509,27 +534,24 @@ class _UserOrderPageState extends State<UserOrderPage> {
       bottomNavigationBar: ElevatedButton(
         onPressed: () async {
           try {
-            final cartInfo = await CartService().getCart();
             OrderService().order(
-              orderStatus[0],
-              widget.menu.storeId,
+              'REQUEST',
+              cartInfo['storeId'],
               totalPrice,
               cartInfo,
               orderMenus,
             ); // orderMenus를 주문 API에 포함
 
-            await OrderService().getOrder();
-
             // 결제 화면으로 이동
-            Navigator.push(
-              context,
-              cart
-                  ? MaterialPageRoute(
-                      builder: (context) => CompletePage(
-                            widget.store,
-                          ))
-                  : downToUpRoute(),
-            );
+            // Navigator.push(
+            //   context,
+            //   cart
+            //       ? MaterialPageRoute(
+            //           builder: (context) => CompletePage(
+            //                 store,
+            //               ))
+            //       : downToUpRoute(),
+            // );
           } catch (e) {
             print(e.toString());
           }
@@ -553,30 +575,30 @@ class _UserOrderPageState extends State<UserOrderPage> {
   }
 
   // 아래에서 위로 페이지 이동하는 애니메이션 함수
-  Route downToUpRoute() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          UserOrderPage(widget.store, widget.menu),
+  // Route downToUpRoute() {
+  //   return PageRouteBuilder(
+  //     pageBuilder: (context, animation, secondaryAnimation) =>
+  //         UserOrderPage(widget.store, widget.menu),
 
-      // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.0, 1.0); // 시작점 지정(화면의 아래쪽 의미)
-        const end = Offset.zero; // 원래 위치(화면의 제자리) 지정
-        const curve = Curves.ease; // 부드러운 속도 변화
+  //     // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
+  //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+  //       const begin = Offset(0.0, 1.0); // 시작점 지정(화면의 아래쪽 의미)
+  //       const end = Offset.zero; // 원래 위치(화면의 제자리) 지정
+  //       const curve = Curves.ease; // 부드러운 속도 변화
 
-        // 시작과 끝을 정의(부드럽게 페이지 이동)
-        var tween = Tween(begin: begin, end: end).chain(
-          CurveTween(curve: curve),
-        );
+  //       // 시작과 끝을 정의(부드럽게 페이지 이동)
+  //       var tween = Tween(begin: begin, end: end).chain(
+  //         CurveTween(curve: curve),
+  //       );
 
-        // 위에서 지정했던 애니메이션을 적용하는 위젯
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    );
-  }
+  //       // 위에서 지정했던 애니메이션을 적용하는 위젯
+  //       return SlideTransition(
+  //         position: animation.drive(tween),
+  //         child: child,
+  //       );
+  //     },
+  //   );
+  // }
 
   // 체크박스 컨테이너 위젯
   Widget checkboxContainer(

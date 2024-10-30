@@ -45,7 +45,7 @@ class OrderAndPayBtn extends StatelessWidget {
   Route downToUpRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
-          UserOrderPage(store, userMenu),
+          const UserOrderPage(),
 
       // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
       transitionsBuilder: (context, animation, secondaryAnimation, child) {

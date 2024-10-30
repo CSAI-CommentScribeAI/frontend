@@ -16,13 +16,4 @@ class CartMenuModel {
         menuName = json['menuName'] ?? '', // JSON 키를 'menuName'으로 수정
         imageUrl = json['imageUrl'] ?? '', // JSON 키를 'imageUrl'로 수정
         price = json['price'] ?? 0;
-
-  Map<String, dynamic> toJson() {
-    return {
-      'menuId': menuId, // JSON 키를 'menuId'로 수정
-      'menuName': menuName, // JSON 키를 'menuName'으로 수정
-      'imageUrl': imageUrl, // JSON 키를 'imageUrl'로 수정
-      'price': price
-    };
-  }
 }

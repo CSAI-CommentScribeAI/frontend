@@ -64,4 +64,42 @@ class UserStoreService {
       return [];
     }
   }
+
+  // 가게 조회
+  Future<Map<String, dynamic>> getStore(int storeId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
+
+    if (Platform.isAndroid) {
+      serverAddress = 'http://10.0.2.2:9000/api/v1/store/$storeId';
+    } else if (Platform.isIOS) {
+      serverAddress = 'http://127.0.0.1:9000/api/v1/store/$storeId';
+    }
+
+    try {
+      final url = Uri.parse(serverAddress);
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final utf8Response = utf8.decode(response.bodyBytes);
+        final jsonResponse = jsonDecode(utf8Response);
+        final dataResponse = jsonResponse['data'];
+
+        Map<String, dynamic> store = dataResponse;
+
+        print('가게 조회 성공: $dataResponse');
+        return store;
+      } else {
+        throw Exception(
+            '가게 조회 실패코드 - 응답 본문: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('예외 발생: $e');
+    }
+  }
 }

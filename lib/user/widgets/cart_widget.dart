@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:frontend/user/models/cartMenu_model.dart';
+
 import 'package:frontend/user/services/cart_service.dart';
 import 'package:intl/intl.dart';
 
@@ -144,7 +145,7 @@ class _CartWidgetState extends State<CartWidget> {
               // Navigator.push(
               //   context,
               //   MaterialPageRoute(
-              //     builder: (context) => UserMenuPage(category: category),
+              //     builder: (context) => const StoreSelectPage(),
               //   ),
               // );
             },

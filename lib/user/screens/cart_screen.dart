@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/user/models/cartMenu_model.dart';
 import 'package:frontend/user/screens/userHome_screen.dart';
+import 'package:frontend/user/screens/userOrder_screen.dart';
 import 'package:frontend/user/services/cart_service.dart';
 import 'package:frontend/user/widgets/cart_widget.dart';
 import 'package:intl/intl.dart';
@@ -70,8 +71,8 @@ class _CartItemPageState extends State<CartItemPage> {
               );
               // 데이터 로드 중 에러 발생 시 오류 메세지 표시
             } else if (snapshot.hasError) {
-              return Center(
-                child: Text('Error: ${snapshot.error}'),
+              return const Center(
+                child: Text('장바구니에 담은 메뉴가 없습니다.'),
               );
               // 데이터가 없거나 빈 리스트일 경우 '등록된 가게가 없습니다' 메시지 표시
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -105,13 +106,13 @@ class _CartItemPageState extends State<CartItemPage> {
       ),
       bottomNavigationBar: ElevatedButton(
         onPressed: () async {
-          // Navigator.push(
-          //   context,
-          //   downToUpRoute(),
-          // );
+          Navigator.push(
+            context,
+            downToUpRoute(),
+          );
         }, // 결제 화면으로 이동
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF274AA3),
+          backgroundColor: const Color(0xFF374AA3),
           shape: const BeveledRectangleBorder(
             borderRadius: BorderRadiusDirectional.zero,
           ),
@@ -129,25 +130,25 @@ class _CartItemPageState extends State<CartItemPage> {
   }
 
   // 아래에서 위로 페이지 이동하는 애니메이션 함수
-  // Route downToUpRoute() {
-  //   return PageRouteBuilder(
-  //     pageBuilder: (context, animation, secondaryAnimation) =>
-  //         UserOrderPage(widget.store, widget.userMenu),
-  //     // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
-  //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-  //       const begin = Offset(0.0, 1.0); // 시작점 지정(화면의 아래쪽 의미)
-  //       const end = Offset.zero; // 원래 위치(화면의 제자리) 지정
-  //       const curve = Curves.ease; // 부드러운 속도 변화
-  //       // 시작과 끝을 정의(부드럽게 페이지 이동)
-  //       var tween = Tween(begin: begin, end: end).chain(
-  //         CurveTween(curve: curve),
-  //       );
-  //       // 위에서 지정했던 애니메이션을 적용하는 위젯
-  //       return SlideTransition(
-  //         position: animation.drive(tween),
-  //         child: child,
-  //       );
-  //     },
-  //   );
-  // }
+  Route downToUpRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          const UserOrderPage(),
+      // 페이지 전환 애니메이션 정의(child: 전환될 페이지)
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 1.0); // 시작점 지정(화면의 아래쪽 의미)
+        const end = Offset.zero; // 원래 위치(화면의 제자리) 지정
+        const curve = Curves.ease; // 부드러운 속도 변화
+        // 시작과 끝을 정의(부드럽게 페이지 이동)
+        var tween = Tween(begin: begin, end: end).chain(
+          CurveTween(curve: curve),
+        );
+        // 위에서 지정했던 애니메이션을 적용하는 위젯
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
 }
