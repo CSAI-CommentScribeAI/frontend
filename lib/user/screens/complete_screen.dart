@@ -142,8 +142,8 @@ class _CompletePageState extends State<CompletePage> {
                                       ),
 
                                       // 주문 가게 이미지
-                                      Image.network(
-                                        order.storeImageUrl,
+                                      Image.asset(
+                                        'assets/images/deliverylogo.png',
                                         width: 80,
                                         height: 80,
                                       ),

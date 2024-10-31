@@ -4,6 +4,7 @@ import 'package:frontend/owner/providers/menu_provider.dart';
 import 'package:frontend/owner/providers/order_provider.dart';
 import 'package:frontend/user/providers/cart_provider.dart';
 import 'package:frontend/user/providers/category_provider.dart';
+import 'package:frontend/user/providers/review_provider.dart';
 import 'package:frontend/user/providers/userInfo_provider.dart';
 import 'package:frontend/user/providers/userMenu_provider.dart';
 import 'package:frontend/user/providers/userStore_provider.dart';
@@ -42,6 +43,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => UserStoreProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => LetterProvider()),
+        ChangeNotifierProvider(create: (_) => ReviewProvider()),
       ],
       child: const MyApp(),
     ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/providers/review_provider.dart';
 import 'package:frontend/user/providers/userMenu_provider.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/userHome_screen.dart';
+import 'package:frontend/user/screens/userReview_screen.dart';
 import 'package:frontend/user/services/cart_service.dart';
 import 'package:frontend/user/services/userMenu_service.dart';
 import 'package:intl/intl.dart';
@@ -19,6 +21,7 @@ class UserMenuSelectPage extends StatefulWidget {
 
 class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
   var f = NumberFormat('###,###,###,###');
+  List<Map<String, dynamic>> storeReviewList = [];
 
   @override
   void initState() {
@@ -27,6 +30,14 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Provider.of<UserMenuProvider>(context, listen: false)
           .fetchMenus(widget.store.id);
+
+      await Provider.of<ReviewProvider>(context, listen: false)
+          .getStoreReview(widget.store.id);
+
+      setState(() {
+        storeReviewList =
+            Provider.of<ReviewProvider>(context, listen: false).storeReviewList;
+      });
 
       getMenuData();
     });
@@ -189,11 +200,11 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
                     children: [
                       TextButton(
                         onPressed: () {
-                          showReviewsBottomSheet(context);
+                          showReviewsBottomSheet(context, widget.store.id);
                         },
-                        child: const Text(
-                          '리뷰 93개',
-                          style: TextStyle(
+                        child: Text(
+                          '${storeReviewList.length}개',
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -473,7 +484,8 @@ class _UserMenuSelectPageState extends State<UserMenuSelectPage> {
   }
 }
 
-void showReviewsBottomSheet(BuildContext context) {
+// 리뷰 유형 보는 바텀시트
+void showReviewsBottomSheet(BuildContext context, int storeId) {
   showModalBottomSheet(
     context: context,
     builder: (BuildContext context) {
@@ -503,29 +515,39 @@ void showReviewsBottomSheet(BuildContext context) {
             ),
             const SizedBox(height: 40),
             // 여기에 리뷰 목록을 추가하세요.
-            Row(
-              children: [
-                const Text(
-                  '우리 배달앱 리뷰보기',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UserReviewPage(storeId: storeId),
                   ),
-                ),
-                const SizedBox(width: 184),
-                ClipRRect(
-                  // 둥근 정도 조절
-                  borderRadius: BorderRadius.circular(5.0),
-                  child: SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: Image.asset(
-                      'assets/images/mydelivery.png',
+                );
+              },
+              child: Row(
+                children: [
+                  const Text(
+                    '우리 배달앱 리뷰보기',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 184),
+                  ClipRRect(
+                    // 둥근 정도 조절
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: Image.asset(
+                        'assets/images/mydelivery.png',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 21),
             const Divider(), // 구분선 생성

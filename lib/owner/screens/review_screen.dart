@@ -76,7 +76,7 @@ class _ReviewPageState extends State<ReviewPage> {
 
   Future<List<dynamic>> _getReviews() async {
     // int storeId = await getStoreId();
-    List<dynamic> reviewList = await ReviewService().getReview(storeId);
+    List<dynamic> reviewList = await ReviewService().getStoreReview(storeId);
     setState(() {
       reviewCount = reviewList.length; // 리뷰 개수를 상태 변수에 저장
     });
