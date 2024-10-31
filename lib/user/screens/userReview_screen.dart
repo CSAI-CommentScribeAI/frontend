@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/all/widgets/userReview_widget.dart';
-import 'package:frontend/owner/models/menu_model.dart';
-import 'package:frontend/owner/models/store_model.dart';
+import 'package:frontend/user/providers/review_provider.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/userHome_screen.dart';
+import 'package:frontend/user/services/review_service.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:provider/provider.dart';
 
 class UserReviewPage extends StatefulWidget {
-  final StoreModel? store;
-  final AddMenuModel? userMenu;
-  const UserReviewPage(this.store, this.userMenu, {super.key});
+  final int storeId;
+  const UserReviewPage({required this.storeId, super.key});
   @override
   State<UserReviewPage> createState() => _UserReviewPageState();
 }
@@ -19,35 +19,23 @@ class _UserReviewPageState extends State<UserReviewPage> {
   double rate = 0.0; // 선택된 날짜에 해당하는 리뷰들의 평균 별점
   bool isReplied = false; // 답글 유무
   bool isExpanded = false;
-  List<Map<String, dynamic>> userReviewList = [
-    {
-      // 실제 위젯을 렌더링할 때 이미지가 준비되었는지 확인한 후에 위젯을 생성을 위해
-      // 이미지를 미리 가져와서 사용하기보다는 이미지의 경로를 저장
-      "profileImgPath": 'assets/images/profile1.png',
-      "name": "민택기",
-      "open_date": "2024.01.18",
-      "rate": 4.5,
-      "menu": "필리치즈바비큐스테이크피자",
-      "review":
-          "퇴근후 피자맥주가 땡겨 찾은 이곳 피자에 미치다!하프앤하프로 필리치즈바비큐스테이크피자와 맥앤치즈베이컨피자를 주문했는데요 너무맛있어서 흡입해버렸어요🥹다음에 또오고싶을정도로 추천이요!잘먹었습니다😃",
-      "menuImgPath": 'assets/images/testReviewImg1.png',
-      "reply": "리뷰를 남겨주셔서 감사합니다. 또 이용해주세요^^",
-      "block": false, // 차단 활성화 값 변경 위해 추가
-      "hide": false // 숨김 활성화 값 변경 위해 추가
-    },
-    {
-      "profileImgPath": 'assets/images/profile2.png',
-      "name": "소진수",
-      "open_date": "2024.01.20",
-      "rate": 4.0,
-      "menu": "시칠리안 갈릭쉬림프",
-      "review": "아란치니가 생각보다 히든 메뉴에요:) 술집같은 분위기인데 안주도 꽤나 맛있었어요~",
-      "menuImgPath": 'assets/images/testReviewImg2.png',
-      "reply": "다음에도 더 맛있는 자메이카 통다리 만들어보겠습니다!!!",
-      "block": false,
-      "hide": false
-    },
-  ];
+  List<Map<String, dynamic>> storeReviewList = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<ReviewProvider>(context, listen: false)
+          .getStoreReview(widget.storeId);
+
+      setState(() {
+        storeReviewList =
+            Provider.of<ReviewProvider>(context, listen: false).storeReviewList;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,7 +121,7 @@ class _UserReviewPageState extends State<UserReviewPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '리뷰(${userReviewList.length}건)',
+                  '리뷰(${storeReviewList.length}건)',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -173,108 +161,85 @@ class _UserReviewPageState extends State<UserReviewPage> {
                 color: const Color(0xFF808080).withOpacity(0.7),
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: userReviewList.length, // 리뷰 수 표시
-                physics: const ScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  final userReview = userReviewList[index];
-                  // FutureBuilder : 이미지가 로드될 때까지 기다려 해당 이미지가 준비되면 가져오는 방식
-                  return FutureBuilder(
-                    future: precacheImage(
-                        AssetImage(userReview["profileImgPath"]), context),
-                    builder: (context, profileSnapshot) {
-                      if (profileSnapshot.connectionState ==
-                          ConnectionState.done) {
-                        return FutureBuilder(
-                          future: precacheImage(
-                              AssetImage(userReview["menuImgPath"]), context),
-                          builder: (context, menuSnapshot) {
-                            if (menuSnapshot.connectionState ==
-                                ConnectionState.done) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 25),
-                                child: Column(
-                                  children: [
-                                    // 고객 리뷰
-                                    // reviewList[index](객체 review)를 전달
-                                    UserReview(
-                                      review: userReview,
-                                      visibleTrail: false,
+
+            // 리뷰
+            FutureBuilder(
+                future: ReviewService().getStoreReview(widget.storeId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('등록된 장바구니가 없습니다.');
+                  } else {
+                    return Expanded(
+                      child: ListView.builder(
+                        itemCount: snapshot.data!.length, // 리뷰 수 표시
+                        physics: const ScrollPhysics(),
+                        itemBuilder: (BuildContext context, int index) {
+                          final userReview = snapshot.data![index];
+                          // FutureBuilder : 이미지가 로드될 때까지 기다려 해당 이미지가 준비되면 가져오는 방식
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 25),
+                            child: Column(
+                              children: [
+                                // 고객 리뷰
+                                // reviewList[index](객체 review)를 전달
+                                UserReview(
+                                  review: userReview,
+                                  visibleTrail: false,
+                                ),
+                                const SizedBox(height: 20),
+                                // 답글 달기 버튼
+                                if (userReview['replies']?.isNotEmpty ?? false)
+                                  // 답글이 생성되었을 때
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.only(
+                                        right: 20.0, bottom: 10.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(5.0),
                                     ),
-                                    const SizedBox(height: 20),
-                                    // 답글 달기 버튼
-                                    // 아마도 작성 유형이나 답글 등록 버튼 누를 때 isReplied 값 상태 변경할 예정
-                                    if (isReplied)
-                                      // 답글이 생성되었을 때
-                                      Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.only(
-                                            right: 20.0, bottom: 10.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black.withOpacity(0.1),
-                                          borderRadius:
-                                              BorderRadius.circular(5.0),
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            // 사장님 프로필과 등록 날짜
-                                            ListTile(
-                                              leading: const CircleAvatar(
-                                                backgroundImage: AssetImage(
-                                                    'assets/images/sajang.png'),
-                                              ),
-                                              title: Text(
-                                                '사장님',
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black
-                                                      .withOpacity(0.6),
-                                                ),
-                                              ),
-                                              subtitle: Text(
-                                                '2024.01.19',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.black
-                                                      .withOpacity(0.6),
-                                                ),
-                                              ),
+                                    child: Column(
+                                      children: [
+                                        // 사장님 프로필과 등록 날짜
+                                        ListTile(
+                                          leading: const CircleAvatar(
+                                            backgroundImage: AssetImage(
+                                                'assets/images/sajang.png'),
+                                          ),
+                                          title: Text(
+                                            '사장님',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color:
+                                                  Colors.black.withOpacity(0.6),
                                             ),
-                                            // 답글
-                                            Text(userReview["reply"]),
-                                            const SizedBox(height: 15),
-                                          ],
+                                          ),
+                                          subtitle: Text(
+                                            '2024.01.19',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color:
+                                                  Colors.black.withOpacity(0.6),
+                                            ),
+                                          ),
                                         ),
-                                      )
-                                  ],
-                                ),
-                              );
-                            } else {
-                              return const SizedBox(
-                                height: 48,
-                                child: Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            }
-                          },
-                        );
-                      } // 가져오는 것을 대기하고 있을 때 로딩 인디케이터로 로딩 중 표시
-                      else {
-                        return const SizedBox(
-                          height: 48,
-                          child: Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      }
-                    },
-                  );
-                },
-              ),
-            ),
+                                        const SizedBox(height: 15),
+                                      ],
+                                    ),
+                                  )
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }
+                })
           ],
         ),
       ),

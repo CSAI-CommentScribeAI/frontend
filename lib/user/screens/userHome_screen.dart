@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/store_model.dart';
 import 'package:frontend/user/models/category_model.dart';
-import 'package:frontend/user/providers/cart_provider.dart';
 import 'package:frontend/user/providers/category_provider.dart';
 import 'package:frontend/user/providers/userInfo_provider.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
+import 'package:frontend/user/screens/complete_screen.dart';
 import 'package:frontend/user/screens/storeSelect_screen.dart';
 import 'package:frontend/user/screens/userAddress_screen.dart';
 import 'package:frontend/user/services/userStore_service.dart';
@@ -164,19 +164,21 @@ class _UserHomePageState extends State<UserHomePage> {
         ),
         centerTitle: false,
         actions: [
-          GestureDetector(
-            onTap: () {},
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Padding(
-                padding: const EdgeInsets.only(right: 10.0),
-                child: Image.asset(
-                  'assets/images/bottom_my.png',
-                  width: 20,
-                  height: 24,
-                  color: Colors.white,
+          IconButton(
+            padding: const EdgeInsets.only(right: 10.0), // 패딩 설정
+            constraints: const BoxConstraints(),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CompletePage(),
                 ),
-              ),
+              );
+            },
+            icon: const Icon(
+              Icons.receipt_long_outlined,
+              color: Colors.white,
+              size: 27,
             ),
           ),
 

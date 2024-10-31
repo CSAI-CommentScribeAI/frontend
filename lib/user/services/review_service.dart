@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
-import 'package:frontend/all/models/review_model.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -100,28 +99,25 @@ class ReviewService {
       // 200 : 요청 성공
       if (response.statusCode == 200) {
         final utf8Response = utf8.decode(response.bodyBytes);
-        final reviewResponse = jsonDecode(utf8Response);
+        final jsonResponse = jsonDecode(utf8Response);
+        final dataResponse = jsonResponse['data'];
 
-        final orderReview = reviewResponse['data'];
-        print('주문 리뷰 요청 성공: $orderReview');
+        print('주문 리뷰 요청 성공: $dataResponse');
 
-        return orderReview;
+        return dataResponse;
       } else {
         // 요청 실패 시
-        print('주문 리뷰 요청 실패: ${response.statusCode}');
-        print('응답 본문: ${response.body}');
-
-        return {};
+        throw Exception(
+            '주문 리뷰 요청 실패: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       // 예외 발생 시
-      print('예외 발생: $e');
-      return {};
+      throw Exception('예외 발생: $e');
     }
   }
 
   // 가게별 가게 리뷰 API
-  Future<List<dynamic>> getReview(int storeId) async {
+  Future<List<Map<String, dynamic>>> getStoreReview(int storeId) async {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
 
@@ -143,25 +139,61 @@ class ReviewService {
 
       if (response.statusCode == 200) {
         final utf8Response = utf8.decode(response.bodyBytes);
-        final dynamic jsonResponse = jsonDecode(utf8Response);
+        final jsonResponse = jsonDecode(utf8Response);
+        final List<dynamic> dataResponse = jsonResponse['data'];
+        final List<Map<String, dynamic>> formattedData =
+            List<Map<String, dynamic>>.from(dataResponse);
 
-        if (jsonResponse is Map && jsonResponse['data'] is List) {
-          final List<dynamic> reviewInstance = jsonResponse['data'];
-          print('JSON 데이터: $reviewInstance');
-          print('조회 성공 $reviewInstance');
-          return reviewInstance;
-        } else {
-          print('응답이 예상과 다름: $jsonResponse');
-          return [];
-        }
+        print('가게별 리뷰 조회 성공: $formattedData');
+        return formattedData;
       } else {
-        print('조회 실패: ${response.statusCode}');
-        print('응답 본문: ${response.body}');
-        return [];
+        throw Exception('조회 실패: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      print('예외 발생: $e');
-      return [];
+      throw Exception('예외 발생: $e');
+    }
+  }
+
+  // 사용자 리뷰 요청 API
+  Future<List<Map<String, dynamic>>> getUserReview(int userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken') ?? '';
+
+    String serverAddress;
+    if (Platform.isAndroid) {
+      serverAddress = 'http://10.0.2.2:9000/api/v1/comment/user/$userId';
+    } else if (Platform.isIOS) {
+      serverAddress = 'http://127.0.0.1:9000/api/v1/comment/user/$userId';
+    } else {
+      throw Exception("Unsupported platform");
+    }
+
+    try {
+      final url = Uri.parse(serverAddress);
+      final headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      // Get 요청
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final utf8Response = utf8.decode(response.bodyBytes);
+        final jsonResponse = jsonDecode(utf8Response);
+
+        // `dataResponse`를 `List<Map<String, dynamic>>` 형식으로 변환
+        final List<dynamic> dataResponse = jsonResponse['data'];
+        final List<Map<String, dynamic>> formattedData =
+            List<Map<String, dynamic>>.from(dataResponse);
+
+        print('사용자 리뷰 조회 성공 $formattedData');
+        return formattedData;
+      } else {
+        throw Exception('사용자 조회 실패: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('예외 발생: $e');
     }
   }
 }
