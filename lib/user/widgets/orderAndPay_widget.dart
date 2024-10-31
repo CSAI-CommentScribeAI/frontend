@@ -18,11 +18,11 @@ class OrderAndPayBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.push(
-            context,
-            cart
-                ? MaterialPageRoute(builder: (context) => CompletePage(store))
-                : downToUpRoute());
+        // Navigator.push(
+        //     context,
+        //     cart
+        //         ? MaterialPageRoute(builder: (context) => CompletePage(store))
+        //         : downToUpRoute());
       }, // 결제 화면으로 이동
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF274AA3),
