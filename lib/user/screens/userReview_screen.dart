@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/all/widgets/userReview_widget.dart';
-import 'package:frontend/user/providers/review_provider.dart';
+import 'package:frontend/all/providers/review_provider.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/userHome_screen.dart';
-import 'package:frontend/user/services/review_service.dart';
+import 'package:frontend/all/services/review_service.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
