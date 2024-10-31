@@ -167,17 +167,17 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                           TextButton(
                                             onPressed: () {
                                               print(order.storeId);
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        OrderReviewPage(
-                                                            storeId:
-                                                                order.storeId,
-                                                            orderId: order
-                                                                .orderId) // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
-                                                    ),
-                                              );
+                                              // Navigator.push(
+                                              //   context,
+                                              //   MaterialPageRoute(
+                                              //       builder: (context) =>
+                                              //           OrderReviewPage(
+                                              //               storeId:
+                                              //                   order.storeId,
+                                              //               orderId: order
+                                              //                   .orderId) // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
+                                              //       ),
+                                              // );
                                             },
                                             style: TextButton.styleFrom(
                                               foregroundColor: Colors.black,

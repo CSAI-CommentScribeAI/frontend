@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:frontend/all/providers/review_provider.dart';
 
 import 'package:frontend/user/services/reply_service.dart';
-import 'package:frontend/user/services/review_service.dart';
+import 'package:frontend/all/services/review_service.dart';
+import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
 
 class OrderReviewPage extends StatefulWidget {
-  final int storeId;
   final int orderId;
-  const OrderReviewPage(
-      {required this.storeId, required this.orderId, super.key});
+  const OrderReviewPage({required this.orderId, super.key});
 
   @override
   State<OrderReviewPage> createState() => _OrderReviewPageState();
@@ -27,6 +28,8 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
   String reply = ''; // 등록한 답글
   String profileLink =
       'https://cdata2.tsherpa.co.kr/tsherpa/ssam_channel/resource/channel/images/content_img/img_profile_01.png';
+
+  Map<String, dynamic> orderReviewMap = {}; // 주문별 리뷰
 
   // 답글 작성 유형 리스트
   List<Map<String, dynamic>> writeList = [
@@ -82,19 +85,19 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
     }
   }
 
-  // 리뷰 아이디 가져오는 함수
-  Future<int> getReviewId() async {
-    Map<String, dynamic> reviewMap =
-        await ReviewService().getOrderReview(widget.orderId);
-    int? reviewId;
+  @override
+  void initState() {
+    super.initState();
 
-    reviewId = reviewMap['orderId'];
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<ReviewProvider>(context, listen: false)
+          .getOrderReview(widget.orderId);
 
-    if (reviewId == null) {
-      throw Exception("No review found");
-    }
-
-    return reviewId;
+      setState(() {
+        orderReviewMap =
+            Provider.of<ReviewProvider>(context, listen: false).orderReviewList;
+      });
+    });
   }
 
   @override
@@ -285,11 +288,43 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
                             ? Center(
                                 child: ElevatedButton(
                                   onPressed: () async {
-                                    int reviewId = await getReviewId();
-                                    String AIReply = await ReplyService()
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (BuildContext context) {
+                                        return Center(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Lottie.asset(
+                                                'assets/loading/Animation - 1730336079955.json',
+                                                width: 200,
+                                                height: 200,
+                                                fit: BoxFit.contain,
+                                              ),
+                                              const Text(
+                                                '작성 중...',
+                                                style: TextStyle(
+                                                  fontSize: 30,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
+
+                                    int reviewId = orderReview['orderId'];
+
+                                    String aiReply = await ReplyService()
                                         .writeAIReply(reviewId);
+
+                                    Navigator.pop(context);
+
                                     setState(() {
-                                      replyController.text = AIReply;
+                                      replyController.text =
+                                          aiReply; // ai로 작성된 답글을 replyController.text에 저장
                                       isVisible = false;
                                     });
                                   },
@@ -327,9 +362,14 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
           if (formKey.currentState!.validate()) {
             formKey.currentState!.save();
             try {
+              int reviewId = orderReviewMap['orderId'];
+
               await ReplyService()
-                  .resisterReply(await getReviewId(), replyController.text);
-              Navigator.pop(context);
+                  .resisterReply(reviewId, replyController.text);
+
+              if (context.mounted) {
+                Navigator.pop(context);
+              }
               print(replyController.text);
             } catch (e) {
               print('예외 발생: ${e.toString()}');

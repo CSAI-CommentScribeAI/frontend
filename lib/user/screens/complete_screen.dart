@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/user/models/order_model.dart';
 import 'package:frontend/user/screens/userHome_screen.dart';
 import 'package:frontend/user/screens/write_screen.dart';
-import 'package:frontend/user/services/review_service.dart';
+import 'package:frontend/all/services/review_service.dart';
 import 'package:frontend/user/services/userOrder_service.dart';
 import 'package:intl/intl.dart';
 

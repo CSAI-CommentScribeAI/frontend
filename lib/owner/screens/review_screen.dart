@@ -5,7 +5,7 @@ import 'package:frontend/owner/screens/filtering_screen.dart';
 import 'package:frontend/owner/services/store_service.dart';
 import 'package:frontend/owner/widgets/circle_widget.dart';
 import 'package:frontend/user/services/reply_service.dart';
-import 'package:frontend/user/services/review_service.dart';
+import 'package:frontend/all/services/review_service.dart';
 
 class ReviewPage extends StatefulWidget {
   final String selectedStore;

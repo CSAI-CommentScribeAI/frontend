@@ -6,7 +6,6 @@ import 'package:frontend/owner/services/delivery_service.dart';
 import 'package:frontend/owner/services/letter_service.dart';
 import 'package:frontend/owner/widgets/store_widget.dart';
 import 'package:frontend/user/models/order_model.dart';
-import 'package:frontend/user/services/review_service.dart';
 
 class ReceiptPage extends StatefulWidget {
   final int storeId;
@@ -650,26 +649,19 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                         if (order.orderStatus == "DELIVERED")
                                           TextButton(
                                             onPressed: () async {
-                                              // final orderId = await getOrderId();
                                               try {
-                                                await ReviewService()
-                                                    .getOrderReview(
-                                                        order.orderId);
-
-                                                print(order.orderId);
-                                                print(widget.storeId);
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          OrderReviewPage(
-                                                            storeId:
-                                                                widget.storeId,
-                                                            orderId:
-                                                                order.orderId,
-                                                          ) // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
-                                                      ),
-                                                );
+                                                if (context.mounted) {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            OrderReviewPage(
+                                                              orderId:
+                                                                  order.orderId,
+                                                            ) // ReceiptPage에서는 selectedStore에 orderList의 title을 집어넣음
+                                                        ),
+                                                  );
+                                                }
                                               } catch (e) {
                                                 print(e.toString());
                                               }

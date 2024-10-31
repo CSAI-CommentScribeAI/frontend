@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/owner/models/menu_model.dart';
 import 'package:frontend/owner/models/store_model.dart';
-import 'package:frontend/user/providers/review_provider.dart';
+import 'package:frontend/all/providers/review_provider.dart';
 import 'package:frontend/user/providers/userMenu_provider.dart';
 import 'package:frontend/user/screens/cart_screen.dart';
 import 'package:frontend/user/screens/userHome_screen.dart';
